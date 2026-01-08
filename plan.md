@@ -4,6 +4,93 @@
 
 A personal finance management application with AI-powered transaction categorization and an intelligent chatbot assistant. Users can track accounts, categorize transactions, set spending/saving goals, and visualize their financial health.
 
+## Table of Contents
+
+- AI-Powered Budget App - Development Plan
+  - Project Overview
+  - Tech Stack
+    - Frontend
+    - Backend
+    - AI/LLM
+    - Future Considerations
+  - Data Model
+    - Core Tables
+      - `users`
+      - `accounts`
+      - `categories`
+      - `subcategories`
+      - `transactions`
+      - `spending_goals`
+      - `saving_goals`
+      - `ai_corrections`
+      - `user_preferences`
+      - `chat_sessions`
+      - `chat_messages`
+  - Application Architecture
+    - File Structure
+  - Key Features & Specifications
+    - 1. Authentication
+    - 2. Setup/Onboarding
+    - 3. Transaction Management
+      - Input Methods
+      - Most Recent Activity Panel
+      - Transaction History
+    - 4. Dashboard
+      - Date Range Selector
+      - Account Summary Table
+      - Category Summary Table
+      - Visualizations
+      - Financial Health Score
+    - 5. Budget Goals
+      - Spending Goals
+      - Saving Goals
+    - 6. AI Features
+      - Statement Parsing & Transaction Categorization (_Core Feature_)
+      - AI Chatbot (_Core Feature_)
+  - Development Phases
+    - Phase 0: Project Setup & Infrastructure
+    - Phase 1: Database Schema & Backend Setup
+    - Phase 2: Authentication & User Management
+    - Phase 3: Core Data Models (Accounts, Categories, Subcategories)
+    - Phase 4: Transaction Management (CRUD)
+    - Phase 5: Dashboard - Basic Views & Tables
+    - Phase 6: Dashboard - Visualizations
+    - Phase 7: AI Integration - Single Transaction Categorization
+    - Phase 8: Statement Parsing with Regex + Parallel Batch Categorization
+    - Phase 9: AI Chatbot Side Panel
+    - Phase 10: Budget Goals & Tracking
+    - Phase 11: Financial Health Score
+    - Phase 12: Polish, Testing & Deployment
+      - 12.1: UI/UX Polish
+      - 12.2: Performance Optimization
+      - 12.3: Unit Testing
+      - 12.4: Integration Testing
+      - 12.5: End-to-End Testing
+      - 12.6: Security Review
+      - 12.7: Documentation
+      - 12.8: Error Monitoring & Logging
+      - 12.9: Deployment
+      - 12.10: Beta Testing
+      - 12.11: Launch Checklist
+  - Future Enhancements (Not in Initial Phases)
+  - Key Recommendations
+    - AI Implementation Best Practices
+      - AI Categorization Optimization Factors
+    - Data Management Best Practices
+    - UX Best Practices
+    - Performance Considerations
+    - Security Considerations
+    - Name Constraints
+      - Naming Rules
+      - Renaming Behavior
+      - Deletion Rules
+  - Success Metrics
+  - Questions & Decisions
+    - Answered
+    - Deferred (for future phases)
+  - Development Tips for AI Agents
+  - Phase Completion Checklist
+
 ---
 
 ## Tech Stack
@@ -18,6 +105,11 @@ A personal finance management application with AI-powered transaction categoriza
   - Recharts (line charts, bar charts)
   - @nivo/sankey (Sankey diagrams)
 - **State Management**: React Context + hooks (consider Zustand if complexity grows)
+- **Theme**: Dark mode only (fast, lightweight aesthetic)
+- **Design Philosophy**:
+  - Prioritize speed and responsiveness
+  - Lightweight, minimal design
+  - Interactive hover effects on icons and buttons
 
 ### Backend
 
@@ -48,6 +140,10 @@ A personal finance management application with AI-powered transaction categoriza
 - User analytics and usage data collection
 - MCP (Model Context Protocol) server for external integrations
 - Bill reminders with notifications
+- **Payment System**: Stripe integration for subscription model
+  - Free trial: One week of free AI chatbot access
+  - Paid tier: $5/month after trial
+  - Friend access management (complimentary access for specific users)
 
 ---
 
@@ -646,19 +742,34 @@ When user manually inputs one transaction (not via statement parsing):
 - Access to all user data (accounts, transactions, categories, goals)
 - Can perform actions on user's behalf:
   - Create accounts, categories, subcategories
-  - Add transactions
+  - Add transactions (must correctly characterize as expense vs income vs transfer)
   - Set up budget goals
   - Modify settings
 - Conversational onboarding (alternative to setup forms)
 - Offers budget templates (50/30/20 rule, zero-based budgeting)
 - Answers questions about spending patterns
 - Provides financial advice based on user's data
+- **Transaction Intelligence**:
+  - Properly categorizes expense vs income vs transfer
+  - Detects duplicate transfers (checks if opposite transfer already exists)
+  - Has access to SQL database of transactions with comprehensive filter capabilities
+  - Learns from user patterns over time
+- **User Communication**:
+  - Inform users that AI improves and adapts to their patterns over time
+  - Show transparency when agent is "thinking" or using tools (no blank screen)
+  - Display active tool calls and reasoning process
 
 **Personality Settings** (user-configurable in Settings):
 
 - **Professional**: Formal, data-focused, concise
 - **Friendly**: Encouraging, uses emojis, conversational
 - **Stern**: Direct, pushes user on overspending, accountability-focused
+
+**AI Configuration**:
+
+- **Temperature**: Set to 0 for consistent, deterministic responses
+- **Context Management**: Keep agent focused on approved financial topics
+- **Tool Transparency**: Display which tools/functions the AI is calling in real-time
 
 **Implementation** (VS Code-style side panel):
 
@@ -725,6 +836,16 @@ Each phase should be completed and tested before moving to the next. Phases are 
 11. Create basic Router.tsx with placeholder routes
 12. Create basic App.tsx with header including AI chat toggle button placeholder
 13. Create basic AppLayout.tsx component (header with nav and chat toggle button)
+14. Configure dark mode theme:
+    - Set up dark color palette in Tailwind config
+    - Ensure all shadcn/ui components use dark theme
+    - Add hover effects for interactive elements
+    - Test responsive behavior across devices
+15. Establish design standards:
+    - Create reusable animation/transition patterns
+    - Define spacing and typography system
+    - Set up loading states and skeletons
+    - Document component styling patterns
 
 **Deliverables**:
 
@@ -1668,7 +1789,11 @@ Each phase should be completed and tested before moving to the next. Phases are 
   - ARIA labels
   - Keyboard navigation
   - Screen reader testing
-- Dark mode support (optional but recommended)
+- **Dark mode verification**: Ensure dark theme is consistently applied
+  - All components follow dark theme palette
+  - Proper contrast ratios for readability
+  - Interactive elements have visible hover states
+  - Loading states and animations work well in dark mode
 
 #### 12.2: Performance Optimization
 
@@ -1893,6 +2018,49 @@ These features are noted but not part of the MVP development plan:
     - Detect and suggest recurring payment patterns
     - Calendar integration for bill due dates
 
+14. **Financial Projections** (High Priority Future Feature)
+
+    - **Overview**: Project account balances and net worth into the future
+    - **Time Horizons**: Support various projection periods (months, years, decades)
+    - **Projection Models**:
+      - **Baseline Model**: Assume user adheres to current budget/spending patterns
+      - **Budget-Based**: Project based on user's set spending goals for each subcategory
+      - **Custom Scenarios**: Allow user to define specific assumptions
+    - **Variable Inputs**:
+      - **Rate Changes** (static or year-over-year):
+        - Expense increases (e.g., "expenses will increase 3% annually")
+        - Income changes (e.g., "income will increase 5% at year 2")
+        - Subcategory-specific rates (e.g., "rent increases 2% YoY")
+      - **Lump Sum Events**:
+        - One-time expenses (e.g., "$50K house down payment in 2028")
+        - Windfalls (e.g., "$20K bonus in Q4 2027")
+        - Major purchases or life events
+      - **Account Growth Rates**:
+        - Savings account interest rates (e.g., 4.5% APY)
+        - Investment account returns (e.g., 7% annually)
+        - Debt payoff schedules (e.g., mortgage amortization)
+    - **Inflation Adjustment**:
+      - Toggle between nominal and real (inflation-adjusted) terms
+      - User-configurable inflation rate
+      - Default: use historical/current inflation data
+    - **Visualization**:
+      - Multi-line chart showing projected balances over time
+      - Scenario comparison (baseline vs. optimistic vs. conservative)
+      - Highlight key milestones (e.g., "Savings goal reached in 3.2 years")
+    - **What-If Analysis**:
+      - Interactive sliders to adjust assumptions in real-time
+      - See immediate impact of changes on projections
+      - Compare multiple scenarios side-by-side
+    - **Goal Integration**:
+      - Show when saving goals will be reached under current trajectory
+      - Suggest adjustments to meet goals by target date
+      - Alert if goals become unrealistic based on spending patterns
+    - **Implementation Notes**:
+      - Build after core features are stable (Phase 13+)
+      - Use compound growth formulas for investment accounts
+      - Consider Monte Carlo simulation for probability ranges (advanced)
+      - Export projection reports as PDF
+
 ---
 
 ## Key Recommendations
@@ -2055,6 +2223,42 @@ Key variables to tune for optimal performance, cost, and accuracy:
 - **Input validation**: Both client-side and server-side
 - **Sensitive data**: Never log transaction details or user financial data
 - **API keys**: Use environment variables, never commit to Git
+- **Encryption & Privacy** (Privacy-First Approach):
+  - **At Rest**: Supabase encrypts all data at rest by default
+  - **In Transit**: HTTPS/TLS for all API communication
+  - **Client-Side Encryption** (consider for future):
+    - Encrypt sensitive transaction data before sending to database
+    - User holds encryption key (zero-knowledge architecture)
+    - Trade-off: Limits server-side aggregation and AI analysis
+  - **Data Minimization**: Only collect essential financial data
+  - **User Data Control**:
+    - Full data export functionality
+    - Complete account deletion (including all transactions)
+    - Transparency about what data is stored and how it's used
+  - **AI Privacy**:
+    - Transaction data sent to AI is anonymized where possible
+    - No long-term storage of raw transactions by AI provider
+    - User consent for AI processing
+  - **Third-Party Audits**: Consider SOC 2 compliance (if scaling)
+- **Computation Strategy**:
+  - **Client-Side** (Browser):
+    - UI rendering and interactions
+    - Form validation
+    - Simple calculations (running balances for display)
+    - Chart data transformation
+    - Local caching and state management
+  - **Server-Side** (Vercel Functions + Supabase):
+    - Authentication
+    - Database queries and aggregations
+    - AI categorization calls
+    - Complex financial calculations (health score, projections)
+    - Batch processing (statement parsing)
+  - **Rules of Thumb**:
+    - Sensitive operations: server-side (security)
+    - Expensive operations: server-side (performance, especially for large datasets)
+    - Interactive UX: client-side when possible (responsiveness)
+    - Data aggregation: prefer database/server-side (efficiency)
+    - Balance between: Offload heavy computation to server, but keep UI responsive with optimistic updates
 
 ### Name Constraints
 

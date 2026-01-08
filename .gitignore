@@ -60,3 +60,8 @@ coverage/
 # Misc
 .turbo/
 .vercel
+
+# Excel files
+*.xls
+*.xlsx
+*.xlsm
