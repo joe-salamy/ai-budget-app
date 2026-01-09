@@ -537,7 +537,6 @@ This unified feature handles both parsing pasted statements and categorizing tra
 
 - **No AI used** - purely pattern matching
 - **Process**:
-
   1. User pastes statement text into textarea
   2. Apply regex patterns to identify transaction rows
   3. Extract fields from each row:
@@ -555,12 +554,10 @@ This unified feature handles both parsing pasted statements and categorizing tra
 
   ```javascript
   // Credit card statement: "01/15/2026  AMAZON.COM  -$45.99"
-  const pattern1 =
-    /(\d{2}\/\d{2}\/\d{4})\s+([A-Za-z0-9\s\.]+)\s+[-]?\$?([\d,]+\.\d{2})/;
+  const pattern1 = /(\d{2}\/\d{2}\/\d{4})\s+([A-Za-z0-9\s\.]+)\s+[-]?\$?([\d,]+\.\d{2})/;
 
   // Bank statement: "2026-01-15 | Whole Foods #123 | $87.23 | Debit"
-  const pattern2 =
-    /(\d{4}-\d{2}-\d{2})\s*\|\s*([^|]+)\s*\|\s*\$?([\d,]+\.\d{2})/;
+  const pattern2 = /(\d{4}-\d{2}-\d{2})\s*\|\s*([^|]+)\s*\|\s*\$?([\d,]+\.\d{2})/;
 
   // Generic: flexible pattern matching
   const datePattern = /\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}/;
@@ -568,7 +565,6 @@ This unified feature handles both parsing pasted statements and categorizing tra
   ```
 
 - **Multiple Format Support**:
-
   - Try each pattern sequentially
   - Use the pattern with most successful matches
   - Fall back to line-by-line parsing if no pattern matches well
@@ -620,7 +616,6 @@ This unified feature handles both parsing pasted statements and categorizing tra
 
 - **Only runs for transactions not found in lookup**
 - **Process**:
-
   1. Collect all transactions marked as `needs_ai`
   2. Split into batches of 10 transactions each
   3. Send multiple batches to AI **in parallel** (concurrent API calls)
@@ -628,7 +623,6 @@ This unified feature handles both parsing pasted statements and categorizing tra
   5. Merge results back into transaction list
 
 - **Batch Configuration**:
-
   - **Batch size**: 20-50 transactions per API call (test for optimal amount)
     - Small enough to complete quickly (~1-2 seconds per batch)
     - Large enough to reduce total API calls
@@ -641,9 +635,7 @@ This unified feature handles both parsing pasted statements and categorizing tra
 - **Implementation Example**:
 
   ```javascript
-  const uncategorized = transactions.filter(
-    (t) => t.categorization_method === "needs_ai"
-  );
+  const uncategorized = transactions.filter((t) => t.categorization_method === "needs_ai");
   const batches = chunkArray(uncategorized, 10); // Split into groups of 10
 
   // Process batches in parallel
@@ -1691,7 +1683,6 @@ Each phase should be completed and tested before moving to the next. Phases are 
 **Tasks**:
 
 1. Create scoring service (`/src/services/scoring.ts`):
-
    - calculateFinancialHealthScore(userId, startDate, endDate): returns 0-100 score
    - **Scoring Algorithm** (recommended):
 
@@ -1931,13 +1922,11 @@ Each phase should be completed and tested before moving to the next. Phases are 
 These features are noted but not part of the MVP development plan:
 
 1. **Multi-Currency Support**
-
    - Add currency field to accounts
    - Exchange rate handling
    - Currency conversion in dashboard
 
 2. **CSV Import/Export & Data Downloads**
-
    - Import transactions from CSV file upload
    - Export all transaction data to CSV
    - Export account/category data to CSV
@@ -1945,29 +1934,24 @@ These features are noted but not part of the MVP development plan:
    - Bulk export (all data + visuals in ZIP file)
 
 3. **PDF Statement Parsing**
-
    - OCR integration for PDF statements
    - Support for various bank statement formats
 
 4. **Recurring Transactions**
-
    - Detect recurring patterns (subscriptions, rent)
    - Auto-suggest adding recurring transactions
    - Reminders for expected recurring transactions
 
 5. **Multi-User/Family Accounts**
-
    - Share accounts/budgets with family members
    - Role-based permissions
    - Individual vs. shared views
 
 6. **Better Auth Migration**
-
    - Evaluate Better Auth as alternative to Supabase Auth
    - Migration guide if switching
 
 7. **Bank Account Linking**
-
    - Plaid integration for automatic transaction syncing
    - Link bank accounts, credit cards, investment accounts
    - Auto-import transactions daily
@@ -1975,13 +1959,11 @@ These features are noted but not part of the MVP development plan:
    - Handle auth/re-auth flows
 
 8. **Mobile App**
-
    - React Native version
    - Camera receipt scanning
    - Push notifications for budget alerts
 
 9. **MCP Server Integration**
-
    - Build Model Context Protocol (MCP) server
    - Expose budget app data and functions to external AI tools
    - Allow AI assistants (Claude, ChatGPT) to access user's financial data
@@ -1989,7 +1971,6 @@ These features are noted but not part of the MVP development plan:
    - Secure authentication and authorization for MCP clients
 
 10. **User Analytics & Data Collection**
-
     - Anonymous usage analytics (privacy-focused)
     - Feature adoption tracking
     - Error monitoring and crash reporting
@@ -1998,19 +1979,16 @@ These features are noted but not part of the MVP development plan:
     - Aggregate spending insights (anonymized, opt-in)
 
 11. **Investment Tracking**
-
     - Track stock/crypto holdings
     - Portfolio visualization
     - ROI calculations
 
 12. **Tax Preparation**
-
     - Export tax-relevant transactions
     - Categorize for tax purposes
     - Generate tax reports
 
 13. **Bill Reminders & Recurring Payments**
-
     - Set up bill due dates
     - Push/email/in-app notifications
     - Mark bills as paid automatically or manually
@@ -2019,7 +1997,6 @@ These features are noted but not part of the MVP development plan:
     - Calendar integration for bill due dates
 
 14. **Financial Projections** (High Priority Future Feature)
-
     - **Overview**: Project account balances and net worth into the future
     - **Time Horizons**: Support various projection periods (months, years, decades)
     - **Projection Models**:
@@ -2079,7 +2056,6 @@ These features are noted but not part of the MVP development plan:
 Key variables to tune for optimal performance, cost, and accuracy:
 
 1. **Batch Size** (transactions per API call)
-
    - **Recommendation**: 20-50 transactions per batch for statement parsing
    - **Tradeoffs**:
      - Smaller batches (1-10): Higher cost, more API calls, but faster failure recovery
@@ -2089,7 +2065,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **Testing**: Monitor success rate per batch size to find optimal point
 
 2. **Context Window Size** (historical transactions included)
-
    - **Recommendation**: Last 50-100 user transactions with categories
    - **Tradeoffs**:
      - More context (100-200): Better accuracy for ambiguous cases, but higher token cost
@@ -2099,7 +2074,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **Optimization**: Include only distinct transaction names (deduplicate)
 
 3. **AI Corrections History**
-
    - **Recommendation**: Include all corrections where AI was wrong (up to 50 most recent)
    - **Purpose**: Direct feedback loop - "I was wrong about X, it's actually Y"
    - **Tradeoffs**:
@@ -2108,7 +2082,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **Implementation**: Query ai_corrections table, include in dedicated prompt section
 
 4. **Model Selection**
-
    - **Gemini 1.5 Flash** (recommended starting point):
      - Speed: Very fast (~1-2 seconds)
      - Cost: $0.075 per 1M input tokens, $0.30 per 1M output tokens
@@ -2122,7 +2095,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **When to upgrade**: If Flash accuracy < 85% after prompt optimization
 
 5. **Prompt Engineering**
-
    - **Structure**: System role + context + task + output format
    - **Optimization techniques**:
      - Use few-shot examples (include 3-5 example categorizations in prompt)
@@ -2132,7 +2104,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **Testing**: A/B test prompt variations, track accuracy
 
 6. **Caching Strategy**
-
    - **Lookup cache** (database):
      - Check transactions table: same name + account → use previous category
      - Effectiveness: ~60-80% of transactions are recurring
@@ -2144,13 +2115,11 @@ Key variables to tune for optimal performance, cost, and accuracy:
      - Cost: Minimal storage cost
 
 7. **Rate Limiting & Throttling**
-
    - **User-level limits**: Prevent abuse (e.g., 100 AI categorizations per day for free tier)
    - **API request batching**: Queue individual categorization requests, batch every 5 seconds
    - **Graceful degradation**: If rate limit hit, fall back to "Unassigned"
 
 8. **Monitoring & Metrics**
-
    - Track per API call:
      - Token usage (input + output)
      - Response time
@@ -2163,7 +2132,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - Use metrics to optimize: If accuracy drops, investigate prompt or increase context
 
 9. **Error Handling & Fallbacks**
-
    - **API failures**: Always return "Unassigned", never block user workflow
    - **Invalid JSON**: Use Gemini's JSON mode if available, or add retry with "ensure valid JSON" prompt
    - **Token limit exceeded**: Reduce context window automatically and retry
@@ -2280,7 +2248,6 @@ Key variables to tune for optimal performance, cost, and accuracy:
 #### Deletion Rules
 
 - **Deleting an account or subcategory**:
-
   1. Show popup/dialog with two options:
      - "Delete all associated transactions"
      - "Leave transactions unassigned"
@@ -2303,21 +2270,18 @@ Key variables to tune for optimal performance, cost, and accuracy:
 After launch, track these metrics to measure success:
 
 - **User Engagement**:
-
   - Daily/weekly active users
   - Average session duration
   - Transactions added per user per month
   - AI chatbot usage rate
 
 - **Feature Adoption**:
-
   - % of users using statement parsing
   - % of users with budget goals set
   - % of transactions auto-categorized by AI
   - Financial health score views
 
 - **AI Performance**:
-
   - Categorization accuracy (% of AI suggestions accepted)
   - Average AI response time
   - Cost per categorization
