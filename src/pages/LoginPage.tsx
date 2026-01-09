@@ -39,7 +39,7 @@ function LoginPage() {
   useEffect(() => {
     clearError();
     setFormErrors({});
-  }, [email, password]);
+  }, [email, password, clearError]);
 
   const validateForm = (): boolean => {
     const errors: typeof formErrors = {};
