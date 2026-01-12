@@ -11,11 +11,32 @@ import {
   CardContent,
 } from "@/components/ui/Card";
 import { useAuth } from "@/hooks/useAuth";
-import { User, Lock, LogOut, AlertTriangle } from "lucide-react";
+import { useAccounts } from "@/hooks/useAccounts";
+import { useCategories } from "@/hooks/useCategories";
+import { AccountForm } from "@/components/features/AccountForm";
+import { CategoryForm } from "@/components/features/CategoryForm";
+import { SubcategoryForm } from "@/components/features/SubcategoryForm";
+import { User, Lock, LogOut, AlertTriangle, Trash2, Info } from "lucide-react";
 
 function SettingsPage() {
   const navigate = useNavigate();
   const { user, signOut, updatePassword, error, clearError } = useAuth();
+  const {
+    accounts,
+    loading: accountsLoading,
+    addAccount,
+    removeAccount,
+  } = useAccounts();
+  const {
+    categories,
+    subcategories,
+    loading: categoriesLoading,
+    addCategory,
+    removeCategory,
+    addSubcategory,
+    removeSubcategory,
+    getSubcategoriesByCategory,
+  } = useCategories();
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,6 +47,10 @@ function SettingsPage() {
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const [showAddAccount, setShowAddAccount] = useState(false);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [showAddSubcategory, setShowAddSubcategory] = useState(false);
 
   const validatePasswordForm = (): boolean => {
     const errors: typeof passwordErrors = {};
@@ -79,10 +104,50 @@ function SettingsPage() {
   };
 
   const handleDeleteAccount = () => {
-    // This will be implemented in a future phase with a serverless function
     alert("Account deletion will be available in a future update.");
     setShowDeleteConfirm(false);
   };
+
+  const handleDeleteAccountItem = async (id: string, name: string) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete the account "${name}"? This action cannot be undone.`
+      )
+    ) {
+      await removeAccount(id);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string, name: string) => {
+    const subsForCategory = getSubcategoriesByCategory(id);
+    if (subsForCategory.length > 0) {
+      alert(
+        `Cannot delete category "${name}". It has ${subsForCategory.length} subcategories. Delete subcategories first.`
+      );
+      return;
+    }
+
+    if (
+      window.confirm(
+        `Are you sure you want to delete the category "${name}"? This action cannot be undone.`
+      )
+    ) {
+      await removeCategory(id);
+    }
+  };
+
+  const handleDeleteSubcategory = async (id: string, name: string) => {
+    if (
+      window.confirm(
+        `Are you sure you want to delete the subcategory "${name}"? This action cannot be undone.`
+      )
+    ) {
+      await removeSubcategory(id);
+    }
+  };
+
+  const userCategories = categories.filter((cat) => !cat.is_system);
+  const userSubcategories = subcategories.filter((sub) => !sub.is_system);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-6">
@@ -201,19 +266,235 @@ function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Placeholder Cards for Future Phases */}
-      <Card variant="outlined">
+      {/* Accounts Management */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-gray-400">Accounts & Categories</CardTitle>
-          <CardDescription>Management interface coming in Phase 3</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Accounts</CardTitle>
+              <CardDescription>Manage your financial accounts</CardDescription>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowAddAccount(!showAddAccount)}
+            >
+              {showAddAccount ? "Cancel" : "Add Account"}
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-500 text-sm">
-            You'll be able to manage your financial accounts, categories, and subcategories here.
-          </p>
+        <CardContent className="space-y-4">
+          {showAddAccount && (
+            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+              <AccountForm
+                onSubmit={async (data) => {
+                  const result = await addAccount(data.name, data.type, data.initialBalance);
+                  if (result.success) {
+                    setShowAddAccount(false);
+                  }
+                  return result;
+                }}
+                submitLabel="Add Account"
+                showCancel
+                onCancel={() => setShowAddAccount(false)}
+              />
+            </div>
+          )}
+
+          {accountsLoading ? (
+            <p className="text-gray-400">Loading accounts...</p>
+          ) : accounts.length > 0 ? (
+            <div className="space-y-2">
+              {accounts.map((account) => (
+                <div
+                  key={account.id}
+                  className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+                >
+                  <div>
+                    <p className="font-medium text-gray-100">{account.name}</p>
+                    <p className="text-sm text-gray-400">
+                      {account.type === "asset" ? "Asset" : "Liability"} • Initial Balance: $
+                      {account.initial_balance.toFixed(2)}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteAccountItem(account.id, account.name)}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-4">No accounts yet.</p>
+          )}
+
+          <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
+            <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-300">
+              Renaming accounts will automatically update all related transactions via foreign key relationships.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
+      {/* Categories Management */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Categories</CardTitle>
+              <CardDescription>Organize your income and expenses</CardDescription>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowAddCategory(!showAddCategory)}
+            >
+              {showAddCategory ? "Cancel" : "Add Category"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {showAddCategory && (
+            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+              <CategoryForm
+                onSubmit={async (data) => {
+                  const result = await addCategory(data.name, data.type);
+                  if (result.success) {
+                    setShowAddCategory(false);
+                  }
+                  return result;
+                }}
+                submitLabel="Add Category"
+                showCancel
+                onCancel={() => setShowAddCategory(false)}
+              />
+            </div>
+          )}
+
+          {categoriesLoading ? (
+            <p className="text-gray-400">Loading categories...</p>
+          ) : userCategories.length > 0 ? (
+            <div className="space-y-2">
+              {userCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+                >
+                  <div>
+                    <p className="font-medium text-gray-100">{category.name}</p>
+                    <p className="text-sm text-gray-400">
+                      {category.type === "income" ? "Income" : "Expense"}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteCategory(category.id, category.name)}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-4">No categories yet.</p>
+          )}
+
+          <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
+            <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-300">
+              Cannot delete categories with subcategories. Delete subcategories first.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Subcategories Management */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Subcategories</CardTitle>
+              <CardDescription>Further organize your transactions</CardDescription>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowAddSubcategory(!showAddSubcategory)}
+              disabled={categories.length === 0}
+            >
+              {showAddSubcategory ? "Cancel" : "Add Subcategory"}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {showAddSubcategory && (
+            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+              <SubcategoryForm
+                categories={categories}
+                onSubmit={async (data) => {
+                  const result = await addSubcategory(data.name, data.categoryId);
+                  if (result.success) {
+                    setShowAddSubcategory(false);
+                  }
+                  return result;
+                }}
+                submitLabel="Add Subcategory"
+                showCancel
+                onCancel={() => setShowAddSubcategory(false)}
+              />
+            </div>
+          )}
+
+          {categoriesLoading ? (
+            <p className="text-gray-400">Loading subcategories...</p>
+          ) : userSubcategories.length > 0 ? (
+            <div className="space-y-2">
+              {userSubcategories.map((subcategory) => {
+                const category = categories.find((cat) => cat.id === subcategory.category_id);
+                return (
+                  <div
+                    key={subcategory.id}
+                    className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-100">{subcategory.name}</p>
+                      <p className="text-sm text-gray-400">
+                        Category: {category?.name || "Unknown"}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-4">No subcategories yet.</p>
+          )}
+
+          <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
+            <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-300">
+              Names must be unique across all accounts, categories, and subcategories.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Assistant Placeholder */}
       <Card variant="outlined">
         <CardHeader>
           <CardTitle className="text-gray-400">AI Assistant</CardTitle>

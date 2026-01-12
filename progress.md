@@ -1,7 +1,7 @@
 # Project Progress - AI Budget App
 
 ## Current Status
-**Phase 2 Complete** ✅ - Full authentication system implemented with Supabase Auth
+**Phase 3 Complete** ✅ - Core Data Models (Accounts, Categories, Subcategories) implemented
 
 ## Completed Milestones
 - **Phase 0: Project Setup & Infrastructure** ✅
@@ -23,94 +23,87 @@
 
 - **Phase 1: Database Schema & Backend Setup** ✅
   - Complete database schema migration: [20260108_initial_schema.sql](supabase/migrations/20260108_initial_schema.sql)
-    - 10 tables created: user_preferences, accounts, categories, subcategories, transactions, spending_goals, saving_goals, ai_corrections, chat_sessions, chat_messages
-    - 5 PostgreSQL ENUMs defined (account_type, category_type, goal_period, ai_personality, chat_role)
-    - Comprehensive indexes on frequently queried columns
-    - Triggers for auto-updating timestamps and creating user preferences on signup
   - Row-Level Security policies: [20260108_rls_policies.sql](supabase/migrations/20260108_rls_policies.sql)
-    - RLS enabled on all 10 tables
-    - User data isolation policies (users can only access own data)
-    - System categories readable by all, writable by none
   - Seed data migration: [20260108_seed_data.sql](supabase/migrations/20260108_seed_data.sql)
-    - 2 system "Unassigned" categories (income + expense)
-    - 2 system "Unassigned" subcategories
-    - Hardcoded UUIDs for consistency
   - Supabase client configured: [src/lib/supabaseClient.ts](src/lib/supabaseClient.ts)
-    - Full TypeScript type definitions for all tables
-    - Helper functions for auth (isAuthenticated, getCurrentUser, signOut)
-    - Auto-refresh and session persistence enabled
-  - System constants updated: [src/config/constants.ts](src/config/constants.ts)
-    - SYSTEM_CATEGORIES and SYSTEM_SUBCATEGORIES exported
-  - Setup documentation: [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md)
-    - Step-by-step guide for creating Supabase project
-    - Instructions for running migrations
-    - Troubleshooting section
 
 - **Phase 2: Authentication & User Management** ✅
-  - Auth service implemented: [src/services/auth.ts](src/services/auth.ts)
-    - signUp, signIn, signInWithGoogle, signOut, getCurrentUser
-    - resetPassword, updatePassword functions
-    - Standardized error handling with AuthResponse type
-  - useAuth hook created: [src/hooks/useAuth.ts](src/hooks/useAuth.ts)
-    - AuthProvider context for global auth state
-    - Session persistence with Supabase
-    - Auth state change listeners
-    - Loading and error states
-  - UI components library: [src/components/ui/](src/components/ui/)
-    - Button component with variants (primary, secondary, outline, ghost, danger)
-    - Input component with labels, errors, helper text
-    - Card component family (Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter)
-    - Dark theme styling, accessibility support
-  - Authentication pages:
-    - [LandingPage.tsx](src/pages/LandingPage.tsx) - Hero section, features grid, CTAs
-    - [SignUpPage.tsx](src/pages/SignUpPage.tsx) - Email/password signup, Google OAuth, validation
-    - [LoginPage.tsx](src/pages/LoginPage.tsx) - Login form, forgot password flow, Google OAuth
-    - [SettingsPage.tsx](src/pages/SettingsPage.tsx) - User profile, change password, sign out
-  - Protected routing: [src/Router.tsx](src/Router.tsx)
-    - ProtectedRoute wrapper for authenticated pages
-    - PublicRoute wrapper for login/signup
-    - Redirect logic (unauthenticated → login, authenticated public routes → dashboard)
-  - App integration: [src/App.tsx](src/App.tsx)
-    - Wrapped with AuthProvider for global auth context
-  - Testing: Dev server running successfully (http://localhost:5175)
+  - Auth service: [src/services/auth.ts](src/services/auth.ts)
+  - useAuth hook: [src/hooks/useAuth.tsx](src/hooks/useAuth.tsx)
+  - UI components: Button, Input, Card in [src/components/ui/](src/components/ui/)
+  - Auth pages: LandingPage, SignUpPage, LoginPage, SettingsPage
+  - Protected routing with redirect logic
+
+- **Phase 3: Core Data Models** ✅
+  - **Services**:
+    - [src/services/accounts.ts](src/services/accounts.ts) - Full CRUD for accounts with name uniqueness validation
+    - [src/services/categories.ts](src/services/categories.ts) - Full CRUD for categories and subcategories
+  - **Hooks**:
+    - [src/hooks/useAccounts.ts](src/hooks/useAccounts.ts) - Fetch/manage accounts with optimistic updates
+    - [src/hooks/useCategories.ts](src/hooks/useCategories.ts) - Fetch/manage categories & subcategories
+    - [src/hooks/useAutoSave.ts](src/hooks/useAutoSave.ts) - Debounced auto-save utility
+  - **UI Components**:
+    - [src/components/ui/Select.tsx](src/components/ui/Select.tsx) - Dropdown selection component
+    - [src/components/features/AccountForm.tsx](src/components/features/AccountForm.tsx) - Account creation/editing form
+    - [src/components/features/CategoryForm.tsx](src/components/features/CategoryForm.tsx) - Category creation/editing form
+    - [src/components/features/SubcategoryForm.tsx](src/components/features/SubcategoryForm.tsx) - Subcategory creation/editing form
+  - **Pages**:
+    - [src/pages/SetupPage.tsx](src/pages/SetupPage.tsx) - 3-step wizard (Accounts → Categories → Subcategories)
+    - [src/pages/SettingsPage.tsx](src/pages/SettingsPage.tsx) - Updated with Accounts, Categories, Subcategories management sections
+  - **Features Implemented**:
+    - Name uniqueness validation across accounts, categories, and subcategories
+    - System categories/subcategories cannot be edited or deleted
+    - Categories with subcategories cannot be deleted (must delete subcategories first)
+    - Soft delete support for all entities
+    - Transaction count checks before deletion
 
 ## Technical Decisions
 - **Decision**: Supabase for database and auth
-  - **Rationale**: PostgreSQL + RLS, built-in auth with Google OAuth, excellent free tier
 - **Decision**: React 19 + TypeScript + Vite
-  - **Rationale**: Latest React (improved performance), fast build tool, excellent TypeScript support
 - **Decision**: Tailwind CSS 4 + dark mode only
-  - **Rationale**: Latest version, utility-first, built-in dark mode support, lightweight
 - **Decision**: Vercel for hosting
-  - **Rationale**: Zero-config deployments, serverless functions, excellent Vite integration
 - **Decision**: Gemini 1.5 Flash for AI
-  - **Rationale**: Best balance accuracy/speed/cost, 1M token context window
 
 ## Deviations from plan.md
 - Used Tailwind CSS 4 (latest) instead of v3
 - Used React 19 (latest stable) instead of 18+
 
 ## Known Blockers & Tech Debt
-- Google OAuth needs to be configured in Supabase dashboard (optional - can be done later)
-- Account deletion requires serverless function implementation (deferred to later phase)
-- Email confirmation is disabled (can be enabled in Supabase settings if needed)
+- Google OAuth needs to be configured in Supabase dashboard (optional)
+- Account deletion requires serverless function implementation (deferred)
+- Email confirmation is disabled (can be enabled in Supabase if needed)
+
+## Bug Fixes
+- **2026-01-11: Fixed 403 Forbidden errors on Setup page**
+  - **Issue**: API calls to categories, accounts, and subcategories returned 403 Forbidden despite correct RLS policies
+  - **Root Cause**: Missing table-level GRANT permissions for the `authenticated` role. RLS policies control which rows a user can access, but GRANTs control whether the role can access the table at all.
+  - **Fix**: Applied GRANT statements in Supabase SQL Editor:
+    ```sql
+    GRANT SELECT, INSERT, UPDATE, DELETE ON accounts TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON categories TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON subcategories TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON transactions TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON user_preferences TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON spending_goals TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON saving_goals TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ai_corrections TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON chat_sessions TO authenticated;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON chat_messages TO authenticated;
+    ```
+  - **Additional Fix**: Updated `useAccounts` and `useCategories` hooks to wait for auth state before fetching data (prevents race condition on page load)
 
 ## Next Immediate Steps
-1. **Test authentication flows manually**:
-   - Sign up with email/password
-   - Log in with existing account
-   - Test forgot password flow
-   - Test protected route access
-   - Test sign out functionality
-2. **Configure Google OAuth (optional)**:
-   - Set up Google Cloud Console OAuth credentials
-   - Add credentials to Supabase Auth settings
-3. **Proceed to Phase 3**: Core Data Models (Accounts, Categories, Subcategories)
+1. **Proceed to Phase 4**: Transaction Management (CRUD)
+   - Create transaction service
+   - Create useTransactions hook
+   - Build TransactionInputPage with Income, Expense, Transfer tabs
+   - Build TransactionHistoryPage with filtering and bulk operations
+   - Build Most Recent Activity panel
 
 ## Project Organization
 - **Root**: Configuration files, plan.md, progress.md, CLAUDE.md
-- **docs/**: All documentation (README.md, SUPABASE_SETUP.md, verify-setup.md)
-- **archive/**: Old/unused files (Excel files, scratchpad)
+- **docs/**: All documentation
+- **archive/**: Old/unused files
 - **prompts/**: AI agent instructions and guidelines
 - **src/**: Application source code
 - **api/**: Vercel serverless functions

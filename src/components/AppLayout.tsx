@@ -17,6 +17,12 @@ function AppLayout() {
                 Dashboard
               </a>
               <a
+                href="/setup"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Setup
+              </a>
+              <a
                 href="/transactions/input"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >

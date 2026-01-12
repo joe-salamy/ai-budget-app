@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useAuth } from './hooks/useAuth';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -49,7 +49,11 @@ function PublicRoute({ children }: { children: ReactNode }) {
     );
   }
 
-  // Allow access to public routes even when logged in for landing page
+  // Redirect authenticated users to dashboard for login/signup pages
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return <>{children}</>;
 }
 
