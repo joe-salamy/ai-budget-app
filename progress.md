@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Phase 4 Complete** ✅ - Transaction Management (CRUD) implemented
+**Phase 5 Complete** ✅ - Dashboard - Basic Views & Tables implemented
 
 ## Completed Milestones
 
@@ -88,6 +88,41 @@
     - [src/pages/TransactionInputPage.tsx](src/pages/TransactionInputPage.tsx) - Add transactions with Income/Expense/Transfer tabs, auto-categorization, Recent Activity panel
     - [src/pages/TransactionHistoryPage.tsx](src/pages/TransactionHistoryPage.tsx) - View/filter/sort transactions with bulk selection and operations
 
+- **Phase 5: Dashboard - Basic Views & Tables** ✅
+  - **Services**:
+    - [src/services/dashboard.ts](src/services/dashboard.ts) - Dashboard data aggregation:
+      - getAccountSummary(startDate, endDate) - Account balances with transactions
+      - getCategorySummary(startDate, endDate) - Category/subcategory totals with goals
+      - calculateNetWorth(date) - Net worth calculation
+      - getDashboardMetrics(startDate, endDate) - Quick income/expense metrics
+  - **Hooks**:
+    - [src/hooks/useDashboard.ts](src/hooks/useDashboard.ts) - Dashboard state management:
+      - Date range state with 90-day default
+      - Account/Category summary fetching
+      - Net worth and metrics calculations
+      - Refresh functions for all data
+  - **UI Components**:
+    - [src/components/features/AccountSummary.tsx](src/components/features/AccountSummary.tsx) - Expandable account summary table:
+      - Grouped by asset/liability type
+      - Starting balance, changes, ending balance per account
+      - Click to expand and see transactions in date range
+      - Net worth summary in footer
+    - [src/components/features/CategorySummary.tsx](src/components/features/CategorySummary.tsx) - Expandable category summary table:
+      - Grouped by income/expense type
+      - Category totals with goal tracking
+      - Click to expand and see subcategories
+      - Color-coded goal differences (green/red)
+      - Income/Expense/Net summary in footer
+  - **Pages**:
+    - [src/pages/DashboardPage.tsx](src/pages/DashboardPage.tsx) - Complete dashboard with:
+      - Date range selector (start/end date inputs)
+      - Quick date presets (30 days, 90 days, this month, last month, 6 months, YTD)
+      - Key metrics cards (Net Worth, Income, Expenses, Net Change)
+      - Financial Health Score placeholder (Phase 11)
+      - Account Summary table with expandable rows
+      - Category Summary table with expandable rows
+      - Chart placeholders for Phase 6
+
 ## Technical Decisions
 
 - **Decision**: Supabase for database and auth
@@ -117,11 +152,10 @@
 
 ## Next Immediate Steps
 
-1. **Proceed to Phase 5**: Dashboard & Visualizations
-   - Build Dashboard overview with key metrics
-   - Implement spending charts (Recharts)
-   - Add net worth tracking
-   - Build Sankey diagram for cash flow
+1. **Proceed to Phase 6**: Dashboard - Visualizations
+   - Build Net Worth Over Time line chart (Recharts)
+   - Build Sankey Diagram for cash flow (@nivo/sankey)
+   - Integrate charts with date range filter
 
 ## Project Organization
 
