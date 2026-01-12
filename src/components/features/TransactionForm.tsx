@@ -1,5 +1,5 @@
 // TransactionForm component - Reusable form for adding/editing transactions
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
@@ -252,12 +252,8 @@ export function TransactionForm({
     enabled: !!onAutoSave,
   });
 
-  // Update form when initial data changes (for editing)
-  useEffect(() => {
-    if (initialData) {
-      setFormData((prev) => ({ ...prev, ...initialData }));
-    }
-  }, [initialData]);
+  // Note: For editing transactions, the parent should pass a unique `key` prop
+  // to force remounting the component with new initialData
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

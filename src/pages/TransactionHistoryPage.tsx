@@ -348,6 +348,7 @@ function TransactionHistoryPage() {
       >
         {editingTransaction && (
           <TransactionForm
+            key={editingTransaction.id}
             type={editingTransaction.amount >= 0 ? "income" : "expense"}
             accounts={accounts}
             categories={categories}

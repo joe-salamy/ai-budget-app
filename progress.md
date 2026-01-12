@@ -1,9 +1,11 @@
 # Project Progress - AI Budget App
 
 ## Current Status
-**Phase 3 Complete** ✅ - Core Data Models (Accounts, Categories, Subcategories) implemented
+
+**Phase 4 Complete** ✅ - Transaction Management (CRUD) implemented
 
 ## Completed Milestones
+
 - **Phase 0: Project Setup & Infrastructure** ✅
   - Vite + React 19 + TypeScript initialized with strict mode
   - ESLint and Prettier configured
@@ -56,8 +58,38 @@
     - Categories with subcategories cannot be deleted (must delete subcategories first)
     - Soft delete support for all entities
     - Transaction count checks before deletion
+    - **Edit functionality in Settings page**:
+      - Edit accounts (name, type, initial balance)
+      - Edit categories (name only, type locked to prevent breaking subcategory logic)
+      - Edit subcategories (name, parent category)
+
+- **Phase 4: Transaction Management (CRUD)** ✅
+  - **Services**:
+    - [src/services/transactions.ts](src/services/transactions.ts) - Full CRUD for transactions including:
+      - Create/update/delete transactions
+      - Transfer transactions (creates paired entries)
+      - Bulk update/delete operations
+      - Transaction filtering (by account, date range, search query)
+      - Running balance calculations
+      - Recent activity by account
+  - **Hooks**:
+    - [src/hooks/useTransactions.ts](src/hooks/useTransactions.ts) - Fetch/manage transactions with:
+      - useTransactions hook with filtering support
+      - useRecentActivity hook for activity panel
+      - useSimpleTransactions for basic transaction lists
+  - **UI Components**:
+    - [src/components/ui/Modal.tsx](src/components/ui/Modal.tsx) - Reusable modal dialog
+    - [src/components/features/TransactionForm.tsx](src/components/features/TransactionForm.tsx) - Form for income/expense/transfer with auto-categorization
+    - [src/components/features/TransactionTable.tsx](src/components/features/TransactionTable.tsx) - Sortable table with bulk selection
+    - [src/components/features/RecentActivityPanel.tsx](src/components/features/RecentActivityPanel.tsx) - Account activity summary with balances
+    - [src/components/features/BulkEditModal.tsx](src/components/features/BulkEditModal.tsx) - Bulk subcategory assignment
+    - [src/components/features/ConfirmDeleteModal.tsx](src/components/features/ConfirmDeleteModal.tsx) - Delete confirmation dialog
+  - **Pages**:
+    - [src/pages/TransactionInputPage.tsx](src/pages/TransactionInputPage.tsx) - Add transactions with Income/Expense/Transfer tabs, auto-categorization, Recent Activity panel
+    - [src/pages/TransactionHistoryPage.tsx](src/pages/TransactionHistoryPage.tsx) - View/filter/sort transactions with bulk selection and operations
 
 ## Technical Decisions
+
 - **Decision**: Supabase for database and auth
 - **Decision**: React 19 + TypeScript + Vite
 - **Decision**: Tailwind CSS 4 + dark mode only
@@ -65,45 +97,36 @@
 - **Decision**: Gemini 1.5 Flash for AI
 
 ## Deviations from plan.md
+
 - Used Tailwind CSS 4 (latest) instead of v3
 - Used React 19 (latest stable) instead of 18+
 
 ## Known Blockers & Tech Debt
+
 - Google OAuth needs to be configured in Supabase dashboard (optional)
 - Account deletion requires serverless function implementation (deferred)
 - Email confirmation is disabled (can be enabled in Supabase if needed)
+- Lint warnings in hooks for setState in useEffect (follows existing codebase pattern for data fetching)
 
 ## Bug Fixes
+
 - **2026-01-11: Fixed 403 Forbidden errors on Setup page**
   - **Issue**: API calls to categories, accounts, and subcategories returned 403 Forbidden despite correct RLS policies
-  - **Root Cause**: Missing table-level GRANT permissions for the `authenticated` role. RLS policies control which rows a user can access, but GRANTs control whether the role can access the table at all.
-  - **Fix**: Applied GRANT statements in Supabase SQL Editor:
-    ```sql
-    GRANT SELECT, INSERT, UPDATE, DELETE ON accounts TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON categories TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON subcategories TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON transactions TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON user_preferences TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON spending_goals TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON saving_goals TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON ai_corrections TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON chat_sessions TO authenticated;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON chat_messages TO authenticated;
-    ```
-  - **Additional Fix**: Updated `useAccounts` and `useCategories` hooks to wait for auth state before fetching data (prevents race condition on page load)
+  - **Root Cause**: Missing table-level GRANT permissions for the `authenticated` role
+  - **Fix**: Applied GRANT statements in Supabase SQL Editor
 
 ## Next Immediate Steps
-1. **Proceed to Phase 4**: Transaction Management (CRUD)
-   - Create transaction service
-   - Create useTransactions hook
-   - Build TransactionInputPage with Income, Expense, Transfer tabs
-   - Build TransactionHistoryPage with filtering and bulk operations
-   - Build Most Recent Activity panel
+
+1. **Proceed to Phase 5**: Dashboard & Visualizations
+   - Build Dashboard overview with key metrics
+   - Implement spending charts (Recharts)
+   - Add net worth tracking
+   - Build Sankey diagram for cash flow
 
 ## Project Organization
+
 - **Root**: Configuration files, plan.md, progress.md, CLAUDE.md
 - **docs/**: All documentation
-- **archive/**: Old/unused files
 - **prompts/**: AI agent instructions and guidelines
 - **src/**: Application source code
 - **api/**: Vercel serverless functions

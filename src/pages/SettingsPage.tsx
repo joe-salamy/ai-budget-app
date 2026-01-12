@@ -16,7 +16,8 @@ import { useCategories } from "@/hooks/useCategories";
 import { AccountForm } from "@/components/features/AccountForm";
 import { CategoryForm } from "@/components/features/CategoryForm";
 import { SubcategoryForm } from "@/components/features/SubcategoryForm";
-import { User, Lock, LogOut, AlertTriangle, Trash2, Info } from "lucide-react";
+import { User, Lock, LogOut, AlertTriangle, Trash2, Info, Pencil } from "lucide-react";
+import type { Account, Category, Subcategory } from "@/types";
 
 function SettingsPage() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ function SettingsPage() {
     accounts,
     loading: accountsLoading,
     addAccount,
+    editAccount,
     removeAccount,
   } = useAccounts();
   const {
@@ -32,8 +34,10 @@ function SettingsPage() {
     subcategories,
     loading: categoriesLoading,
     addCategory,
+    editCategory,
     removeCategory,
     addSubcategory,
+    editSubcategory,
     removeSubcategory,
     getSubcategoriesByCategory,
   } = useCategories();
@@ -51,6 +55,11 @@ function SettingsPage() {
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showAddSubcategory, setShowAddSubcategory] = useState(false);
+
+  // State for editing items
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
 
   const validatePasswordForm = (): boolean => {
     const errors: typeof passwordErrors = {};
@@ -144,6 +153,22 @@ function SettingsPage() {
     ) {
       await removeSubcategory(id);
     }
+  };
+
+  // Edit handlers
+  const handleEditAccount = (account: Account) => {
+    setEditingAccount(account);
+    setShowAddAccount(false); // Close add form if open
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setShowAddCategory(false); // Close add form if open
+  };
+
+  const handleEditSubcategory = (subcategory: Subcategory) => {
+    setEditingSubcategory(subcategory);
+    setShowAddSubcategory(false); // Close add form if open
   };
 
   const userCategories = categories.filter((cat) => !cat.is_system);
@@ -277,7 +302,10 @@ function SettingsPage() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => setShowAddAccount(!showAddAccount)}
+              onClick={() => {
+                setShowAddAccount(!showAddAccount);
+                setEditingAccount(null); // Close edit form if open
+              }}
             >
               {showAddAccount ? "Cancel" : "Add Account"}
             </Button>
@@ -301,6 +329,29 @@ function SettingsPage() {
             </div>
           )}
 
+          {editingAccount && (
+            <div className="p-4 bg-gray-800 rounded-lg border border-blue-600">
+              <h4 className="text-sm font-medium text-blue-400 mb-3">Edit Account</h4>
+              <AccountForm
+                initialData={editingAccount}
+                onSubmit={async (data) => {
+                  const result = await editAccount(editingAccount.id, {
+                    name: data.name,
+                    type: data.type,
+                    initial_balance: data.initialBalance,
+                  });
+                  if (result.success) {
+                    setEditingAccount(null);
+                  }
+                  return result;
+                }}
+                submitLabel="Save Changes"
+                showCancel
+                onCancel={() => setEditingAccount(null)}
+              />
+            </div>
+          )}
+
           {accountsLoading ? (
             <p className="text-gray-400">Loading accounts...</p>
           ) : accounts.length > 0 ? (
@@ -317,14 +368,24 @@ function SettingsPage() {
                       {account.initial_balance.toFixed(2)}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteAccountItem(account.id, account.name)}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditAccount(account)}
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    >
+                      <Pencil size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteAccountItem(account.id, account.name)}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -352,7 +413,10 @@ function SettingsPage() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => setShowAddCategory(!showAddCategory)}
+              onClick={() => {
+                setShowAddCategory(!showAddCategory);
+                setEditingCategory(null); // Close edit form if open
+              }}
             >
               {showAddCategory ? "Cancel" : "Add Category"}
             </Button>
@@ -376,6 +440,28 @@ function SettingsPage() {
             </div>
           )}
 
+          {editingCategory && (
+            <div className="p-4 bg-gray-800 rounded-lg border border-blue-600">
+              <h4 className="text-sm font-medium text-blue-400 mb-3">Edit Category</h4>
+              <CategoryForm
+                initialData={editingCategory}
+                onSubmit={async (data) => {
+                  const result = await editCategory(editingCategory.id, {
+                    name: data.name,
+                  });
+                  if (result.success) {
+                    setEditingCategory(null);
+                  }
+                  return result;
+                }}
+                submitLabel="Save Changes"
+                showCancel
+                onCancel={() => setEditingCategory(null)}
+                disableTypeChange
+              />
+            </div>
+          )}
+
           {categoriesLoading ? (
             <p className="text-gray-400">Loading categories...</p>
           ) : userCategories.length > 0 ? (
@@ -391,14 +477,24 @@ function SettingsPage() {
                       {category.type === "income" ? "Income" : "Expense"}
                     </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteCategory(category.id, category.name)}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                  >
-                    <Trash2 size={16} />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditCategory(category)}
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    >
+                      <Pencil size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteCategory(category.id, category.name)}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -426,7 +522,10 @@ function SettingsPage() {
             <Button
               variant="primary"
               size="sm"
-              onClick={() => setShowAddSubcategory(!showAddSubcategory)}
+              onClick={() => {
+                setShowAddSubcategory(!showAddSubcategory);
+                setEditingSubcategory(null); // Close edit form if open
+              }}
               disabled={categories.length === 0}
             >
               {showAddSubcategory ? "Cancel" : "Add Subcategory"}
@@ -452,6 +551,29 @@ function SettingsPage() {
             </div>
           )}
 
+          {editingSubcategory && (
+            <div className="p-4 bg-gray-800 rounded-lg border border-blue-600">
+              <h4 className="text-sm font-medium text-blue-400 mb-3">Edit Subcategory</h4>
+              <SubcategoryForm
+                categories={categories}
+                initialData={editingSubcategory}
+                onSubmit={async (data) => {
+                  const result = await editSubcategory(editingSubcategory.id, {
+                    name: data.name,
+                    category_id: data.categoryId,
+                  });
+                  if (result.success) {
+                    setEditingSubcategory(null);
+                  }
+                  return result;
+                }}
+                submitLabel="Save Changes"
+                showCancel
+                onCancel={() => setEditingSubcategory(null)}
+              />
+            </div>
+          )}
+
           {categoriesLoading ? (
             <p className="text-gray-400">Loading subcategories...</p>
           ) : userSubcategories.length > 0 ? (
@@ -469,14 +591,24 @@ function SettingsPage() {
                         Category: {category?.name || "Unknown"}
                       </p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditSubcategory(subcategory)}
+                        className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      >
+                        <Pencil size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      >
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
