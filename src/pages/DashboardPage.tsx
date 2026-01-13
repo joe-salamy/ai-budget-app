@@ -2,6 +2,8 @@
 import { useDashboard } from "../hooks/useDashboard";
 import { AccountSummary } from "../components/features/AccountSummary";
 import { CategorySummary } from "../components/features/CategorySummary";
+import { NetWorthChart } from "../components/features/NetWorthChart";
+import { SankeyDiagram } from "../components/features/SankeyDiagram";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
 
@@ -37,6 +39,11 @@ function DashboardPage() {
     netWorth,
     metrics,
     metricsLoading,
+    netWorthChartData,
+    netWorthChartAccounts,
+    netWorthChartLoading,
+    sankeyData,
+    sankeyLoading,
   } = useDashboard();
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,32 +221,18 @@ function DashboardPage() {
         loading={categorySummaryLoading}
       />
 
-      {/* Charts Placeholder */}
+      {/* Charts */}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Net Worth Over Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center h-64 border border-dashed border-gray-600 rounded-lg">
-              <div className="text-center">
-                <svg
-                  className="w-12 h-12 mx-auto text-gray-500 mb-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-                  />
-                </svg>
-                <p className="text-gray-400">Line Chart</p>
-                <p className="text-sm text-gray-500">Coming in Phase 6</p>
-              </div>
-            </div>
+            <NetWorthChart
+              data={netWorthChartData}
+              accounts={netWorthChartAccounts}
+              loading={netWorthChartLoading}
+            />
           </CardContent>
         </Card>
 
@@ -248,25 +241,10 @@ function DashboardPage() {
             <CardTitle className="text-lg">Cash Flow (Sankey Diagram)</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-center h-64 border border-dashed border-gray-600 rounded-lg">
-              <div className="text-center">
-                <svg
-                  className="w-12 h-12 mx-auto text-gray-500 mb-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                  />
-                </svg>
-                <p className="text-gray-400">Sankey Diagram</p>
-                <p className="text-sm text-gray-500">Coming in Phase 6</p>
-              </div>
-            </div>
+            <SankeyDiagram
+              data={sankeyData || { nodes: [], links: [] }}
+              loading={sankeyLoading}
+            />
           </CardContent>
         </Card>
       </div>

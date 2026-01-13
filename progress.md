@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Phase 5 Complete** ✅ - Dashboard - Basic Views & Tables implemented
+**Phase 6 Complete** ✅ - Dashboard Visualizations implemented
 
 ## Completed Milestones
 
@@ -121,7 +121,32 @@
       - Financial Health Score placeholder (Phase 11)
       - Account Summary table with expandable rows
       - Category Summary table with expandable rows
-      - Chart placeholders for Phase 6
+
+- **Phase 6: Dashboard - Visualizations** ✅
+  - **Services**:
+    - [src/services/charts.ts](src/services/charts.ts) - Chart data preparation:
+      - prepareNetWorthData(startDate, endDate) - Net worth line chart data with dynamic time granularity (daily/weekly/monthly based on date range)
+      - prepareSankeyData(startDate, endDate) - Cash flow Sankey diagram data
+  - **Hooks**:
+    - [src/hooks/useDashboard.ts](src/hooks/useDashboard.ts) - Extended with chart state:
+      - netWorthChartData, netWorthChartAccounts, netWorthChartLoading
+      - sankeyData, sankeyLoading
+      - refreshCharts function
+  - **UI Components**:
+    - [src/components/features/NetWorthChart.tsx](src/components/features/NetWorthChart.tsx) - Net worth line chart (Recharts):
+      - Line for each account with color coding (green=assets, red=liabilities)
+      - Prominent net worth line in blue
+      - Responsive container, custom tooltip, legend
+      - Formatted currency on Y-axis, dates on X-axis
+    - [src/components/features/SankeyDiagram.tsx](src/components/features/SankeyDiagram.tsx) - Cash flow visualization (@nivo/sankey):
+      - Income subcategories → Income categories → Expenses categories → Expense subcategories
+      - Color-coded nodes (green=income, red=expenses, blue=savings)
+      - Link gradients, custom tooltips, responsive design
+  - **Pages**:
+    - [src/pages/DashboardPage.tsx](src/pages/DashboardPage.tsx) - Updated with real charts:
+      - Replaced placeholder with NetWorthChart
+      - Replaced placeholder with SankeyDiagram
+      - Charts update with date range changes
 
 ## Technical Decisions
 
@@ -159,10 +184,11 @@
 
 ## Next Immediate Steps
 
-1. **Proceed to Phase 6**: Dashboard - Visualizations
-   - Build Net Worth Over Time line chart (Recharts)
-   - Build Sankey Diagram for cash flow (@nivo/sankey)
-   - Integrate charts with date range filter
+1. **Proceed to Phase 7**: AI Integration - Single Transaction Categorization
+   - Set up Vercel serverless function for AI endpoint
+   - Integrate Gemini 1.5 Flash API
+   - Add auto-categorization to transaction form
+   - Store AI suggestions and user corrections
 
 ## Project Organization
 

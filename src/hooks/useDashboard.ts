@@ -1,5 +1,6 @@
 // useDashboard hook - Fetch and manage dashboard data
 import { useState, useEffect, useCallback } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { format, subDays } from "date-fns";
 import {
   getAccountSummary,
@@ -7,11 +8,20 @@ import {
   calculateNetWorth,
   getDashboardMetrics,
 } from "../services/dashboard";
+import {
+  prepareNetWorthData,
+  prepareSankeyData,
+} from "../services/charts";
 import type {
   AccountSummary,
   CategorySummary,
   NetWorthSummary,
 } from "../services/dashboard";
+import type {
+  NetWorthDataPoint,
+  SankeyData,
+} from "../services/charts";
+import type { AccountType } from "../types";
 import { useAuth } from "./useAuth";
 
 interface DateRange {
@@ -28,7 +38,7 @@ interface DashboardMetrics {
 interface UseDashboardReturn {
   // Date range
   dateRange: DateRange;
-  setDateRange: (range: DateRange) => void;
+  setDateRange: Dispatch<SetStateAction<DateRange>>;
 
   // Account summary data
   accountSummary: AccountSummary[];
@@ -50,11 +60,22 @@ interface UseDashboardReturn {
   metricsLoading: boolean;
   metricsError: string | null;
 
+  // Chart data
+  netWorthChartData: NetWorthDataPoint[];
+  netWorthChartAccounts: Array<{ name: string; type: AccountType }>;
+  netWorthChartLoading: boolean;
+  netWorthChartError: string | null;
+
+  sankeyData: SankeyData | null;
+  sankeyLoading: boolean;
+  sankeyError: string | null;
+
   // Refresh functions
   refreshAccountSummary: () => Promise<void>;
   refreshCategorySummary: () => Promise<void>;
   refreshNetWorth: () => Promise<void>;
   refreshMetrics: () => Promise<void>;
+  refreshCharts: () => Promise<void>;
   refreshAll: () => Promise<void>;
 }
 
@@ -105,6 +126,17 @@ export function useDashboard(): UseDashboardReturn {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [metricsLoading, setMetricsLoading] = useState<boolean>(true);
   const [metricsError, setMetricsError] = useState<string | null>(null);
+
+  // Chart state - Net Worth
+  const [netWorthChartData, setNetWorthChartData] = useState<NetWorthDataPoint[]>([]);
+  const [netWorthChartAccounts, setNetWorthChartAccounts] = useState<Array<{ name: string; type: AccountType }>>([]);
+  const [netWorthChartLoading, setNetWorthChartLoading] = useState<boolean>(true);
+  const [netWorthChartError, setNetWorthChartError] = useState<string | null>(null);
+
+  // Chart state - Sankey
+  const [sankeyData, setSankeyData] = useState<SankeyData | null>(null);
+  const [sankeyLoading, setSankeyLoading] = useState<boolean>(true);
+  const [sankeyError, setSankeyError] = useState<string | null>(null);
 
   // Fetch account summary
   const fetchAccountSummary = useCallback(async () => {
@@ -193,14 +225,67 @@ export function useDashboard(): UseDashboardReturn {
     setMetricsLoading(false);
   }, [user, dateRange.startDate, dateRange.endDate]);
 
+  // Fetch net worth chart data
+  const fetchNetWorthChart = useCallback(async () => {
+    if (!user) {
+      setNetWorthChartLoading(false);
+      return;
+    }
+
+    setNetWorthChartLoading(true);
+    setNetWorthChartError(null);
+
+    const response = await prepareNetWorthData(dateRange.startDate, dateRange.endDate);
+
+    if (response.success) {
+      setNetWorthChartData(response.data || []);
+      setNetWorthChartAccounts(response.accounts || []);
+    } else {
+      setNetWorthChartError(response.error || "Failed to fetch net worth chart data");
+    }
+
+    setNetWorthChartLoading(false);
+  }, [user, dateRange.startDate, dateRange.endDate]);
+
+  // Fetch Sankey chart data
+  const fetchSankeyData = useCallback(async () => {
+    if (!user) {
+      setSankeyLoading(false);
+      return;
+    }
+
+    setSankeyLoading(true);
+    setSankeyError(null);
+
+    const response = await prepareSankeyData(dateRange.startDate, dateRange.endDate);
+
+    if (response.success) {
+      setSankeyData(response.data || null);
+    } else {
+      setSankeyError(response.error || "Failed to fetch Sankey chart data");
+    }
+
+    setSankeyLoading(false);
+  }, [user, dateRange.startDate, dateRange.endDate]);
+
+  // Refresh all charts
+  const refreshCharts = useCallback(async () => {
+    await Promise.all([
+      fetchNetWorthChart(),
+      fetchSankeyData(),
+    ]);
+  }, [fetchNetWorthChart, fetchSankeyData]);
+
   // Refresh all data
   const refreshAll = useCallback(async () => {
     await Promise.all([
       fetchAccountSummary(),
       fetchCategorySummary(),
       fetchMetrics(),
+      fetchNetWorthChart(),
+      fetchSankeyData(),
     ]);
-  }, [fetchAccountSummary, fetchCategorySummary, fetchMetrics]);
+  }, [fetchAccountSummary, fetchCategorySummary, fetchMetrics, fetchNetWorthChart, fetchSankeyData]);
 
   // Load data when auth is ready and date range changes
   useEffect(() => {
@@ -211,10 +296,15 @@ export function useDashboard(): UseDashboardReturn {
       setCategorySummaryLoading(false);
       setNetWorthLoading(false);
       setMetricsLoading(false);
+      setNetWorthChartLoading(false);
+      setSankeyLoading(false);
       setAccountSummary([]);
       setCategorySummary([]);
       setNetWorth(null);
       setMetrics(null);
+      setNetWorthChartData([]);
+      setNetWorthChartAccounts([]);
+      setSankeyData(null);
     }
   }, [authLoading, user, dateRange.startDate, dateRange.endDate, refreshAll]);
 
@@ -243,11 +333,21 @@ export function useDashboard(): UseDashboardReturn {
     metricsLoading,
     metricsError,
 
+    // Chart data
+    netWorthChartData,
+    netWorthChartAccounts,
+    netWorthChartLoading,
+    netWorthChartError,
+    sankeyData,
+    sankeyLoading,
+    sankeyError,
+
     // Refresh functions
     refreshAccountSummary: fetchAccountSummary,
     refreshCategorySummary: fetchCategorySummary,
     refreshNetWorth: fetchNetWorth,
     refreshMetrics: fetchMetrics,
+    refreshCharts,
     refreshAll,
   };
 }
