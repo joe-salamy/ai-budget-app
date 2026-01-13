@@ -191,10 +191,12 @@ interface AccountRowProps {
 }
 
 function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
+  // Display change from account perspective: flip sign for liability accounts
+  const displayChange = account.account_type === "liability" ? -account.total_change : account.total_change;
   const changeColor =
-    account.total_change > 0
+    displayChange > 0
       ? "text-green-400"
-      : account.total_change < 0
+      : displayChange < 0
       ? "text-red-400"
       : "text-gray-400";
 
@@ -233,8 +235,8 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
           {formatCurrency(account.starting_balance)}
         </td>
         <td className={`px-4 py-3 text-sm text-right font-medium ${changeColor}`}>
-          {account.total_change >= 0 ? "+" : ""}
-          {formatCurrency(account.total_change)}
+          {displayChange >= 0 ? "+" : ""}
+          {formatCurrency(displayChange)}
         </td>
         <td className="px-4 py-3 text-sm text-right text-gray-200 font-medium">
           {formatCurrency(account.ending_balance)}
@@ -271,8 +273,10 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
                 </thead>
                 <tbody className="divide-y divide-gray-800/50">
                   {account.transactions.map((txn) => {
+                    // Display amount from account perspective: flip sign for liability accounts
+                    const displayAmount = account.account_type === "liability" ? -txn.amount : txn.amount;
                     const amountColor =
-                      txn.amount >= 0 ? "text-green-400" : "text-red-400";
+                      displayAmount >= 0 ? "text-green-400" : "text-red-400";
 
                     return (
                       <tr key={txn.id} className="hover:bg-gray-800/20">
@@ -283,8 +287,8 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
                           {txn.name}
                         </td>
                         <td className={`px-4 py-2 text-sm text-right ${amountColor}`}>
-                          {txn.amount >= 0 ? "+" : ""}
-                          {formatCurrency(txn.amount)}
+                          {displayAmount >= 0 ? "+" : ""}
+                          {formatCurrency(displayAmount)}
                         </td>
                         <td className="px-4 py-2 text-sm text-right text-gray-300">
                           {formatCurrency(txn.running_balance)}

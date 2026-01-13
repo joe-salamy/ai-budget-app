@@ -40,11 +40,11 @@ function DashboardPage() {
   } = useDashboard();
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDateRange({ ...dateRange, startDate: e.target.value });
+    setDateRange((prev) => ({ ...prev, startDate: e.target.value }));
   };
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDateRange({ ...dateRange, endDate: e.target.value });
+    setDateRange((prev) => ({ ...prev, endDate: e.target.value }));
   };
 
   const handlePresetClick = (preset: typeof DATE_PRESETS[0]) => {

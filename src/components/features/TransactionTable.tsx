@@ -265,7 +265,9 @@ export function TransactionTable({
           <tbody className="divide-y divide-gray-700/50">
             {sortedTransactions.map((txn, index) => {
               const isSelected = selectedIds.has(txn.id);
-              const amountColor = txn.amount >= 0 ? "text-green-400" : "text-red-400";
+              // Display amount from account perspective: flip sign for liability accounts
+              const displayAmount = txn.account_type === "liability" ? -txn.amount : txn.amount;
+              const amountColor = displayAmount >= 0 ? "text-green-400" : "text-red-400";
 
               return (
                 <tr
@@ -307,8 +309,8 @@ export function TransactionTable({
 
                   {/* Amount */}
                   <td className={`px-4 py-3 whitespace-nowrap text-sm text-right font-medium ${amountColor}`}>
-                    {txn.amount >= 0 ? "+" : ""}
-                    {formatCurrency(txn.amount)}
+                    {displayAmount >= 0 ? "+" : ""}
+                    {formatCurrency(displayAmount)}
                   </td>
 
                   {/* Subcategory */}

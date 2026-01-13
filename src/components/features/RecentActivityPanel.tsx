@@ -106,28 +106,32 @@ function AccountActivityCard({ activity }: AccountActivityCardProps) {
 
       {/* Recent transaction */}
       {activity.recent_transaction ? (
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex-1 min-w-0">
-            <p className="text-gray-300 truncate">
-              {activity.recent_transaction.name}
-            </p>
-            <p className="text-gray-500 text-xs">
-              {formatDistanceToNow(new Date(activity.recent_transaction.date), {
-                addSuffix: true,
-              })}
-            </p>
-          </div>
-          <span
-            className={`ml-2 font-medium ${
-              activity.recent_transaction.amount >= 0
-                ? "text-green-400"
-                : "text-red-400"
-            }`}
-          >
-            {activity.recent_transaction.amount >= 0 ? "+" : ""}
-            {formatCurrency(activity.recent_transaction.amount)}
-          </span>
-        </div>
+        (() => {
+          // Display amount from account perspective: flip sign for liability accounts
+          const displayAmount = activity.account_type === "liability" ? -activity.recent_transaction.amount : activity.recent_transaction.amount;
+          return (
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex-1 min-w-0">
+                <p className="text-gray-300 truncate">
+                  {activity.recent_transaction.name}
+                </p>
+                <p className="text-gray-500 text-xs">
+                  {formatDistanceToNow(new Date(activity.recent_transaction.date), {
+                    addSuffix: true,
+                  })}
+                </p>
+              </div>
+              <span
+                className={`ml-2 font-medium ${
+                  displayAmount >= 0 ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                {displayAmount >= 0 ? "+" : ""}
+                {formatCurrency(displayAmount)}
+              </span>
+            </div>
+          );
+        })()
       ) : (
         <p className="text-gray-500 text-sm">No transactions yet</p>
       )}

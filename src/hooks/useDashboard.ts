@@ -216,7 +216,7 @@ export function useDashboard(): UseDashboardReturn {
       setNetWorth(null);
       setMetrics(null);
     }
-  }, [authLoading, user, refreshAll]);
+  }, [authLoading, user, dateRange.startDate, dateRange.endDate, refreshAll]);
 
   return {
     // Date range

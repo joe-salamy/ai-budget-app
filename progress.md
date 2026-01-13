@@ -150,6 +150,13 @@
   - **Root Cause**: Missing table-level GRANT permissions for the `authenticated` role
   - **Fix**: Applied GRANT statements in Supabase SQL Editor
 
+- **2026-01-12: Fixed date selector not triggering data refresh on Dashboard**
+  - **Issue**: When manually changing dates using calendar selectors, transactions did not query properly. Account Summary showed no transactions and changes = 0, Category Summary was blank. However, preset buttons worked correctly.
+  - **Root Cause**: The `useEffect` hook in `useDashboard.ts` depended on `refreshAll` callback, creating a complex dependency chain. When dates were changed manually, React didn't properly detect the change and trigger the effect to refetch data.
+  - **Fix**:
+    - Added `dateRange.startDate` and `dateRange.endDate` explicitly to the effect's dependency array in `src/hooks/useDashboard.ts:219`
+    - Updated date change handlers in `src/pages/DashboardPage.tsx:42-48` to use functional updates for better state handling
+
 ## Next Immediate Steps
 
 1. **Proceed to Phase 6**: Dashboard - Visualizations
