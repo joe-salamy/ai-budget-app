@@ -122,7 +122,7 @@ A personal finance management application with AI-powered transaction categoriza
 
 ### AI/LLM
 
-- **Primary Model**: Google Gemini 1.5 Flash (prioritizing accuracy > speed > cost)
+- **Primary Model**: Google Gemini 2.5 Flash (prioritizing accuracy > speed > cost)
 - **Use Cases**:
   - Transaction categorization
   - Statement parsing
@@ -2049,7 +2049,7 @@ These features are noted but not part of the MVP development plan:
 - **Fallback gracefully**: Always have "Unassigned" as fallback if AI fails
 - **Cost management**: Cache common categorizations to reduce API calls
 - **Prompt engineering**: Iterate on prompts based on real-world accuracy
-- **Model choice**: Start with Gemini 1.5 Flash for balance of accuracy/cost; upgrade to Pro if needed
+- **Model choice**: Start with Gemini 2.5 Flash for balance of accuracy/cost; upgrade to Pro if needed
 
 #### AI Categorization Optimization Factors
 
@@ -2082,7 +2082,7 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **Implementation**: Query ai_corrections table, include in dedicated prompt section
 
 4. **Model Selection**
-   - **Gemini 1.5 Flash** (recommended starting point):
+   - **Gemini 2.5 Flash** (recommended starting point):
      - Speed: Very fast (~1-2 seconds)
      - Cost: $0.075 per 1M input tokens, $0.30 per 1M output tokens
      - Accuracy: Good for straightforward categorization
@@ -2137,7 +2137,7 @@ Key variables to tune for optimal performance, cost, and accuracy:
    - **Token limit exceeded**: Reduce context window automatically and retry
    - **Rate limit exceeded**: Queue request or show user-friendly message
 
-10. **Cost Estimation** (example with Gemini 1.5 Flash)
+10. **Cost Estimation** (example with Gemini 2.5 Flash)
     - **Single transaction**:
       - Input: ~500 tokens (context + transaction)
       - Output: ~10 tokens (JSON response)

@@ -130,7 +130,11 @@ export async function createTransfer(
   amount: number,
   subcategoryId?: string | null,
   comment?: string | null
-): Promise<{ success: boolean; data?: { outgoing: Transaction; incoming: Transaction }; error?: string }> {
+): Promise<{
+  success: boolean;
+  data?: { outgoing: Transaction; incoming: Transaction };
+  error?: string;
+}> {
   try {
     const {
       data: { user },
@@ -186,10 +190,7 @@ export async function createTransfer(
 
     if (incomingError) {
       // Rollback the outgoing transaction if incoming fails
-      await supabase
-        .from("transactions")
-        .delete()
-        .eq("id", outgoing.id);
+      await supabase.from("transactions").delete().eq("id", outgoing.id);
       return { success: false, error: incomingError.message };
     }
 
@@ -207,9 +208,7 @@ export async function createTransfer(
 /**
  * Get all transactions for the current user (non-deleted) with optional filters
  */
-export async function getTransactions(
-  filters?: TransactionFilters
-): Promise<TransactionsResponse> {
+export async function getTransactions(filters?: TransactionFilters): Promise<TransactionsResponse> {
   try {
     const {
       data: { user },
@@ -283,12 +282,14 @@ export async function getTransactionsWithDetails(
     // First get transactions
     let query = supabase
       .from("transactions")
-      .select(`
+      .select(
+        `
         *,
         account:accounts!account_id(name, type),
         subcategory:subcategories!subcategory_id(name, category_id, category:categories!category_id(id, name, type)),
         transfer_account:accounts!transfer_to_account_id(name)
-      `)
+      `
+      )
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .order("date", { ascending: false })
@@ -329,7 +330,7 @@ export async function getTransactionsWithDetails(
       const subcategory = txn.subcategory as {
         name: string;
         category_id: string;
-        category: { id: string; name: string; type: string } | null
+        category: { id: string; name: string; type: string } | null;
       } | null;
       const transferAccount = txn.transfer_account as { name: string } | null;
 
@@ -361,9 +362,7 @@ export async function getTransactionsWithDetails(
 /**
  * Get transactions for a specific account
  */
-export async function getTransactionsByAccount(
-  accountId: string
-): Promise<TransactionsResponse> {
+export async function getTransactionsByAccount(accountId: string): Promise<TransactionsResponse> {
   return getTransactions({ accountId });
 }
 
@@ -492,10 +491,7 @@ export async function getRecentActivityByAccount(): Promise<{
           .eq("account_id", account.id)
           .is("deleted_at", null);
 
-        const transactionSum = (transactions || []).reduce(
-          (sum, txn) => sum + txn.amount,
-          0
-        );
+        const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
         const currentBalance = account.initial_balance + transactionSum;
 
         // Get most recent transaction
@@ -726,10 +722,7 @@ export async function calculateRunningBalance(
       return { success: false, error: txnError.message };
     }
 
-    const transactionSum = (transactions || []).reduce(
-      (sum, txn) => sum + txn.amount,
-      0
-    );
+    const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
     return { success: true, balance: account.initial_balance + transactionSum };
   } catch (error) {
@@ -780,10 +773,7 @@ export async function calculateCurrentBalance(
       return { success: false, error: txnError.message };
     }
 
-    const transactionSum = (transactions || []).reduce(
-      (sum, txn) => sum + txn.amount,
-      0
-    );
+    const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
     return { success: true, balance: account.initial_balance + transactionSum };
   } catch (error) {
@@ -863,10 +853,7 @@ export async function getTransactionsWithRunningBalance(
         .lt("date", filters.startDate)
         .is("deleted_at", null);
 
-      const priorSum = (priorTransactions || []).reduce(
-        (sum, txn) => sum + txn.amount,
-        0
-      );
+      const priorSum = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
       startingBalance += priorSum;
     }
 

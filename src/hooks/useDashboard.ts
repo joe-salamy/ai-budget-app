@@ -8,19 +8,9 @@ import {
   calculateNetWorth,
   getDashboardMetrics,
 } from "../services/dashboard";
-import {
-  prepareNetWorthData,
-  prepareSankeyData,
-} from "../services/charts";
-import type {
-  AccountSummary,
-  CategorySummary,
-  NetWorthSummary,
-} from "../services/dashboard";
-import type {
-  NetWorthDataPoint,
-  SankeyData,
-} from "../services/charts";
+import { prepareNetWorthData, prepareSankeyData } from "../services/charts";
+import type { AccountSummary, CategorySummary, NetWorthSummary } from "../services/dashboard";
+import type { NetWorthDataPoint, SankeyData } from "../services/charts";
 import type { AccountType } from "../types";
 import { useAuth } from "./useAuth";
 
@@ -129,7 +119,9 @@ export function useDashboard(): UseDashboardReturn {
 
   // Chart state - Net Worth
   const [netWorthChartData, setNetWorthChartData] = useState<NetWorthDataPoint[]>([]);
-  const [netWorthChartAccounts, setNetWorthChartAccounts] = useState<Array<{ name: string; type: AccountType }>>([]);
+  const [netWorthChartAccounts, setNetWorthChartAccounts] = useState<
+    Array<{ name: string; type: AccountType }>
+  >([]);
   const [netWorthChartLoading, setNetWorthChartLoading] = useState<boolean>(true);
   const [netWorthChartError, setNetWorthChartError] = useState<string | null>(null);
 
@@ -270,10 +262,7 @@ export function useDashboard(): UseDashboardReturn {
 
   // Refresh all charts
   const refreshCharts = useCallback(async () => {
-    await Promise.all([
-      fetchNetWorthChart(),
-      fetchSankeyData(),
-    ]);
+    await Promise.all([fetchNetWorthChart(), fetchSankeyData()]);
   }, [fetchNetWorthChart, fetchSankeyData]);
 
   // Refresh all data
@@ -285,7 +274,13 @@ export function useDashboard(): UseDashboardReturn {
       fetchNetWorthChart(),
       fetchSankeyData(),
     ]);
-  }, [fetchAccountSummary, fetchCategorySummary, fetchMetrics, fetchNetWorthChart, fetchSankeyData]);
+  }, [
+    fetchAccountSummary,
+    fetchCategorySummary,
+    fetchMetrics,
+    fetchNetWorthChart,
+    fetchSankeyData,
+  ]);
 
   // Load data when auth is ready and date range changes
   useEffect(() => {

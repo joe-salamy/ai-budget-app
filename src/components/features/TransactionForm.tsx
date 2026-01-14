@@ -1,11 +1,17 @@
 // TransactionForm component - Reusable form for adding/editing transactions
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import type { SelectOption } from "../ui/Select";
 import { useAutoSave } from "../../hooks/useAutoSave";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
+import {
+  categorizeSingleTransaction,
+  getAICorrection,
+  saveAICorrection,
+} from "../../services/ai";
+import type { CategorizationResult } from "../../services/ai";
 import type { Account, Category, Subcategory } from "../../types";
 
 // ============== TYPES ==============
@@ -21,6 +27,19 @@ export interface TransactionFormData {
   comment: string;
   // Transfer-specific
   transfer_to_account_id?: string;
+  // AI-related
+  ai_suggested?: boolean;
+  user_corrected?: boolean;
+}
+
+// AI categorization state
+type CategorizationSource = "none" | "lookup" | "correction" | "ai";
+
+interface AICategorizationState {
+  source: CategorizationSource;
+  suggestion: CategorizationResult | null;
+  isLoading: boolean;
+  userAccepted: boolean;
 }
 
 interface TransactionFormProps {
@@ -63,8 +82,17 @@ export function TransactionForm({
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof TransactionFormData, string>>>({});
-  const [lookupHint, setLookupHint] = useState<string | null>(null);
-  const [isLookingUp, setIsLookingUp] = useState(false);
+
+  // AI categorization state
+  const [aiState, setAIState] = useState<AICategorizationState>({
+    source: "none",
+    suggestion: null,
+    isLoading: false,
+    userAccepted: false,
+  });
+
+  // Track the original AI suggestion for correction saving
+  const originalAISuggestionRef = useRef<CategorizationResult | null>(null);
 
   // Filter subcategories based on transaction type
   const filteredSubcategories = useMemo(() => {
@@ -135,6 +163,15 @@ export function TransactionForm({
     return options;
   }, [filteredSubcategories, categories]);
 
+  // Get account name from account ID
+  const getAccountName = useCallback(
+    (accountId: string): string => {
+      const account = accounts.find((a) => a.id === accountId);
+      return account?.name || "Unknown Account";
+    },
+    [accounts]
+  );
+
   // Handle field changes
   const handleChange = useCallback(
     (field: keyof TransactionFormData, value: string) => {
@@ -142,38 +179,201 @@ export function TransactionForm({
       // Clear error for this field
       setErrors((prev) => ({ ...prev, [field]: undefined }));
 
-      // Clear lookup hint if name changes
-      if (field === "name") {
-        setLookupHint(null);
+      // Clear AI state if name, account, or amount changes
+      if (field === "name" || field === "account_id" || field === "amount") {
+        setAIState({
+          source: "none",
+          suggestion: null,
+          isLoading: false,
+          userAccepted: false,
+        });
+        originalAISuggestionRef.current = null;
+      }
+
+      // Track if user manually changes subcategory after AI suggestion
+      if (field === "subcategory_id" && aiState.source === "ai" && aiState.suggestion) {
+        if (value !== aiState.suggestion.subcategory_id) {
+          setAIState((prev) => ({ ...prev, userAccepted: false }));
+        }
       }
     },
-    []
+    [aiState.source, aiState.suggestion]
   );
 
-  // Lookup previous transaction when name is entered (for auto-categorization)
+  // Lookup previous transaction and AI correction, or trigger AI categorization
   const handleNameBlur = useCallback(async () => {
-    if (!formData.name || !formData.account_id) return;
+    if (!formData.name.trim() || !formData.account_id) return;
 
-    setIsLookingUp(true);
+    // Don't re-categorize if we already have a suggestion for this name
+    if (aiState.source !== "none" && aiState.suggestion) return;
+
+    setAIState((prev) => ({ ...prev, isLoading: true }));
+
     try {
-      const response = await getRecentTransactionByNameAndAccount(
+      // Step 1: Check for AI correction first (user's preferred categorization)
+      const correctionResponse = await getAICorrection(
         formData.name,
         formData.account_id
       );
 
-      if (response.success && response.data && response.data.subcategory_id) {
-        // Auto-fill subcategory from previous transaction
+      if (correctionResponse.success && correctionResponse.data) {
+        // Found a user correction - use it
+        const subcategory = subcategories.find(
+          (s) => s.id === correctionResponse.data!.subcategory_id
+        );
+        const category = subcategory
+          ? categories.find((c) => c.id === subcategory.category_id)
+          : null;
+
         setFormData((prev) => ({
           ...prev,
-          subcategory_id: response.data!.subcategory_id || "",
+          subcategory_id: correctionResponse.data!.subcategory_id,
         }));
-        setLookupHint("Based on previous entry");
+        setAIState({
+          source: "correction",
+          suggestion: {
+            subcategory_id: correctionResponse.data!.subcategory_id,
+            subcategory_name: subcategory?.name || "Unknown",
+            category_name: category?.name || "Unknown",
+            confidence: 1.0,
+          },
+          isLoading: false,
+          userAccepted: true,
+        });
+        return;
+      }
+
+      // Step 2: Check for previous transaction with same name + account
+      const lookupResponse = await getRecentTransactionByNameAndAccount(
+        formData.name,
+        formData.account_id
+      );
+
+      if (lookupResponse.success && lookupResponse.data && lookupResponse.data.subcategory_id) {
+        // Found a previous transaction - use its category
+        const subcategory = subcategories.find(
+          (s) => s.id === lookupResponse.data!.subcategory_id
+        );
+        const category = subcategory
+          ? categories.find((c) => c.id === subcategory.category_id)
+          : null;
+
+        setFormData((prev) => ({
+          ...prev,
+          subcategory_id: lookupResponse.data!.subcategory_id || "",
+        }));
+        setAIState({
+          source: "lookup",
+          suggestion: {
+            subcategory_id: lookupResponse.data!.subcategory_id || "",
+            subcategory_name: subcategory?.name || "Unknown",
+            category_name: category?.name || "Unknown",
+            confidence: 0.95,
+          },
+          isLoading: false,
+          userAccepted: true,
+        });
+        return;
+      }
+
+      // Step 3: No previous match - trigger AI categorization
+      // Only trigger if we have an amount (to determine income vs expense)
+      if (!formData.amount) {
+        setAIState((prev) => ({ ...prev, isLoading: false }));
+        return;
+      }
+
+      const amount = parseFloat(formData.amount);
+      const adjustedAmount = type === "expense" ? -Math.abs(amount) : Math.abs(amount);
+
+      const aiResponse = await categorizeSingleTransaction({
+        name: formData.name,
+        account_name: getAccountName(formData.account_id),
+        amount: adjustedAmount,
+      });
+
+      if (aiResponse.success && aiResponse.data) {
+        // AI returned a suggestion
+        setFormData((prev) => ({
+          ...prev,
+          subcategory_id: aiResponse.data!.subcategory_id,
+        }));
+        setAIState({
+          source: "ai",
+          suggestion: aiResponse.data,
+          isLoading: false,
+          userAccepted: false, // User needs to accept or override
+        });
+        originalAISuggestionRef.current = aiResponse.data;
+      } else {
+        // AI failed - clear loading state
+        setAIState({
+          source: "none",
+          suggestion: null,
+          isLoading: false,
+          userAccepted: false,
+        });
       }
     } catch {
-      // Ignore lookup errors
+      // Error during lookup/AI - clear loading state
+      setAIState({
+        source: "none",
+        suggestion: null,
+        isLoading: false,
+        userAccepted: false,
+      });
     }
-    setIsLookingUp(false);
-  }, [formData.name, formData.account_id]);
+  }, [
+    formData.name,
+    formData.account_id,
+    formData.amount,
+    aiState.source,
+    aiState.suggestion,
+    type,
+    categories,
+    subcategories,
+    getAccountName,
+  ]);
+
+  // Also trigger AI categorization when amount is entered (if name is already filled)
+  const handleAmountBlur = useCallback(async () => {
+    // Only trigger AI if we have name and account but no categorization yet
+    if (
+      formData.name.trim() &&
+      formData.account_id &&
+      formData.amount &&
+      aiState.source === "none" &&
+      !aiState.isLoading
+    ) {
+      await handleNameBlur();
+    }
+  }, [formData.name, formData.account_id, formData.amount, aiState.source, aiState.isLoading, handleNameBlur]);
+
+  // Accept AI suggestion
+  const handleAcceptAISuggestion = useCallback(() => {
+    setAIState((prev) => ({ ...prev, userAccepted: true }));
+  }, []);
+
+  // Override AI suggestion (called when user changes subcategory after AI suggestion)
+  const handleSubcategoryChange = useCallback(
+    (value: string) => {
+      handleChange("subcategory_id", value);
+
+      // If this is an override of an AI suggestion, mark for correction saving
+      if (aiState.source === "ai" && aiState.suggestion && value !== aiState.suggestion.subcategory_id) {
+        setAIState((prev) => ({
+          ...prev,
+          userAccepted: false,
+        }));
+      } else if (aiState.source === "ai" && aiState.suggestion && value === aiState.suggestion.subcategory_id) {
+        setAIState((prev) => ({
+          ...prev,
+          userAccepted: true,
+        }));
+      }
+    },
+    [handleChange, aiState.source, aiState.suggestion]
+  );
 
   // Validate form
   const validate = useCallback((): boolean => {
@@ -213,9 +413,34 @@ export function TransactionForm({
 
     if (!validate()) return;
 
-    const result = await onSubmit(formData);
+    // Determine AI flags
+    const wasAISuggested = aiState.source === "ai";
+    const wasUserCorrected = Boolean(
+      wasAISuggested &&
+      originalAISuggestionRef.current &&
+      formData.subcategory_id !== originalAISuggestionRef.current.subcategory_id
+    );
+
+    // Prepare form data with AI flags
+    const submitData: TransactionFormData = {
+      ...formData,
+      ai_suggested: wasAISuggested,
+      user_corrected: wasUserCorrected,
+    };
+
+    const result = await onSubmit(submitData);
 
     if (result.success) {
+      // Save AI correction if user overrode the suggestion
+      if (wasUserCorrected && originalAISuggestionRef.current && formData.subcategory_id) {
+        await saveAICorrection({
+          transaction_name: formData.name,
+          account_id: formData.account_id,
+          ai_suggested_subcategory_id: originalAISuggestionRef.current.subcategory_id,
+          user_corrected_subcategory_id: formData.subcategory_id,
+        });
+      }
+
       // Reset form on success
       setFormData({
         date: today,
@@ -226,7 +451,13 @@ export function TransactionForm({
         comment: "",
         transfer_to_account_id: "",
       });
-      setLookupHint(null);
+      setAIState({
+        source: "none",
+        suggestion: null,
+        isLoading: false,
+        userAccepted: false,
+      });
+      originalAISuggestionRef.current = null;
     } else if (result.error) {
       setErrors({ name: result.error });
     }
@@ -304,12 +535,6 @@ export function TransactionForm({
             error={errors.name}
             fullWidth
           />
-          {isLookingUp && (
-            <p className="text-sm text-gray-400 mt-1">Looking up previous entries...</p>
-          )}
-          {lookupHint && (
-            <p className="text-sm text-green-400 mt-1">{lookupHint}</p>
-          )}
         </div>
 
         {/* Amount */}
@@ -320,6 +545,7 @@ export function TransactionForm({
           min="0"
           value={formData.amount}
           onChange={(e) => handleChange("amount", e.target.value)}
+          onBlur={handleAmountBlur}
           placeholder="0.00"
           error={errors.amount}
           fullWidth
@@ -328,14 +554,90 @@ export function TransactionForm({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Subcategory */}
-        <Select
-          label={`Subcategory${type === "transfer" ? " (Optional)" : ""}`}
-          options={subcategoryOptions}
-          value={formData.subcategory_id}
-          onChange={(value) => handleChange("subcategory_id", value)}
-          placeholder="Select subcategory"
-          error={errors.subcategory_id}
-        />
+        <div>
+          <Select
+            label={`Subcategory${type === "transfer" ? " (Optional)" : ""}`}
+            options={subcategoryOptions}
+            value={formData.subcategory_id}
+            onChange={handleSubcategoryChange}
+            placeholder="Select subcategory"
+            error={errors.subcategory_id}
+          />
+
+          {/* AI Categorization Status */}
+          {aiState.isLoading && (
+            <div className="flex items-center gap-2 mt-2 text-sm text-gray-400">
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              <span>AI is categorizing...</span>
+            </div>
+          )}
+
+          {/* Lookup match hint */}
+          {aiState.source === "lookup" && aiState.suggestion && (
+            <p className="text-sm text-green-400 mt-2">
+              Based on previous entry
+            </p>
+          )}
+
+          {/* User correction match hint */}
+          {aiState.source === "correction" && aiState.suggestion && (
+            <p className="text-sm text-blue-400 mt-2">
+              Based on your preference
+            </p>
+          )}
+
+          {/* AI suggestion with accept/override UI */}
+          {aiState.source === "ai" && aiState.suggestion && !aiState.isLoading && (
+            <div className="mt-2">
+              {aiState.userAccepted ? (
+                <p className="text-sm text-green-400 flex items-center gap-1">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  AI suggestion accepted
+                </p>
+              ) : formData.subcategory_id === aiState.suggestion.subcategory_id ? (
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-yellow-400">
+                    AI suggests: {aiState.suggestion.category_name} &gt; {aiState.suggestion.subcategory_name}
+                    <span className="text-gray-500 ml-1">
+                      ({Math.round(aiState.suggestion.confidence * 100)}% confident)
+                    </span>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleAcceptAISuggestion}
+                    className="text-green-400 hover:text-green-300 transition-colors"
+                    title="Accept suggestion"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-orange-400">
+                  Changed from AI suggestion
+                </p>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Category (read-only, derived from subcategory) */}
         <div>

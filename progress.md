@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Phase 6 Complete** ✅ - Dashboard Visualizations implemented
+**Phase 7 Complete** ✅ - AI Integration - Single Transaction Categorization
 
 ## Completed Milestones
 
@@ -148,13 +148,45 @@
       - Replaced placeholder with SankeyDiagram
       - Charts update with date range changes
 
+- **Phase 7: AI Integration - Single Transaction Categorization** ✅
+  - **Serverless Functions**:
+    - [api/categorize.ts](api/categorize.ts) - Vercel serverless function for AI categorization:
+      - Single and batch mode support
+      - Fetches user's subcategories, past transactions, and AI corrections
+      - Builds intelligent prompt for Gemini 2.5 Flash
+      - Returns categorization with confidence scores
+      - Fallback to "Unassigned" on API failures
+      - Token usage logging for cost monitoring
+  - **Services**:
+    - [src/services/ai.ts](src/services/ai.ts) - Frontend AI service:
+      - categorizeSingleTransaction() - Single transaction categorization
+      - categorizeBatchTransactions() - Batch categorization support
+      - saveAICorrection() - Store user corrections for learning
+      - getAICorrection() - Retrieve user's preferred categorization
+  - **UI Components**:
+    - [src/components/features/TransactionForm.tsx](src/components/features/TransactionForm.tsx) - Updated with AI categorization:
+      - Lookup-first approach: checks AI corrections → past transactions → AI
+      - Loading state with spinner during AI categorization
+      - Visual indicators: "Based on previous entry", "Based on your preference", "AI suggests"
+      - Accept/override UI for AI suggestions with confidence display
+      - Automatic correction saving when user overrides AI
+      - ai_suggested and user_corrected flags on form data
+  - **Pages**:
+    - [src/pages/TransactionInputPage.tsx](src/pages/TransactionInputPage.tsx) - Updated:
+      - Passes AI flags to transaction creation
+      - Updated tips to explain auto-categorization and AI learning
+  - **Environment**:
+    - [.env.local.example](.env.local.example) - Added server-side keys:
+      - SUPABASE_SERVICE_ROLE_KEY for serverless functions
+      - GEMINI_API_KEY for Google AI
+
 ## Technical Decisions
 
 - **Decision**: Supabase for database and auth
 - **Decision**: React 19 + TypeScript + Vite
 - **Decision**: Tailwind CSS 4 + dark mode only
 - **Decision**: Vercel for hosting
-- **Decision**: Gemini 1.5 Flash for AI
+- **Decision**: Gemini 2.5 Flash for AI
 
 ## Deviations from plan.md
 
@@ -182,13 +214,27 @@
     - Added `dateRange.startDate` and `dateRange.endDate` explicitly to the effect's dependency array in `src/hooks/useDashboard.ts:219`
     - Updated date change handlers in `src/pages/DashboardPage.tsx:42-48` to use functional updates for better state handling
 
+## Recent Changes
+
+- **2026-01-13: Transaction Input Page - Multi-Transaction Tabular Input**
+  - **Change**: Replaced single-transaction form with tabular multi-transaction entry
+  - **New Component**: [src/components/features/MultiTransactionTable.tsx](src/components/features/MultiTransactionTable.tsx)
+  - **Features**:
+    - Enter multiple transactions at once in a table format (starts with 3 rows, can add more)
+    - Separate tabs for Income, Expense, and Transfer types
+    - "Auto-Categorize" button for batch AI categorization of uncategorized transactions
+    - AI categorization now runs ONLY on button click (not on description blur)
+    - Batch processing: up to 25 transactions per LLM call to reduce API usage
+    - Visual indicators for categorization source: "Previous" (lookup), "Preferred" (user correction), "AI", "Corrected"
+    - Rows persist account selection when adding new rows
+
 ## Next Immediate Steps
 
-1. **Proceed to Phase 7**: AI Integration - Single Transaction Categorization
-   - Set up Vercel serverless function for AI endpoint
-   - Integrate Gemini 1.5 Flash API
-   - Add auto-categorization to transaction form
-   - Store AI suggestions and user corrections
+1. **Proceed to Phase 8**: Statement Parsing with Regex + Parallel Batch Categorization
+   - Create regex parsing utilities for statement formats
+   - Create Vercel serverless function for statement parsing
+   - Implement parallel batch categorization
+   - Build statement upload UI with review workflow
 
 ## Project Organization
 

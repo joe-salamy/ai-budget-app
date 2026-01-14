@@ -119,16 +119,14 @@ export async function getAccountSummary(
           .lt("date", startDate)
           .is("deleted_at", null);
 
-        const priorSum = (priorTransactions || []).reduce(
-          (sum, txn) => sum + txn.amount,
-          0
-        );
+        const priorSum = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
         const startingBalance = account.initial_balance + priorSum;
 
         // Get transactions in the date range with details
         const { data: rangeTransactions } = await supabase
           .from("transactions")
-          .select(`
+          .select(
+            `
             id,
             date,
             name,
@@ -137,7 +135,8 @@ export async function getAccountSummary(
               name,
               category:categories!category_id(name)
             )
-          `)
+          `
+          )
           .eq("user_id", user.id)
           .eq("account_id", account.id)
           .gte("date", startDate)
@@ -148,38 +147,33 @@ export async function getAccountSummary(
 
         // Calculate total change and running balances
         let runningBalance = startingBalance;
-        const totalChange = (rangeTransactions || []).reduce(
-          (sum, txn) => sum + txn.amount,
-          0
-        );
+        const totalChange = (rangeTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
-        const transactions: AccountTransaction[] = (rangeTransactions || []).map(
-          (txn) => {
-            runningBalance += txn.amount;
-            // Supabase returns nested relations - handle type casting
-            const subcategoryData = txn.subcategory as unknown;
-            let subcategoryName: string | null = null;
-            let categoryName: string | null = null;
+        const transactions: AccountTransaction[] = (rangeTransactions || []).map((txn) => {
+          runningBalance += txn.amount;
+          // Supabase returns nested relations - handle type casting
+          const subcategoryData = txn.subcategory as unknown;
+          let subcategoryName: string | null = null;
+          let categoryName: string | null = null;
 
-            if (subcategoryData && typeof subcategoryData === "object") {
-              const sub = subcategoryData as { name?: string; category?: { name?: string } | null };
-              subcategoryName = sub.name || null;
-              if (sub.category && typeof sub.category === "object") {
-                categoryName = sub.category.name || null;
-              }
+          if (subcategoryData && typeof subcategoryData === "object") {
+            const sub = subcategoryData as { name?: string; category?: { name?: string } | null };
+            subcategoryName = sub.name || null;
+            if (sub.category && typeof sub.category === "object") {
+              categoryName = sub.category.name || null;
             }
-
-            return {
-              id: txn.id,
-              date: txn.date,
-              name: txn.name,
-              amount: txn.amount,
-              running_balance: runningBalance,
-              subcategory_name: subcategoryName,
-              category_name: categoryName,
-            };
           }
-        );
+
+          return {
+            id: txn.id,
+            date: txn.date,
+            name: txn.name,
+            amount: txn.amount,
+            running_balance: runningBalance,
+            subcategory_name: subcategoryName,
+            category_name: categoryName,
+          };
+        });
 
         return {
           account_id: account.id,
@@ -244,7 +238,8 @@ export async function getCategorySummary(
     // Get all categories with subcategories
     const { data: categories, error: categoriesError } = await supabase
       .from("categories")
-      .select(`
+      .select(
+        `
         id,
         name,
         type,
@@ -252,7 +247,8 @@ export async function getCategorySummary(
           id,
           name
         )
-      `)
+      `
+      )
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .order("type", { ascending: true })
@@ -315,36 +311,28 @@ export async function getCategorySummary(
 
     // Build category summaries
     const categorySummaries: CategorySummary[] = categories.map((category) => {
-      const subcategories = (
-        category.subcategories as Array<{ id: string; name: string }>
-      ).filter((sub) => sub);
-
-      const subcategorySummaries: SubcategorySummary[] = subcategories.map(
-        (subcategory) => {
-          const total = subcategoryTotals[subcategory.id] || 0;
-          const goal = subcategoryGoals[subcategory.id] || null;
-          const difference = goal !== null ? goal - Math.abs(total) : null;
-
-          return {
-            subcategory_id: subcategory.id,
-            subcategory_name: subcategory.name,
-            total,
-            goal,
-            difference,
-          };
-        }
+      const subcategories = (category.subcategories as Array<{ id: string; name: string }>).filter(
+        (sub) => sub
       );
+
+      const subcategorySummaries: SubcategorySummary[] = subcategories.map((subcategory) => {
+        const total = subcategoryTotals[subcategory.id] || 0;
+        const goal = subcategoryGoals[subcategory.id] || null;
+        const difference = goal !== null ? goal - Math.abs(total) : null;
+
+        return {
+          subcategory_id: subcategory.id,
+          subcategory_name: subcategory.name,
+          total,
+          goal,
+          difference,
+        };
+      });
 
       // Calculate category totals
-      const categoryTotal = subcategorySummaries.reduce(
-        (sum, sub) => sum + sub.total,
-        0
-      );
+      const categoryTotal = subcategorySummaries.reduce((sum, sub) => sum + sub.total, 0);
       const categoryGoal = subcategorySummaries.some((sub) => sub.goal !== null)
-        ? subcategorySummaries.reduce(
-            (sum, sub) => sum + (sub.goal || 0),
-            0
-          )
+        ? subcategorySummaries.reduce((sum, sub) => sum + (sub.goal || 0), 0)
         : null;
       const categoryDifference =
         categoryGoal !== null ? categoryGoal - Math.abs(categoryTotal) : null;
@@ -375,9 +363,7 @@ export async function getCategorySummary(
  * Calculate net worth at a specific date
  * Net worth = Total Assets - Total Liabilities
  */
-export async function calculateNetWorth(
-  atDate: string
-): Promise<NetWorthResponse> {
+export async function calculateNetWorth(atDate: string): Promise<NetWorthResponse> {
   try {
     const {
       data: { user },
@@ -420,10 +406,7 @@ export async function calculateNetWorth(
           .lte("date", atDate)
           .is("deleted_at", null);
 
-        const transactionSum = (transactions || []).reduce(
-          (sum, txn) => sum + txn.amount,
-          0
-        );
+        const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
         const balance = account.initial_balance + transactionSum;
 
         if (account.type === "asset") {
@@ -479,12 +462,14 @@ export async function getDashboardMetrics(
     // Get all transactions in the date range with category info
     const { data: transactions, error: transactionsError } = await supabase
       .from("transactions")
-      .select(`
+      .select(
+        `
         amount,
         subcategory:subcategories!subcategory_id(
           category:categories!category_id(type)
         )
-      `)
+      `
+      )
       .eq("user_id", user.id)
       .gte("date", startDate)
       .lte("date", endDate)

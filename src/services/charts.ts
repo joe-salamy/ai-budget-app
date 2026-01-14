@@ -207,7 +207,8 @@ export async function prepareSankeyData(
     // Get categories with subcategories
     const { data: categories, error: categoriesError } = await supabase
       .from("categories")
-      .select(`
+      .select(
+        `
         id,
         name,
         type,
@@ -215,7 +216,8 @@ export async function prepareSankeyData(
           id,
           name
         )
-      `)
+      `
+      )
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
@@ -241,7 +243,15 @@ export async function prepareSankeyData(
     }
 
     // Build subcategory to category mapping
-    const subcategoryToCategory: Record<string, { categoryId: string; categoryName: string; categoryType: CategoryType; subcategoryName: string }> = {};
+    const subcategoryToCategory: Record<
+      string,
+      {
+        categoryId: string;
+        categoryName: string;
+        categoryType: CategoryType;
+        subcategoryName: string;
+      }
+    > = {};
 
     categories.forEach((category) => {
       const subs = (category.subcategories as Array<{ id: string; name: string }>) || [];
@@ -261,7 +271,8 @@ export async function prepareSankeyData(
     (transactions || []).forEach((txn) => {
       if (txn.subcategory_id && subcategoryToCategory[txn.subcategory_id]) {
         const absAmount = Math.abs(txn.amount);
-        subcategoryTotals[txn.subcategory_id] = (subcategoryTotals[txn.subcategory_id] || 0) + absAmount;
+        subcategoryTotals[txn.subcategory_id] =
+          (subcategoryTotals[txn.subcategory_id] || 0) + absAmount;
       }
     });
 
@@ -279,9 +290,11 @@ export async function prepareSankeyData(
       if (!mapping) return;
 
       if (mapping.categoryType === "income") {
-        incomeCategoryTotals[mapping.categoryName] = (incomeCategoryTotals[mapping.categoryName] || 0) + total;
+        incomeCategoryTotals[mapping.categoryName] =
+          (incomeCategoryTotals[mapping.categoryName] || 0) + total;
       } else {
-        expenseCategoryTotals[mapping.categoryName] = (expenseCategoryTotals[mapping.categoryName] || 0) + total;
+        expenseCategoryTotals[mapping.categoryName] =
+          (expenseCategoryTotals[mapping.categoryName] || 0) + total;
       }
     });
 

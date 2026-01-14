@@ -19,11 +19,23 @@ interface UseCategoriesReturn {
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  addCategory: (name: string, type: CategoryType) => Promise<{ success: boolean; error?: string; data?: Category }>;
-  editCategory: (id: string, updates: { name?: string }) => Promise<{ success: boolean; error?: string; data?: Category }>;
+  addCategory: (
+    name: string,
+    type: CategoryType
+  ) => Promise<{ success: boolean; error?: string; data?: Category }>;
+  editCategory: (
+    id: string,
+    updates: { name?: string }
+  ) => Promise<{ success: boolean; error?: string; data?: Category }>;
   removeCategory: (id: string) => Promise<{ success: boolean; error?: string }>;
-  addSubcategory: (name: string, categoryId: string) => Promise<{ success: boolean; error?: string; data?: Subcategory }>;
-  editSubcategory: (id: string, updates: { name?: string; category_id?: string }) => Promise<{ success: boolean; error?: string; data?: Subcategory }>;
+  addSubcategory: (
+    name: string,
+    categoryId: string
+  ) => Promise<{ success: boolean; error?: string; data?: Subcategory }>;
+  editSubcategory: (
+    id: string,
+    updates: { name?: string; category_id?: string }
+  ) => Promise<{ success: boolean; error?: string; data?: Subcategory }>;
   removeSubcategory: (id: string) => Promise<{ success: boolean; error?: string }>;
   getSubcategoriesByCategory: (categoryId: string) => Subcategory[];
 }
@@ -82,10 +94,7 @@ export function useCategories(): UseCategoriesReturn {
       setSubcategories(subcategoriesResponse.data);
     } else {
       setError(
-        (prevError) =>
-          prevError ||
-          subcategoriesResponse.error ||
-          "Failed to fetch subcategories"
+        (prevError) => prevError || subcategoriesResponse.error || "Failed to fetch subcategories"
       );
     }
 
@@ -116,21 +125,16 @@ export function useCategories(): UseCategoriesReturn {
     }
   }, []);
 
-  const editCategory = useCallback(
-    async (id: string, updates: { name?: string }) => {
-      const response = await updateCategory(id, updates);
+  const editCategory = useCallback(async (id: string, updates: { name?: string }) => {
+    const response = await updateCategory(id, updates);
 
-      if (response.success && response.data) {
-        setCategories((prev) =>
-          prev.map((cat) => (cat.id === id ? response.data! : cat))
-        );
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    []
-  );
+    if (response.success && response.data) {
+      setCategories((prev) => prev.map((cat) => (cat.id === id ? response.data! : cat)));
+      return { success: true, data: response.data };
+    } else {
+      return { success: false, error: response.error };
+    }
+  }, []);
 
   const removeCategory = useCallback(async (id: string) => {
     const response = await deleteCategory(id);
@@ -145,28 +149,23 @@ export function useCategories(): UseCategoriesReturn {
 
   // Subcategory operations
 
-  const addSubcategory = useCallback(
-    async (name: string, categoryId: string) => {
-      const response = await createSubcategory({ name, category_id: categoryId });
+  const addSubcategory = useCallback(async (name: string, categoryId: string) => {
+    const response = await createSubcategory({ name, category_id: categoryId });
 
-      if (response.success && response.data) {
-        setSubcategories((prev) => [...prev, response.data!]);
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    []
-  );
+    if (response.success && response.data) {
+      setSubcategories((prev) => [...prev, response.data!]);
+      return { success: true, data: response.data };
+    } else {
+      return { success: false, error: response.error };
+    }
+  }, []);
 
   const editSubcategory = useCallback(
     async (id: string, updates: { name?: string; category_id?: string }) => {
       const response = await updateSubcategory(id, updates);
 
       if (response.success && response.data) {
-        setSubcategories((prev) =>
-          prev.map((sub) => (sub.id === id ? response.data! : sub))
-        );
+        setSubcategories((prev) => prev.map((sub) => (sub.id === id ? response.data! : sub)));
         return { success: true, data: response.data };
       } else {
         return { success: false, error: response.error };

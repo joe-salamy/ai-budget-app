@@ -1,5 +1,5 @@
-import { supabase } from '@/lib/supabaseClient';
-import type { User, AuthError } from '@supabase/supabase-js';
+import { supabase } from "@/lib/supabaseClient";
+import type { User, AuthError } from "@supabase/supabase-js";
 
 /**
  * Authentication service for managing user authentication with Supabase
@@ -17,10 +17,7 @@ export interface AuthResponse<T = User> {
  * @param password - User's password (min 6 characters)
  * @returns Promise with user data or error
  */
-export async function signUp(
-  email: string,
-  password: string
-): Promise<AuthResponse> {
+export async function signUp(email: string, password: string): Promise<AuthResponse> {
   try {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -39,7 +36,7 @@ export async function signUp(
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error during sign up'),
+      error: error instanceof Error ? error : new Error("Unknown error during sign up"),
     };
   }
 }
@@ -50,10 +47,7 @@ export async function signUp(
  * @param password - User's password
  * @returns Promise with user data or error
  */
-export async function signIn(
-  email: string,
-  password: string
-): Promise<AuthResponse> {
+export async function signIn(email: string, password: string): Promise<AuthResponse> {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -68,7 +62,7 @@ export async function signIn(
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error during sign in'),
+      error: error instanceof Error ? error : new Error("Unknown error during sign in"),
     };
   }
 }
@@ -81,13 +75,13 @@ export async function signIn(
 export async function signInWithGoogle(): Promise<AuthResponse<null>> {
   try {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
         redirectTo: `${window.location.origin}/dashboard`,
         // Request additional scopes if needed
         queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+          access_type: "offline",
+          prompt: "consent",
         },
       },
     });
@@ -101,7 +95,7 @@ export async function signInWithGoogle(): Promise<AuthResponse<null>> {
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error during Google sign in'),
+      error: error instanceof Error ? error : new Error("Unknown error during Google sign in"),
     };
   }
 }
@@ -123,7 +117,7 @@ export async function signOut(): Promise<AuthResponse<null>> {
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error during sign out'),
+      error: error instanceof Error ? error : new Error("Unknown error during sign out"),
     };
   }
 }
@@ -144,7 +138,7 @@ export async function getCurrentUser(): Promise<AuthResponse> {
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error getting current user'),
+      error: error instanceof Error ? error : new Error("Unknown error getting current user"),
     };
   }
 }
@@ -168,7 +162,7 @@ export async function resetPassword(email: string): Promise<AuthResponse<null>> 
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error sending password reset'),
+      error: error instanceof Error ? error : new Error("Unknown error sending password reset"),
     };
   }
 }
@@ -192,7 +186,7 @@ export async function updatePassword(newPassword: string): Promise<AuthResponse>
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error updating password'),
+      error: error instanceof Error ? error : new Error("Unknown error updating password"),
     };
   }
 }
@@ -208,7 +202,7 @@ export async function deleteAccount(): Promise<AuthResponse<null>> {
     const { data: userData, error: userError } = await getCurrentUser();
 
     if (userError || !userData) {
-      return { data: null, error: userError || new Error('No user found') };
+      return { data: null, error: userError || new Error("No user found") };
     }
 
     // Note: Supabase doesn't have a built-in delete user method from client
@@ -218,13 +212,13 @@ export async function deleteAccount(): Promise<AuthResponse<null>> {
     return {
       data: null,
       error: new Error(
-        'Account deletion requires server-side implementation. This feature will be available in a future update.'
+        "Account deletion requires server-side implementation. This feature will be available in a future update."
       ),
     };
   } catch (error) {
     return {
       data: null,
-      error: error instanceof Error ? error : new Error('Unknown error deleting account'),
+      error: error instanceof Error ? error : new Error("Unknown error deleting account"),
     };
   }
 }
@@ -235,7 +229,9 @@ export async function deleteAccount(): Promise<AuthResponse<null>> {
  */
 export async function isAuthenticated(): Promise<boolean> {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     return !!session;
   } catch {
     return false;

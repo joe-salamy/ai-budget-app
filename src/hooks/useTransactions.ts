@@ -37,7 +37,9 @@ interface UseTransactionsReturn {
   filters: TransactionFilters;
   setFilters: (filters: TransactionFilters) => void;
   refresh: () => Promise<void>;
-  addTransaction: (data: CreateTransactionData) => Promise<{ success: boolean; error?: string; data?: Transaction }>;
+  addTransaction: (
+    data: CreateTransactionData
+  ) => Promise<{ success: boolean; error?: string; data?: Transaction }>;
   addTransfer: (
     fromAccountId: string,
     toAccountId: string,
@@ -47,10 +49,16 @@ interface UseTransactionsReturn {
     subcategoryId?: string | null,
     comment?: string | null
   ) => Promise<{ success: boolean; error?: string }>;
-  editTransaction: (id: string, updates: UpdateTransactionData) => Promise<{ success: boolean; error?: string; data?: Transaction }>;
+  editTransaction: (
+    id: string,
+    updates: UpdateTransactionData
+  ) => Promise<{ success: boolean; error?: string; data?: Transaction }>;
   removeTransaction: (id: string) => Promise<{ success: boolean; error?: string }>;
   bulkRemove: (ids: string[]) => Promise<{ success: boolean; error?: string; count?: number }>;
-  bulkUpdateSubcategory: (ids: string[], subcategoryId: string | null) => Promise<{ success: boolean; error?: string; count?: number }>;
+  bulkUpdateSubcategory: (
+    ids: string[],
+    subcategoryId: string | null
+  ) => Promise<{ success: boolean; error?: string; count?: number }>;
 }
 
 interface UseRecentActivityReturn {
@@ -173,36 +181,30 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   );
 
   // Remove a transaction (soft delete)
-  const removeTransaction = useCallback(
-    async (id: string) => {
-      const response = await deleteTransaction(id);
+  const removeTransaction = useCallback(async (id: string) => {
+    const response = await deleteTransaction(id);
 
-      if (response.success) {
-        // Optimistic update
-        setTransactions((prev) => prev.filter((txn) => txn.id !== id));
-        return { success: true };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    []
-  );
+    if (response.success) {
+      // Optimistic update
+      setTransactions((prev) => prev.filter((txn) => txn.id !== id));
+      return { success: true };
+    } else {
+      return { success: false, error: response.error };
+    }
+  }, []);
 
   // Bulk remove transactions
-  const bulkRemove = useCallback(
-    async (ids: string[]) => {
-      const response = await bulkDeleteTransactions(ids);
+  const bulkRemove = useCallback(async (ids: string[]) => {
+    const response = await bulkDeleteTransactions(ids);
 
-      if (response.success) {
-        // Optimistic update
-        setTransactions((prev) => prev.filter((txn) => !ids.includes(txn.id)));
-        return { success: true, count: response.count };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    []
-  );
+    if (response.success) {
+      // Optimistic update
+      setTransactions((prev) => prev.filter((txn) => !ids.includes(txn.id)));
+      return { success: true, count: response.count };
+    } else {
+      return { success: false, error: response.error };
+    }
+  }, []);
 
   // Bulk update subcategory
   const bulkUpdateSubcategory = useCallback(

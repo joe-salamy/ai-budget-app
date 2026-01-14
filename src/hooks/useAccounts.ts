@@ -9,8 +9,15 @@ interface UseAccountsReturn {
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  addAccount: (name: string, type: AccountType, initialBalance: number) => Promise<{ success: boolean; error?: string; data?: Account }>;
-  editAccount: (id: string, updates: { name?: string; type?: AccountType; initial_balance?: number }) => Promise<{ success: boolean; error?: string; data?: Account }>;
+  addAccount: (
+    name: string,
+    type: AccountType,
+    initialBalance: number
+  ) => Promise<{ success: boolean; error?: string; data?: Account }>;
+  editAccount: (
+    id: string,
+    updates: { name?: string; type?: AccountType; initial_balance?: number }
+  ) => Promise<{ success: boolean; error?: string; data?: Account }>;
   removeAccount: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -90,9 +97,7 @@ export function useAccounts(): UseAccountsReturn {
 
       if (response.success && response.data) {
         // Optimistic update
-        setAccounts((prev) =>
-          prev.map((acc) => (acc.id === id ? response.data! : acc))
-        );
+        setAccounts((prev) => prev.map((acc) => (acc.id === id ? response.data! : acc)));
         return { success: true, data: response.data };
       } else {
         return { success: false, error: response.error };

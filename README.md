@@ -21,7 +21,7 @@ See [progress.md](progress.md) for detailed status updates.
 - **Styling:** Tailwind CSS 4 (dark mode)
 - **Database:** Supabase (PostgreSQL)
 - **Hosting:** Vercel
-- **AI:** Google Gemini 1.5 Flash
+- **AI:** Google Gemini 2.5 Flash
 
 ## Getting Started
 

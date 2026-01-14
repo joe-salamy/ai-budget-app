@@ -18,7 +18,7 @@ A personal finance management application with AI-powered transaction categoriza
 - **Styling**: Tailwind CSS 4
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth (Email/Password + Google OAuth)
-- **AI**: Google Gemini 1.5 Flash
+- **AI**: Google Gemini 2.5 Flash
 - **Hosting**: Vercel
 - **Charts**: Recharts + Nivo
 
@@ -48,6 +48,7 @@ npm install
 3. **Set up Supabase**:
 
 Follow the comprehensive guide in [SUPABASE_SETUP.md](SUPABASE_SETUP.md) to:
+
 - Create your Supabase project
 - Run database migrations
 - Configure authentication
@@ -139,6 +140,7 @@ MIT License - See LICENSE file for details
 ## Support
 
 For issues or questions:
+
 - Check [SUPABASE_SETUP.md](SUPABASE_SETUP.md) for setup troubleshooting
 - Review [plan.md](plan.md) for feature documentation
 - Open a GitHub issue for bugs or feature requests

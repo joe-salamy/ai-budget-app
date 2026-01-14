@@ -28,9 +28,7 @@ export interface CategoriesResponse {
 /**
  * Create a new category
  */
-export async function createCategory(
-  categoryData: CreateCategoryData
-): Promise<CategoryResponse> {
+export async function createCategory(categoryData: CreateCategoryData): Promise<CategoryResponse> {
   try {
     const {
       data: { user },
@@ -69,8 +67,7 @@ export async function createCategory(
     ) {
       return {
         success: false,
-        error:
-          "An account, category, or subcategory with this name already exists",
+        error: "An account, category, or subcategory with this name already exists",
       };
     }
 
@@ -230,8 +227,7 @@ export async function updateCategory(
       ) {
         return {
           success: false,
-          error:
-            "An account, category, or subcategory with this name already exists",
+          error: "An account, category, or subcategory with this name already exists",
         };
       }
     }
@@ -389,8 +385,7 @@ export async function createSubcategory(
     ) {
       return {
         success: false,
-        error:
-          "An account, category, or subcategory with this name already exists",
+        error: "An account, category, or subcategory with this name already exists",
       };
     }
 
@@ -492,9 +487,7 @@ export async function getSubcategoriesByCategory(
 /**
  * Get a single subcategory by ID
  */
-export async function getSubcategoryById(
-  id: string
-): Promise<SubcategoryResponse> {
+export async function getSubcategoryById(id: string): Promise<SubcategoryResponse> {
   try {
     const {
       data: { user },
@@ -588,8 +581,7 @@ export async function updateSubcategory(
       ) {
         return {
           success: false,
-          error:
-            "An account, category, or subcategory with this name already exists",
+          error: "An account, category, or subcategory with this name already exists",
         };
       }
     }
@@ -618,9 +610,7 @@ export async function updateSubcategory(
 /**
  * Soft delete a subcategory
  */
-export async function deleteSubcategory(
-  id: string
-): Promise<SubcategoryResponse> {
+export async function deleteSubcategory(id: string): Promise<SubcategoryResponse> {
   try {
     const {
       data: { user },

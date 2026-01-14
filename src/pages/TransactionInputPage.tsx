@@ -1,11 +1,12 @@
-// TransactionInputPage - Page for adding transactions with Income, Expense, and Transfer tabs
+// TransactionInputPage - Page for adding multiple transactions with Income, Expense, and Transfer tabs
 import { useState, useCallback } from "react";
-import { TransactionForm } from "../components/features/TransactionForm";
+import { MultiTransactionTable } from "../components/features/MultiTransactionTable";
 import { RecentActivityPanel } from "../components/features/RecentActivityPanel";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions, useRecentActivity } from "../hooks/useTransactions";
-import type { TransactionType, TransactionFormData } from "../components/features/TransactionForm";
+import { saveAICorrection } from "../services/ai";
+import type { TransactionType, TransactionRowData } from "../components/features/MultiTransactionTable";
 
 type TabType = "income" | "expense" | "transfer";
 
@@ -21,59 +22,93 @@ function TransactionInputPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handle form submission
-  const handleSubmit = useCallback(
-    async (data: TransactionFormData): Promise<{ success: boolean; error?: string }> => {
+  // Handle batch submission of transactions
+  const handleBatchSubmit = useCallback(
+    async (transactions: TransactionRowData[]): Promise<{ success: boolean; error?: string }> => {
       setIsSubmitting(true);
       setSuccessMessage(null);
 
       try {
-        if (activeTab === "transfer") {
-          // Handle transfer (creates two transactions)
-          const result = await addTransfer(
-            data.account_id,
-            data.transfer_to_account_id || "",
-            data.date,
-            data.name,
-            parseFloat(data.amount),
-            data.subcategory_id || null,
-            data.comment || null
-          );
+        let successCount = 0;
+        const errors: string[] = [];
 
-          if (result.success) {
-            setSuccessMessage("Transfer added successfully!");
-            refreshActivity();
-            return { success: true };
-          } else {
-            return { success: false, error: result.error };
-          }
-        } else {
-          // Handle income or expense
-          const amount = parseFloat(data.amount);
-          const signedAmount = activeTab === "income" ? Math.abs(amount) : -Math.abs(amount);
+        for (const txn of transactions) {
+          try {
+            if (activeTab === "transfer") {
+              // Handle transfer (creates two transactions)
+              const result = await addTransfer(
+                txn.account_id,
+                txn.transfer_to_account_id || "",
+                txn.date,
+                txn.name,
+                parseFloat(txn.amount),
+                txn.subcategory_id || null,
+                txn.comment || null
+              );
 
-          const result = await addTransaction({
-            account_id: data.account_id,
-            date: data.date,
-            name: data.name,
-            amount: signedAmount,
-            subcategory_id: data.subcategory_id || null,
-            comment: data.comment || null,
-            is_transfer: false,
-          });
+              if (result.success) {
+                successCount++;
+              } else {
+                errors.push(`${txn.name}: ${result.error}`);
+              }
+            } else {
+              // Handle income or expense
+              const amount = parseFloat(txn.amount);
+              const signedAmount = activeTab === "income" ? Math.abs(amount) : -Math.abs(amount);
 
-          if (result.success) {
-            setSuccessMessage(
-              activeTab === "income"
-                ? "Income added successfully!"
-                : "Expense added successfully!"
-            );
-            refreshActivity();
-            return { success: true };
-          } else {
-            return { success: false, error: result.error };
+              const result = await addTransaction({
+                account_id: txn.account_id,
+                date: txn.date,
+                name: txn.name,
+                amount: signedAmount,
+                subcategory_id: txn.subcategory_id || null,
+                comment: txn.comment || null,
+                is_transfer: false,
+                ai_suggested: txn.ai_suggested || false,
+                user_corrected: txn.user_corrected || false,
+              });
+
+              if (result.success) {
+                successCount++;
+
+                // Save AI correction if user corrected an AI suggestion
+                if (txn.user_corrected && txn.categorizationSource === "ai" && txn.subcategory_id) {
+                  // Note: We don't have the original AI suggestion stored, so we save the correction with null original
+                  await saveAICorrection({
+                    transaction_name: txn.name,
+                    account_id: txn.account_id,
+                    ai_suggested_subcategory_id: null,
+                    user_corrected_subcategory_id: txn.subcategory_id,
+                  });
+                }
+              } else {
+                errors.push(`${txn.name}: ${result.error}`);
+              }
+            }
+          } catch (err) {
+            errors.push(`${txn.name}: ${err instanceof Error ? err.message : "Unknown error"}`);
           }
         }
+
+        refreshActivity();
+
+        if (errors.length > 0) {
+          return {
+            success: false,
+            error: `${successCount} added, ${errors.length} failed: ${errors[0]}`,
+          };
+        }
+
+        const typeLabel =
+          activeTab === "income"
+            ? "income transaction"
+            : activeTab === "expense"
+            ? "expense"
+            : "transfer";
+        const plural = successCount === 1 ? "" : "s";
+
+        setSuccessMessage(`${successCount} ${typeLabel}${plural} added successfully!`);
+        return { success: true };
       } finally {
         setIsSubmitting(false);
       }
@@ -91,12 +126,12 @@ function TransactionInputPage() {
   const isDataLoading = accountsLoading || categoriesLoading;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold text-foreground">Add Transactions</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Transaction Form - Takes up 2/3 on large screens */}
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        {/* Transaction Table - Takes up 3/4 on large screens */}
+        <div className="xl:col-span-3">
           <div className="rounded-lg border border-border bg-card">
             {/* Tab Navigation */}
             <div className="border-b border-border">
@@ -120,8 +155,8 @@ function TransactionInputPage() {
               </div>
             </div>
 
-            {/* Form Content */}
-            <div className="p-6">
+            {/* Table Content */}
+            <div className="p-4">
               {/* Success Message */}
               {successMessage && (
                 <div className="mb-4 p-3 rounded-md bg-green-500/10 border border-green-500/20">
@@ -155,20 +190,14 @@ function TransactionInputPage() {
                       </a>
                     </div>
                   ) : (
-                    <TransactionForm
+                    <MultiTransactionTable
+                      key={activeTab} // Reset table when switching tabs
                       type={tabs.find((t) => t.key === activeTab)?.type || "expense"}
                       accounts={accounts}
                       categories={categories}
                       subcategories={subcategories}
-                      onSubmit={handleSubmit}
+                      onSubmit={handleBatchSubmit}
                       isLoading={isSubmitting}
-                      submitLabel={
-                        activeTab === "income"
-                          ? "Add Income"
-                          : activeTab === "expense"
-                          ? "Add Expense"
-                          : "Add Transfer"
-                      }
                     />
                   )}
                 </>
@@ -181,23 +210,26 @@ function TransactionInputPage() {
             <h3 className="text-sm font-medium text-gray-300 mb-2">Tips</h3>
             <ul className="text-sm text-gray-400 space-y-1">
               <li>
-                • <strong>Income:</strong> Money coming into your accounts (salary, dividends, refunds)
+                <strong>Income:</strong> Money coming into your accounts (salary, dividends, refunds)
               </li>
               <li>
-                • <strong>Expense:</strong> Money going out of your accounts (purchases, bills, subscriptions)
+                <strong>Expense:</strong> Money going out of your accounts (purchases, bills, subscriptions)
               </li>
               <li>
-                • <strong>Transfer:</strong> Moving money between your own accounts (paying credit card, moving to savings)
+                <strong>Transfer:</strong> Moving money between your own accounts (paying credit card, moving to savings)
               </li>
               <li>
-                • The category will auto-populate based on your previous entries for the same description
+                <strong>Batch entry:</strong> Enter multiple transactions at once, then click "Add All" to save them
+              </li>
+              <li>
+                <strong>Auto-Categorize:</strong> Click the "Auto-Categorize" button to have AI suggest categories for uncategorized transactions
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Recent Activity Panel - Takes up 1/3 on large screens */}
-        <div className="lg:col-span-1">
+        {/* Recent Activity Panel - Takes up 1/4 on large screens */}
+        <div className="xl:col-span-1">
           <RecentActivityPanel
             recentActivity={recentActivity}
             loading={activityLoading}

@@ -29,9 +29,7 @@ export interface AccountsResponse {
 /**
  * Create a new account
  */
-export async function createAccount(
-  accountData: CreateAccountData
-): Promise<AccountResponse> {
+export async function createAccount(accountData: CreateAccountData): Promise<AccountResponse> {
   try {
     const {
       data: { user },
@@ -70,8 +68,7 @@ export async function createAccount(
     ) {
       return {
         success: false,
-        error:
-          "An account, category, or subcategory with this name already exists",
+        error: "An account, category, or subcategory with this name already exists",
       };
     }
 
@@ -135,9 +132,7 @@ export async function getAccounts(): Promise<AccountsResponse> {
 /**
  * Get a single account by ID
  */
-export async function getAccountById(
-  id: string
-): Promise<AccountResponse> {
+export async function getAccountById(id: string): Promise<AccountResponse> {
   try {
     const {
       data: { user },
@@ -216,8 +211,7 @@ export async function updateAccount(
       ) {
         return {
           success: false,
-          error:
-            "An account, category, or subcategory with this name already exists",
+          error: "An account, category, or subcategory with this name already exists",
         };
       }
     }

@@ -1,15 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import type { ReactNode } from 'react';
-import { useAuth } from './hooks/useAuth';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import SignUpPage from './pages/SignUpPage';
-import DashboardPage from './pages/DashboardPage';
-import SetupPage from './pages/SetupPage';
-import TransactionInputPage from './pages/TransactionInputPage';
-import TransactionHistoryPage from './pages/TransactionHistoryPage';
-import SettingsPage from './pages/SettingsPage';
-import AppLayout from './components/AppLayout';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
+import { useAuth } from "./hooks/useAuth";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+import DashboardPage from "./pages/DashboardPage";
+import SetupPage from "./pages/SetupPage";
+import TransactionInputPage from "./pages/TransactionInputPage";
+import TransactionHistoryPage from "./pages/TransactionHistoryPage";
+import SettingsPage from "./pages/SettingsPage";
+import AppLayout from "./components/AppLayout";
 
 /**
  * Protected Route wrapper component
