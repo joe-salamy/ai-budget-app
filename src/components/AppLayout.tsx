@@ -59,6 +59,12 @@ function AppLayout() {
                 History
               </a>
               <a
+                href="/goals"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Goals
+              </a>
+              <a
                 href="/settings"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >

@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Phase 9 Complete** ✅ - AI Chatbot Side Panel
+**Phase 10 Complete** ✅ - Budget Goals & Tracking
 
 ## Completed Milestones
 
@@ -15,75 +15,43 @@
 - **Phase 6: Dashboard - Visualizations** ✅
 - **Phase 7: AI Integration - Single Transaction Categorization** ✅
 - **Phase 8: Statement Parsing with Regex + Parallel Batch Categorization** ✅
-
 - **Phase 9: AI Chatbot Side Panel** ✅
-  - **Serverless Functions**:
-    - [api/chat.ts](api/chat.ts) - Vercel serverless function for AI chat:
-      - Fetches user context (accounts, categories, transactions, goals)
-      - Fetches AI personality preference from user_preferences
-      - Fetches session chat history (last 20 messages)
-      - Builds context-aware system prompt with personality directive
-      - Function calling support for budget actions:
-        - create_account, create_category, create_subcategory
-        - add_transaction, get_spending_summary, get_account_balance
-      - Executes functions server-side and returns results in chat
-      - Saves messages to database with session tracking
+
+- **Phase 10: Budget Goals & Tracking** ✅
   - **Services**:
-    - [src/services/chat.ts](src/services/chat.ts) - Frontend chat service:
-      - sendMessage() - Calls /api/chat with session context
-      - getSessions() - Fetches user's chat sessions
-      - getSessionMessages() - Fetches messages for a session
-      - createSession() - Creates new chat session
-      - deleteSession() - Deletes session and messages
-      - renameSession() - Updates session title
-      - getAIPersonality() / updateAIPersonality() - Manage AI personality preference
+    - [src/services/goals.ts](src/services/goals.ts) - Goals CRUD operations:
+      - Spending goals: create, read, update, delete, getProgress
+      - Saving goals: create, read, update, delete, addAmount, complete/uncomplete
+      - Support for goal periods (weekly, monthly, quarterly, annual)
+      - Progress tracking with period-based calculations
   - **Hooks**:
-    - [src/hooks/useChatPanel.tsx](src/hooks/useChatPanel.tsx) - Chat panel state management:
-      - Panel open/closed state with localStorage persistence
-      - Resizable panel width (320-600px) with persistence
-      - Session management (create, select, delete, rename)
-      - Message sending with optimistic UI updates
-      - Quick action support for prompt templates
-      - Error handling and loading states
+    - [src/hooks/useGoals.ts](src/hooks/useGoals.ts) - Goals state management:
+      - Fetch spending and saving goals with details
+      - CRUD operations for both goal types
+      - Progress calculation and tracking
   - **UI Components**:
-    - [src/components/features/ChatSidePanel.tsx](src/components/features/ChatSidePanel.tsx) - Main chat panel:
-      - VS Code-style slide-in panel from right
-      - Resizable width with drag handle
-      - Session dropdown for switching/managing sessions
-      - Quick action buttons (Categorize, Add Transaction, Review Spending, Set Goal)
-      - Message area with user/assistant bubbles
-      - Markdown rendering for AI responses
-      - Copy message button
-      - Typing indicator during AI response
-      - Suggested prompts for new sessions
-      - Input area with auto-resize textarea
-    - [src/components/features/ChatSessionList.tsx](src/components/features/ChatSessionList.tsx) - Session management:
-      - Dropdown showing all sessions
-      - Session title, relative timestamp, preview
-      - Inline rename with validation
-      - Delete with confirmation
-      - New chat button
+    - [src/components/features/SpendingGoalForm.tsx](src/components/features/SpendingGoalForm.tsx)
+    - [src/components/features/SavingGoalForm.tsx](src/components/features/SavingGoalForm.tsx)
   - **Pages**:
-    - [src/components/AppLayout.tsx](src/components/AppLayout.tsx) - Updated with:
-      - ChatSidePanel integration
-      - Toggle button in header with active state
-      - Content margin adjustment when panel is open
-      - Keyboard shortcut handlers
-    - [src/pages/SettingsPage.tsx](src/pages/SettingsPage.tsx) - Updated with:
-      - AI personality selector (Professional, Friendly, Stern)
-      - Visual radio button cards with icons and examples
-      - Auto-save on selection
-      - Keyboard shortcut hint
-  - **Features**:
-    - Toggle panel from all pages (AI Assistant button)
-    - Multiple chat sessions with history
-    - Session management (create, rename, delete, switch)
-    - AI can perform actions via function calling
-    - Personality customization (Professional, Friendly, Stern)
-    - Chat history persistence per session
-    - Resizable panel width
-    - Keyboard shortcuts: Ctrl+K (toggle), Esc (close)
-    - Quick action buttons for common tasks
+    - [src/pages/GoalsPage.tsx](src/pages/GoalsPage.tsx) - Full goals management:
+      - Spending Goals section: table view with subcategory, budget, period, date range
+      - Saving Goals section: card view with progress bars, completion tracking
+      - Add/edit/delete spending goals
+      - Add/edit/delete saving goals with "Add Amount" modal
+      - Toggle complete/incomplete for saving goals
+  - **Dashboard Updates**:
+    - [src/services/dashboard.ts](src/services/dashboard.ts) - Improved goal calculations:
+      - Goals now scale to match the selected date range
+      - Proper period conversion (weekly, monthly, quarterly, annual)
+  - **AI Chatbot Updates**:
+    - [api/chat.ts](api/chat.ts) - Goal-related function calling:
+      - create_spending_goal - Create budget for expense subcategory
+      - create_saving_goal - Create saving target
+      - get_goals_summary - View all goals and progress
+      - add_to_saving_goal - Add amount to saving goal
+  - **Navigation**:
+    - Added Goals link to AppLayout navigation
+    - Added /goals route to Router
 
 ## Technical Decisions
 
@@ -108,13 +76,11 @@
 
 ## Next Immediate Steps
 
-1. **Proceed to Phase 10**: Budget Goals & Tracking
-   - Create goals service for spending and saving goals
-   - Create useGoals hook for goal management
-   - Update SetupPage with optional spending goal fields
-   - Build GoalsPage with spending goals table and saving goals cards
-   - Update CategorySummary with goal tracking
-   - Add goal-related functions to AI chatbot
+1. **Proceed to Phase 11**: Financial Health Score
+   - Create health score calculation service
+   - Build HealthScore component with visual gauge
+   - Add scoring factors breakdown
+   - Integrate with Dashboard
 
 ## Project Organization
 

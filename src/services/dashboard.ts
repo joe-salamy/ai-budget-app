@@ -290,23 +290,29 @@ export async function getCategorySummary(
       }
     });
 
-    // Create a map of subcategory goals (normalized to monthly for now)
+    // Calculate the number of days in the date range for goal scaling
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const rangeInDays = Math.max(
+      1,
+      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    );
+
+    // Period to days conversion
+    const periodToDays: Record<string, number> = {
+      weekly: 7,
+      monthly: 30.44, // Average days in a month
+      quarterly: 91.31, // Average days in a quarter
+      annual: 365.25,
+    };
+
+    // Create a map of subcategory goals scaled to the date range
     const subcategoryGoals: Record<string, number> = {};
     (spendingGoals || []).forEach((goal) => {
-      // Normalize goal to monthly equivalent
-      let monthlyGoal = goal.amount;
-      switch (goal.period) {
-        case "weekly":
-          monthlyGoal = goal.amount * 4.33;
-          break;
-        case "quarterly":
-          monthlyGoal = goal.amount / 3;
-          break;
-        case "annual":
-          monthlyGoal = goal.amount / 12;
-          break;
-      }
-      subcategoryGoals[goal.subcategory_id] = monthlyGoal;
+      // Scale goal amount to match the date range
+      const goalPeriodDays = periodToDays[goal.period] || 30.44;
+      const scaledGoal = (goal.amount / goalPeriodDays) * rangeInDays;
+      subcategoryGoals[goal.subcategory_id] = scaledGoal;
     });
 
     // Build category summaries

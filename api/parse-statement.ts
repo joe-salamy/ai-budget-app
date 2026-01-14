@@ -88,8 +88,7 @@ const DATE_PATTERNS = [
     parse: (m: RegExpMatchArray) => `${m[3]}-${m[2]}-${m[1]}`,
   },
   {
-    regex:
-      /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})/i,
+    regex: /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})/i,
     parse: (m: RegExpMatchArray) => {
       const monthMap: Record<string, string> = {
         jan: "01",
@@ -331,9 +330,7 @@ function looksLikeTransaction(line: string): boolean {
   return hasDate && hasAmount;
 }
 
-function tryFallbackParsing(
-  line: string
-): { date: string; name: string; amount: number } | null {
+function tryFallbackParsing(line: string): { date: string; name: string; amount: number } | null {
   let date: string | null = null;
   for (const pattern of DATE_PATTERNS) {
     const match = line.match(pattern.regex);
@@ -429,9 +426,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Verify user
-    const { data: userData, error: authError } = await supabase.auth.getUser(
-      body.access_token
-    );
+    const { data: userData, error: authError } = await supabase.auth.getUser(body.access_token);
 
     if (authError || !userData.user) {
       return res.status(401).json({ error: "Invalid authentication token" });
@@ -460,8 +455,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (parseResult.successRate < 0.1 && parseResult.transactions.length > 0) {
       return res.status(400).json({
         success: false,
-        error:
-          "Could not parse statement. Please check the format and try again.",
+        error: "Could not parse statement. Please check the format and try again.",
         errors: parseResult.errors,
       });
     }
@@ -491,17 +485,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const existingSet = new Set(
       (existingTransactions || []).map(
-        (t) =>
-          `${t.date}|${t.name.toLowerCase().trim()}|${Math.abs(t.amount).toFixed(2)}`
+        (t) => `${t.date}|${t.name.toLowerCase().trim()}|${Math.abs(t.amount).toFixed(2)}`
       )
     );
 
     // Step 3: Fetch subcategories
     const { data: subcategoriesData } = await supabase
       .from("subcategories")
-      .select(
-        `id, name, category_id, categories!inner (name, type)`
-      )
+      .select(`id, name, category_id, categories!inner (name, type)`)
       .eq("user_id", userId)
       .is("deleted_at", null);
 
@@ -526,10 +517,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq("user_id", userId)
       .eq("account_id", body.accountId);
 
-    const correctionMap = new Map<
-      string,
-      { id: string; name: string; category: string }
-    >();
+    const correctionMap = new Map<string, { id: string; name: string; category: string }>();
     (correctionsData || []).forEach((c) => {
       const sub = c.user_corrected_subcategory as unknown as {
         id: string;
@@ -547,9 +535,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log("Step 5: Looking up past transactions...");
     const { data: pastTransactions } = await supabase
       .from("transactions")
-      .select(
-        `name, subcategory_id, subcategories!inner (name, categories!inner (name))`
-      )
+      .select(`name, subcategory_id, subcategories!inner (name, categories!inner (name))`)
       .eq("user_id", userId)
       .eq("account_id", body.accountId)
       .is("deleted_at", null)
@@ -557,10 +543,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .order("created_at", { ascending: false })
       .limit(500);
 
-    const lookupMap = new Map<
-      string,
-      { id: string; name: string; category: string }
-    >();
+    const lookupMap = new Map<string, { id: string; name: string; category: string }>();
     (pastTransactions || []).forEach((t) => {
       const normalizedName = t.name.toLowerCase().trim();
       if (!lookupMap.has(normalizedName)) {
@@ -653,12 +636,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
 
       // Build subcategory list for prompt
-      const incomeSubcats = subcategories.filter(
-        (s) => s.category_type === "income"
-      );
-      const expenseSubcats = subcategories.filter(
-        (s) => s.category_type === "expense"
-      );
+      const incomeSubcats = subcategories.filter((s) => s.category_type === "income");
+      const expenseSubcats = subcategories.filter((s) => s.category_type === "expense");
 
       let categoriesSection = "## AVAILABLE SUBCATEGORIES\n\n### INCOME:\n";
       incomeSubcats.forEach((s) => {
@@ -715,9 +694,7 @@ Respond ONLY with the JSON array.`;
             const result = results[i];
 
             // Validate subcategory exists
-            const validSubcat = subcategories.find(
-              (s) => s.id === result.subcategory_id
-            );
+            const validSubcat = subcategories.find((s) => s.id === result.subcategory_id);
 
             if (validSubcat) {
               enrichedTransactions[index] = {
@@ -735,12 +712,8 @@ Respond ONLY with the JSON array.`;
       }
     }
 
-    const uncategorizedCount = enrichedTransactions.filter(
-      (t) => !t.subcategory_id
-    ).length;
-    const needsReviewCount = enrichedTransactions.filter(
-      (t) => t.needsReview
-    ).length;
+    const uncategorizedCount = enrichedTransactions.filter((t) => !t.subcategory_id).length;
+    const needsReviewCount = enrichedTransactions.filter((t) => t.needsReview).length;
 
     const elapsedTime = Date.now() - startTime;
     console.log(`Statement parsing completed in ${elapsedTime}ms`);
