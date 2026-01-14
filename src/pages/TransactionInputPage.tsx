@@ -1,14 +1,18 @@
-// TransactionInputPage - Page for adding multiple transactions with Income, Expense, and Transfer tabs
+// TransactionInputPage - Page for adding multiple transactions with Income, Expense, Transfer, and Import tabs
 import { useState, useCallback } from "react";
 import { MultiTransactionTable } from "../components/features/MultiTransactionTable";
 import { RecentActivityPanel } from "../components/features/RecentActivityPanel";
+import { StatementParser } from "../components/features/StatementParser";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions, useRecentActivity } from "../hooks/useTransactions";
 import { saveAICorrection } from "../services/ai";
-import type { TransactionType, TransactionRowData } from "../components/features/MultiTransactionTable";
+import type {
+  TransactionType,
+  TransactionRowData,
+} from "../components/features/MultiTransactionTable";
 
-type TabType = "income" | "expense" | "transfer";
+type TabType = "income" | "expense" | "transfer" | "import";
 
 function TransactionInputPage() {
   const [activeTab, setActiveTab] = useState<TabType>("expense");
@@ -18,7 +22,12 @@ function TransactionInputPage() {
   const { accounts, loading: accountsLoading } = useAccounts();
   const { categories, subcategories, loading: categoriesLoading } = useCategories();
   const { addTransaction, addTransfer } = useTransactions();
-  const { recentActivity, loading: activityLoading, error: activityError, refresh: refreshActivity } = useRecentActivity();
+  const {
+    recentActivity,
+    loading: activityLoading,
+    error: activityError,
+    refresh: refreshActivity,
+  } = useRecentActivity();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -103,8 +112,8 @@ function TransactionInputPage() {
           activeTab === "income"
             ? "income transaction"
             : activeTab === "expense"
-            ? "expense"
-            : "transfer";
+              ? "expense"
+              : "transfer";
         const plural = successCount === 1 ? "" : "s";
 
         setSuccessMessage(`${successCount} ${typeLabel}${plural} added successfully!`);
@@ -117,10 +126,11 @@ function TransactionInputPage() {
   );
 
   // Tab configuration
-  const tabs: { key: TabType; label: string; type: TransactionType }[] = [
+  const tabs: { key: TabType; label: string; type?: TransactionType }[] = [
     { key: "income", label: "Income", type: "income" },
     { key: "expense", label: "Expense", type: "expense" },
     { key: "transfer", label: "Transfer", type: "transfer" },
+    { key: "import", label: "Import Statement" },
   ];
 
   const isDataLoading = accountsLoading || categoriesLoading;
@@ -189,6 +199,13 @@ function TransactionInputPage() {
                         Go to Setup
                       </a>
                     </div>
+                  ) : activeTab === "import" ? (
+                    <StatementParser
+                      accounts={accounts}
+                      categories={categories}
+                      subcategories={subcategories}
+                      onSuccess={refreshActivity}
+                    />
                   ) : (
                     <MultiTransactionTable
                       key={activeTab} // Reset table when switching tabs
@@ -209,21 +226,53 @@ function TransactionInputPage() {
           <div className="mt-4 p-4 rounded-lg border border-border bg-card/50">
             <h3 className="text-sm font-medium text-gray-300 mb-2">Tips</h3>
             <ul className="text-sm text-gray-400 space-y-1">
-              <li>
-                <strong>Income:</strong> Money coming into your accounts (salary, dividends, refunds)
-              </li>
-              <li>
-                <strong>Expense:</strong> Money going out of your accounts (purchases, bills, subscriptions)
-              </li>
-              <li>
-                <strong>Transfer:</strong> Moving money between your own accounts (paying credit card, moving to savings)
-              </li>
-              <li>
-                <strong>Batch entry:</strong> Enter multiple transactions at once, then click "Add All" to save them
-              </li>
-              <li>
-                <strong>Auto-Categorize:</strong> Click the "Auto-Categorize" button to have AI suggest categories for uncategorized transactions
-              </li>
+              {activeTab === "import" ? (
+                <>
+                  <li>
+                    <strong>Copy statements:</strong> Copy transaction data directly from your bank
+                    or credit card website
+                  </li>
+                  <li>
+                    <strong>Supported formats:</strong> Most common statement formats are supported
+                    (CSV, tab-separated, text)
+                  </li>
+                  <li>
+                    <strong>Duplicate detection:</strong> Transactions that already exist will be
+                    marked as duplicates
+                  </li>
+                  <li>
+                    <strong>Smart categorization:</strong> Transactions are auto-categorized based
+                    on history and AI
+                  </li>
+                  <li>
+                    <strong>Review before saving:</strong> You can edit categories and remove
+                    transactions before adding them
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <strong>Income:</strong> Money coming into your accounts (salary, dividends,
+                    refunds)
+                  </li>
+                  <li>
+                    <strong>Expense:</strong> Money going out of your accounts (purchases, bills,
+                    subscriptions)
+                  </li>
+                  <li>
+                    <strong>Transfer:</strong> Moving money between your own accounts (paying credit
+                    card, moving to savings)
+                  </li>
+                  <li>
+                    <strong>Batch entry:</strong> Enter multiple transactions at once, then click
+                    "Add All" to save them
+                  </li>
+                  <li>
+                    <strong>Auto-Categorize:</strong> Click the "Auto-Categorize" button to have AI
+                    suggest categories for uncategorized transactions
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

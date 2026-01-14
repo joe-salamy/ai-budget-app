@@ -2,7 +2,7 @@
 
 ## Current Status
 
-**Phase 7 Complete** ✅ - AI Integration - Single Transaction Categorization
+**Phase 8 Complete** ✅ - Statement Parsing with Regex + Parallel Batch Categorization
 
 ## Completed Milestones
 
@@ -180,6 +180,43 @@
       - SUPABASE_SERVICE_ROLE_KEY for serverless functions
       - GEMINI_API_KEY for Google AI
 
+- **Phase 8: Statement Parsing with Regex + Parallel Batch Categorization** ✅
+  - **Utilities**:
+    - [src/lib/statementParser.ts](src/lib/statementParser.ts) - Regex parsing utilities:
+      - Multiple date format support (MM/DD/YYYY, YYYY-MM-DD, DD-MM-YYYY, etc.)
+      - Various amount formats ($1,234.56, -$45.99, ($99.99), etc.)
+      - Format detection for common statement types (credit card, bank, CSV, tab-separated)
+      - Transaction validation and normalization
+      - Duplicate detection helper
+  - **Serverless Functions**:
+    - [api/parse-statement.ts](api/parse-statement.ts) - Vercel serverless function:
+      - Regex-based statement parsing (no AI for parsing)
+      - Duplicate detection against existing transactions
+      - Lookup-first categorization from past transactions and AI corrections
+      - Parallel batch AI categorization for new transactions
+      - Batch size of 10 for optimal AI performance
+      - Detailed summary with categorization sources
+  - **Services**:
+    - [src/services/statements.ts](src/services/statements.ts) - Frontend statement service:
+      - parseStatement() - Calls API for parsing and categorization
+      - validateStatementFormat() - Quick format validation
+      - saveStatementTransactions() - Batch save transactions
+  - **UI Components**:
+    - [src/components/features/StatementParser.tsx](src/components/features/StatementParser.tsx) - Statement import UI:
+      - Account dropdown selection
+      - Large textarea for pasting statements
+      - Progress indicators during parsing
+      - Results table with color-coded categorization sources
+      - Duplicate highlighting with option to include
+      - Inline subcategory editing
+      - "Add All" button for bulk save
+      - Format help with examples
+  - **Pages**:
+    - [src/pages/TransactionInputPage.tsx](src/pages/TransactionInputPage.tsx) - Updated:
+      - New "Import Statement" tab (4th tab)
+      - Context-aware tips based on active tab
+      - StatementParser integration with activity refresh
+
 ## Technical Decisions
 
 - **Decision**: Supabase for database and auth
@@ -230,11 +267,12 @@
 
 ## Next Immediate Steps
 
-1. **Proceed to Phase 8**: Statement Parsing with Regex + Parallel Batch Categorization
-   - Create regex parsing utilities for statement formats
-   - Create Vercel serverless function for statement parsing
-   - Implement parallel batch categorization
-   - Build statement upload UI with review workflow
+1. **Proceed to Phase 9**: AI Chatbot Side Panel
+   - Create database tables for chat sessions and messages (already defined)
+   - Create Vercel serverless function for AI chat
+   - Build chat service for frontend
+   - Create ChatSidePanel component with persistent side panel UI
+   - Implement function calling for budget actions
 
 ## Project Organization
 
