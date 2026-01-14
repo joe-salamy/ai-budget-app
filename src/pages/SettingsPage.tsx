@@ -1,23 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/Card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { useAuth } from "@/hooks/useAuth";
 import { useAccounts } from "@/hooks/useAccounts";
 import { useCategories } from "@/hooks/useCategories";
 import { AccountForm } from "@/components/features/AccountForm";
 import { CategoryForm } from "@/components/features/CategoryForm";
 import { SubcategoryForm } from "@/components/features/SubcategoryForm";
-import { User, Lock, LogOut, AlertTriangle, Trash2, Info, Pencil } from "lucide-react";
-import type { Account, Category, Subcategory } from "@/types";
+import {
+  User,
+  Lock,
+  LogOut,
+  AlertTriangle,
+  Trash2,
+  Info,
+  Pencil,
+  Bot,
+  Briefcase,
+  Smile,
+  Shield,
+} from "lucide-react";
+import type { Account, Category, Subcategory, AIPersonality } from "@/types";
+import * as chatService from "@/services/chat";
 
 function SettingsPage() {
   const navigate = useNavigate();
@@ -60,6 +67,38 @@ function SettingsPage() {
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
+
+  // AI Personality state
+  const [aiPersonality, setAIPersonality] = useState<AIPersonality>("friendly");
+  const [aiPersonalityLoading, setAIPersonalityLoading] = useState(true);
+  const [aiPersonalitySaving, setAIPersonalitySaving] = useState(false);
+  const [aiPersonalitySaved, setAIPersonalitySaved] = useState(false);
+
+  // Load AI personality on mount
+  useEffect(() => {
+    async function loadPersonality() {
+      const response = await chatService.getAIPersonality();
+      if (response.success && response.data) {
+        setAIPersonality(response.data.ai_personality);
+      }
+      setAIPersonalityLoading(false);
+    }
+    loadPersonality();
+  }, []);
+
+  // Handle AI personality change
+  const handleAIPersonalityChange = async (personality: AIPersonality) => {
+    setAIPersonality(personality);
+    setAIPersonalitySaving(true);
+    setAIPersonalitySaved(false);
+
+    const response = await chatService.updateAIPersonality(personality);
+    if (response.success) {
+      setAIPersonalitySaved(true);
+      setTimeout(() => setAIPersonalitySaved(false), 2000);
+    }
+    setAIPersonalitySaving(false);
+  };
 
   const validatePasswordForm = (): boolean => {
     const errors: typeof passwordErrors = {};
@@ -396,7 +435,8 @@ function SettingsPage() {
           <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
             <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-blue-300">
-              Renaming accounts will automatically update all related transactions via foreign key relationships.
+              Renaming accounts will automatically update all related transactions via foreign key
+              relationships.
             </p>
           </div>
         </CardContent>
@@ -626,16 +666,167 @@ function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* AI Assistant Placeholder */}
-      <Card variant="outlined">
+      {/* AI Assistant Personality */}
+      <Card>
         <CardHeader>
-          <CardTitle className="text-gray-400">AI Assistant</CardTitle>
-          <CardDescription>Personality settings coming in Phase 9</CardDescription>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-blue-600/20 border-2 border-blue-600 flex items-center justify-center">
+              <Bot className="w-6 h-6 text-blue-500" />
+            </div>
+            <div>
+              <CardTitle>AI Assistant</CardTitle>
+              <CardDescription>Customize your AI assistant's personality</CardDescription>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-500 text-sm">
-            Customize your AI assistant's personality (Professional, Friendly, or Stern).
-          </p>
+        <CardContent className="space-y-4">
+          {aiPersonalityLoading ? (
+            <p className="text-gray-400">Loading preferences...</p>
+          ) : (
+            <>
+              <p className="text-sm text-gray-400 mb-4">
+                Choose how your AI assistant communicates with you. This affects the tone and style
+                of responses.
+              </p>
+              <div className="space-y-3">
+                {/* Professional */}
+                <label
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                    aiPersonality === "professional"
+                      ? "border-blue-500 bg-blue-900/20"
+                      : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="personality"
+                    value="professional"
+                    checked={aiPersonality === "professional"}
+                    onChange={() => handleAIPersonalityChange("professional")}
+                    className="sr-only"
+                    disabled={aiPersonalitySaving}
+                  />
+                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                    <Briefcase className="w-5 h-5 text-gray-300" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-white">Professional</span>
+                      {aiPersonality === "professional" && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Clear, concise, and formal. Focused on accuracy and actionable
+                      recommendations.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2 italic">
+                      Example: "Your grocery spending increased by 15% this month. Consider
+                      reviewing recurring subscriptions."
+                    </p>
+                  </div>
+                </label>
+
+                {/* Friendly */}
+                <label
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                    aiPersonality === "friendly"
+                      ? "border-blue-500 bg-blue-900/20"
+                      : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="personality"
+                    value="friendly"
+                    checked={aiPersonality === "friendly"}
+                    onChange={() => handleAIPersonalityChange("friendly")}
+                    className="sr-only"
+                    disabled={aiPersonalitySaving}
+                  />
+                  <div className="w-10 h-10 rounded-full bg-yellow-700/50 flex items-center justify-center flex-shrink-0">
+                    <Smile className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-white">Friendly</span>
+                      {aiPersonality === "friendly" && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Warm, encouraging, and supportive. Makes financial management feel less
+                      intimidating.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2 italic">
+                      Example: "Great job staying under budget! You saved $50 on dining out - that's
+                      awesome!"
+                    </p>
+                  </div>
+                </label>
+
+                {/* Stern */}
+                <label
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                    aiPersonality === "stern"
+                      ? "border-blue-500 bg-blue-900/20"
+                      : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="personality"
+                    value="stern"
+                    checked={aiPersonality === "stern"}
+                    onChange={() => handleAIPersonalityChange("stern")}
+                    className="sr-only"
+                    disabled={aiPersonalitySaving}
+                  />
+                  <div className="w-10 h-10 rounded-full bg-red-900/50 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 text-red-400" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-white">Stern</span>
+                      {aiPersonality === "stern" && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Direct and no-nonsense. Holds you accountable and doesn't sugarcoat reality.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2 italic">
+                      Example: "You overspent by $200 this month. Cut the unnecessary subscriptions
+                      immediately."
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {/* Saving indicator */}
+              {aiPersonalitySaving && <p className="text-sm text-blue-400 mt-2">Saving...</p>}
+              {aiPersonalitySaved && (
+                <p className="text-sm text-green-400 mt-2">Personality updated!</p>
+              )}
+
+              <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg mt-4">
+                <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-blue-300">
+                  Press{" "}
+                  <kbd className="px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 text-xs font-mono">
+                    Ctrl+K
+                  </kbd>{" "}
+                  to open the AI Assistant from anywhere in the app.
+                </p>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 

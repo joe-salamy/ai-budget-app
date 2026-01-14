@@ -1,6 +1,9 @@
-- Just completed phase 7
+- Just completed phase 9
 - Just created Vercel, connected to GitHub, not sure if working
 - Need to test AI categorize, will do later
+- Fix build errors in:
+  - api/chat.ts
+  -
 
 **LATER ON**: Create a map to understand full repo
 

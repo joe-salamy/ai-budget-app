@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "./hooks/useAuth";
+import { ChatPanelProvider } from "./hooks/useChatPanel";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -87,11 +88,13 @@ function Router() {
           }
         />
 
-        {/* Protected routes - wrapped in AppLayout */}
+        {/* Protected routes - wrapped in AppLayout with ChatPanelProvider */}
         <Route
           element={
             <ProtectedRoute>
-              <AppLayout />
+              <ChatPanelProvider>
+                <AppLayout />
+              </ChatPanelProvider>
             </ProtectedRoute>
           }
         >

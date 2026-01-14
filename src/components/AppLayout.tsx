@@ -1,7 +1,31 @@
+import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Bot } from "lucide-react";
+import { ChatSidePanel } from "./features/ChatSidePanel";
+import { useChatPanel } from "@/hooks/useChatPanel";
 
 function AppLayout() {
+  const { isOpen, togglePanel, closePanel, panelWidth } = useChatPanel();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Ctrl+K or Cmd+K to toggle panel
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        togglePanel();
+      }
+
+      // Escape to close panel
+      if (e.key === "Escape" && isOpen) {
+        closePanel();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, togglePanel, closePanel]);
+
   return (
     <div className="dark min-h-screen bg-background">
       {/* Header */}
@@ -45,8 +69,14 @@ function AppLayout() {
 
           {/* AI Chat Toggle Button */}
           <button
-            className="flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-            aria-label="Toggle AI Assistant"
+            onClick={togglePanel}
+            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              isOpen
+                ? "bg-blue-600 text-white"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
+            aria-label="Toggle AI Assistant (Ctrl+K)"
+            title="Toggle AI Assistant (Ctrl+K)"
           >
             <Bot className="h-4 w-4" />
             AI Assistant
@@ -54,10 +84,18 @@ function AppLayout() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto p-4">
+      {/* Main Content - adjusts width when panel is open */}
+      <main
+        className="container mx-auto p-4 transition-all duration-200"
+        style={{
+          marginRight: isOpen ? `${panelWidth}px` : undefined,
+        }}
+      >
         <Outlet />
       </main>
+
+      {/* Chat Side Panel */}
+      <ChatSidePanel />
     </div>
   );
 }

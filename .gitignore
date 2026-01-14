@@ -123,3 +123,7 @@ $RECYCLE.BIN/
 # Test coverage
 *.lcov
 jest-coverage/
+
+# Ignore Claude Code temporary files
+tmpclaude*
+.tmpclaude*
