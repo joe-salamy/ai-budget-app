@@ -4,6 +4,7 @@ import { AccountSummary } from "../components/features/AccountSummary";
 import { CategorySummary } from "../components/features/CategorySummary";
 import { NetWorthChart } from "../components/features/NetWorthChart";
 import { SankeyDiagram } from "../components/features/SankeyDiagram";
+import { FinancialHealthScore } from "../components/features/FinancialHealthScore";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
 
@@ -18,12 +19,48 @@ function formatCurrency(amount: number): string {
 
 // Quick date range presets
 const DATE_PRESETS = [
-  { label: "Last 30 days", getValue: () => ({ startDate: format(subDays(new Date(), 30), "yyyy-MM-dd"), endDate: format(new Date(), "yyyy-MM-dd") }) },
-  { label: "Last 90 days", getValue: () => ({ startDate: format(subDays(new Date(), 90), "yyyy-MM-dd"), endDate: format(new Date(), "yyyy-MM-dd") }) },
-  { label: "This month", getValue: () => ({ startDate: format(startOfMonth(new Date()), "yyyy-MM-dd"), endDate: format(endOfMonth(new Date()), "yyyy-MM-dd") }) },
-  { label: "Last month", getValue: () => ({ startDate: format(startOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"), endDate: format(endOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd") }) },
-  { label: "Last 6 months", getValue: () => ({ startDate: format(subMonths(new Date(), 6), "yyyy-MM-dd"), endDate: format(new Date(), "yyyy-MM-dd") }) },
-  { label: "Year to date", getValue: () => ({ startDate: format(new Date(new Date().getFullYear(), 0, 1), "yyyy-MM-dd"), endDate: format(new Date(), "yyyy-MM-dd") }) },
+  {
+    label: "Last 30 days",
+    getValue: () => ({
+      startDate: format(subDays(new Date(), 30), "yyyy-MM-dd"),
+      endDate: format(new Date(), "yyyy-MM-dd"),
+    }),
+  },
+  {
+    label: "Last 90 days",
+    getValue: () => ({
+      startDate: format(subDays(new Date(), 90), "yyyy-MM-dd"),
+      endDate: format(new Date(), "yyyy-MM-dd"),
+    }),
+  },
+  {
+    label: "This month",
+    getValue: () => ({
+      startDate: format(startOfMonth(new Date()), "yyyy-MM-dd"),
+      endDate: format(endOfMonth(new Date()), "yyyy-MM-dd"),
+    }),
+  },
+  {
+    label: "Last month",
+    getValue: () => ({
+      startDate: format(startOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
+      endDate: format(endOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
+    }),
+  },
+  {
+    label: "Last 6 months",
+    getValue: () => ({
+      startDate: format(subMonths(new Date(), 6), "yyyy-MM-dd"),
+      endDate: format(new Date(), "yyyy-MM-dd"),
+    }),
+  },
+  {
+    label: "Year to date",
+    getValue: () => ({
+      startDate: format(new Date(new Date().getFullYear(), 0, 1), "yyyy-MM-dd"),
+      endDate: format(new Date(), "yyyy-MM-dd"),
+    }),
+  },
 ];
 
 // ============== MAIN COMPONENT ==============
@@ -54,7 +91,7 @@ function DashboardPage() {
     setDateRange((prev) => ({ ...prev, endDate: e.target.value }));
   };
 
-  const handlePresetClick = (preset: typeof DATE_PRESETS[0]) => {
+  const handlePresetClick = (preset: (typeof DATE_PRESETS)[0]) => {
     setDateRange(preset.getValue());
   };
 
@@ -119,9 +156,7 @@ function DashboardPage() {
                 {formatCurrency(netWorth?.net_worth ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              Assets - Liabilities
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Assets - Liabilities</p>
           </CardContent>
         </Card>
 
@@ -138,9 +173,7 @@ function DashboardPage() {
                 +{formatCurrency(metrics?.totalIncome ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              In selected period
-            </p>
+            <p className="text-xs text-gray-500 mt-1">In selected period</p>
           </CardContent>
         </Card>
 
@@ -157,9 +190,7 @@ function DashboardPage() {
                 -{formatCurrency(metrics?.totalExpenses ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              In selected period
-            </p>
+            <p className="text-xs text-gray-500 mt-1">In selected period</p>
           </CardContent>
         </Card>
 
@@ -181,32 +212,13 @@ function DashboardPage() {
                 {formatCurrency(metrics?.netChange ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
-              Income - Expenses
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Income - Expenses</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Financial Health Score Placeholder */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Financial Health Score</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <div className="text-center">
-              <div className="w-24 h-24 rounded-full border-4 border-gray-600 flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl font-bold text-gray-400">--</span>
-              </div>
-              <p className="text-gray-400">Coming in Phase 11</p>
-              <p className="text-sm text-gray-500 mt-1">
-                Your personalized financial health score
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Financial Health Score */}
+      <FinancialHealthScore startDate={dateRange.startDate} endDate={dateRange.endDate} />
 
       {/* Account Summary */}
       <AccountSummary
@@ -216,10 +228,7 @@ function DashboardPage() {
       />
 
       {/* Category Summary */}
-      <CategorySummary
-        categories={categorySummary}
-        loading={categorySummaryLoading}
-      />
+      <CategorySummary categories={categorySummary} loading={categorySummaryLoading} />
 
       {/* Charts */}
       <div className="grid gap-4 lg:grid-cols-2">
@@ -241,10 +250,7 @@ function DashboardPage() {
             <CardTitle className="text-lg">Cash Flow (Sankey Diagram)</CardTitle>
           </CardHeader>
           <CardContent>
-            <SankeyDiagram
-              data={sankeyData || { nodes: [], links: [] }}
-              loading={sankeyLoading}
-            />
+            <SankeyDiagram data={sankeyData || { nodes: [], links: [] }} loading={sankeyLoading} />
           </CardContent>
         </Card>
       </div>
