@@ -1,11 +1,16 @@
-- Just completed phase 10
-- Just created Vercel, connected to GitHub, not sure if working
-- Need to test AI categorize, will do later
+**Status**
 
-- Next prompt: polish UI, use the reusable components, plan first to create good UI
+- Revamped UI/UX: shadcn/ui, framer motion for animations, radix ui for accessibility, sonner for notifications
 
-**LATER ON**: Create a map to understand full repo
+**To do**
 
-- Explanation of every folder/file
-- What order to read everything in
-- Want to understand Supabase, SQL schema scripts
+- **Understand repo**
+  - Explanation of every folder/file
+  - What order to read everything in
+  - Want to understand Supabase, SQL schema scripts
+- **Test functionality**
+  - Test all features
+  - Test AI features
+  - Ensure Vercel serverless works
+- **Polish UI/UX**
+  - Use Nano Banana to revamp, develop optimal prompts for Claude Code

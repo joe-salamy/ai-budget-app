@@ -831,7 +831,7 @@ function SettingsPage() {
       </Card>
 
       {/* Sign Out & Delete Account */}
-      <Card variant="outlined">
+      <Card className="border-2 border-red-900/50">
         <CardHeader>
           <CardTitle className="text-red-400">Danger Zone</CardTitle>
           <CardDescription>Irreversible actions</CardDescription>

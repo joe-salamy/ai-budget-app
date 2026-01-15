@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import type { InputHTMLAttributes } from "react";
+
 import { cn } from "@/lib/utils";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -9,47 +10,31 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
 }
 
-/**
- * Reusable input component with dark theme styling
- * Supports labels, error messages, and helper text
- */
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    {
-      className,
-      label,
-      error,
-      helperText,
-      fullWidth = false,
-      id,
-      type = "text",
-      disabled,
-      ...props
-    },
+    { className, type, label, error, helperText, fullWidth = false, id, disabled, ...props },
     ref
   ) => {
     // Generate ID if not provided (for label association)
     const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
 
-    const baseStyles =
-      "block px-4 py-2 bg-gray-800 border rounded-lg text-white placeholder-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
-
-    const borderStyles = error
-      ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-      : "border-gray-600 focus:border-blue-500 focus:ring-blue-500 hover:border-gray-500";
-
     return (
       <div className={cn("flex flex-col gap-1.5", fullWidth && "w-full")}>
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-gray-200">
+          <label htmlFor={inputId} className="text-sm font-medium text-foreground">
             {label}
           </label>
         )}
         <input
-          ref={ref}
           id={inputId}
           type={type}
-          className={cn(baseStyles, borderStyles, fullWidth && "w-full", className)}
+          className={cn(
+            "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+            error && "border-destructive focus-visible:ring-destructive",
+            fullWidth && "w-full",
+            className
+          )}
+          ref={ref}
           disabled={disabled}
           aria-invalid={error ? "true" : "false"}
           aria-describedby={
@@ -58,12 +43,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p id={`${inputId}-error`} className="text-sm text-red-400" role="alert">
+          <p id={`${inputId}-error`} className="text-sm text-destructive" role="alert">
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p id={`${inputId}-helper`} className="text-sm text-gray-400">
+          <p id={`${inputId}-helper`} className="text-sm text-muted-foreground">
             {helperText}
           </p>
         )}
@@ -71,5 +56,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
-
 Input.displayName = "Input";
+
+export { Input };

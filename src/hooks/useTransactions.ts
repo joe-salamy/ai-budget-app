@@ -12,6 +12,7 @@ import {
   bulkUpdateTransactions,
 } from "../services/transactions";
 import { useAuth } from "./useAuth";
+import { toast } from "../lib/toast";
 import type { Transaction } from "../types";
 import type {
   CreateTransactionData,
@@ -124,8 +125,10 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
       if (response.success && response.data) {
         // Refresh to get the full details with joins
         await fetchTransactions();
+        toast.success("Transaction created", "Your transaction has been added successfully");
         return { success: true, data: response.data };
       } else {
+        toast.error("Failed to create transaction", response.error || "An error occurred");
         return { success: false, error: response.error };
       }
     },
@@ -156,8 +159,10 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
       if (response.success) {
         // Refresh to get the full details
         await fetchTransactions();
+        toast.success("Transfer created", "Your transfer has been recorded successfully");
         return { success: true };
       } else {
+        toast.error("Failed to create transfer", response.error || "An error occurred");
         return { success: false, error: response.error };
       }
     },
@@ -172,8 +177,10 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
       if (response.success && response.data) {
         // Refresh to get updated details
         await fetchTransactions();
+        toast.success("Transaction updated", "Your changes have been saved");
         return { success: true, data: response.data };
       } else {
+        toast.error("Failed to update transaction", response.error || "An error occurred");
         return { success: false, error: response.error };
       }
     },
@@ -187,8 +194,10 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
     if (response.success) {
       // Optimistic update
       setTransactions((prev) => prev.filter((txn) => txn.id !== id));
+      toast.success("Transaction deleted", "The transaction has been removed");
       return { success: true };
     } else {
+      toast.error("Failed to delete transaction", response.error || "An error occurred");
       return { success: false, error: response.error };
     }
   }, []);
@@ -200,8 +209,10 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
     if (response.success) {
       // Optimistic update
       setTransactions((prev) => prev.filter((txn) => !ids.includes(txn.id)));
+      toast.success("Transactions deleted", `${response.count} transactions have been removed`);
       return { success: true, count: response.count };
     } else {
+      toast.error("Failed to delete transactions", response.error || "An error occurred");
       return { success: false, error: response.error };
     }
   }, []);
@@ -214,8 +225,10 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
       if (response.success) {
         // Refresh to get updated details with joined data
         await fetchTransactions();
+        toast.success("Categories updated", `${response.count} transactions have been updated`);
         return { success: true, count: response.count };
       } else {
+        toast.error("Failed to update categories", response.error || "An error occurred");
         return { success: false, error: response.error };
       }
     },

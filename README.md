@@ -9,12 +9,6 @@ A personal finance management application with AI-powered transaction categoriza
 - **[Project Plan](plan.md)** - Comprehensive development plan with all phases
 - **[Progress Tracker](progress.md)** - Current project status and milestones
 
-## Project Status
-
-**Current Phase:** Phase 1 Complete ✅ - Database schema ready
-
-See [progress.md](progress.md) for detailed status updates.
-
 ## Tech Stack
 
 - **Frontend:** React 19 + TypeScript + Vite

@@ -1,72 +1,99 @@
 import { forwardRef } from "react";
 import type { ButtonHTMLAttributes } from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { motion } from "framer-motion";
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
+
 import { cn } from "@/lib/utils";
 
-/**
- * Button variants for different visual styles
- */
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger";
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        // Backward compatibility with old variants
+        primary: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
+        danger: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
+      },
+      size: {
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3 text-xs",
+        lg: "h-10 rounded-md px-8",
+        icon: "h-9 w-9",
+        // Backward compatibility
+        md: "h-9 px-4 py-2",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
 
-/**
- * Button sizes
- */
-export type ButtonSize = "sm" | "md" | "lg";
-
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
+export interface ButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
   isLoading?: boolean;
   fullWidth?: boolean;
 }
 
-/**
- * Reusable button component with dark theme styling
- * Supports multiple variants, sizes, and loading state
- */
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       className,
-      variant = "primary",
-      size = "md",
+      variant,
+      size,
+      asChild = false,
       isLoading = false,
       fullWidth = false,
       disabled,
       children,
+      onClick,
       ...props
     },
     ref
   ) => {
-    const baseStyles =
-      "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed";
+    if (asChild) {
+      return (
+        <Slot
+          className={cn(
+            buttonVariants({ variant, size, className }),
+            fullWidth && "w-full",
+            isLoading && "cursor-wait"
+          )}
+          ref={ref}
+          {...props}
+        >
+          {children}
+        </Slot>
+      );
+    }
 
-    const variants = {
-      primary: "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 active:bg-blue-800",
-      secondary: "bg-gray-700 text-white hover:bg-gray-600 focus:ring-gray-500 active:bg-gray-800",
-      outline: "border-2 border-gray-600 text-gray-200 hover:bg-gray-800 focus:ring-gray-500",
-      ghost: "text-gray-300 hover:bg-gray-800 hover:text-white focus:ring-gray-500",
-      danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 active:bg-red-800",
-    };
-
-    const sizes = {
-      sm: "px-3 py-1.5 text-sm",
-      md: "px-4 py-2 text-base",
-      lg: "px-6 py-3 text-lg",
-    };
+    const MotionButton = motion.button;
 
     return (
-      <button
-        ref={ref}
+      <MotionButton
         className={cn(
-          baseStyles,
-          variants[variant],
-          sizes[size],
+          buttonVariants({ variant, size, className }),
           fullWidth && "w-full",
-          isLoading && "relative cursor-wait",
-          className
+          isLoading && "cursor-wait"
         )}
+        ref={ref}
         disabled={disabled || isLoading}
-        {...props}
+        onClick={onClick}
+        whileHover={disabled || isLoading ? {} : { scale: 1.02 }}
+        whileTap={disabled || isLoading ? {} : { scale: 0.98 }}
+        transition={{ duration: 0.1 }}
+        {...(props as any)}
       >
         {isLoading && (
           <svg
@@ -92,9 +119,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {children}
-      </button>
+      </MotionButton>
     );
   }
 );
-
 Button.displayName = "Button";
+
+export { Button, buttonVariants };
