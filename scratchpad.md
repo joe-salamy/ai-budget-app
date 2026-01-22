@@ -1,8 +1,6 @@
-**Status**
-
-- Revamped UI/UX: shadcn/ui, framer motion for animations, radix ui for accessibility, sonner for notifications
-
 **To do**
+
+- Well now the navbar is fucking retarded
 
 - **Understand repo**
   - Explanation of every folder/file

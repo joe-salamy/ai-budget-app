@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import { Bot } from "lucide-react";
 import { ChatSidePanel } from "./features/ChatSidePanel";
 import { useChatPanel } from "@/hooks/useChatPanel";
+import { Navbar } from "./layout/Navbar";
 
 function AppLayout() {
   const { isOpen, togglePanel, closePanel, panelWidth } = useChatPanel();
@@ -29,66 +29,7 @@ function AppLayout() {
   return (
     <div className="dark min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <h1 className="text-xl font-semibold text-foreground">AI Budget App</h1>
-            <nav className="flex gap-4">
-              <a
-                href="/dashboard"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Dashboard
-              </a>
-              <a
-                href="/setup"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Setup
-              </a>
-              <a
-                href="/transactions/input"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Add Transactions
-              </a>
-              <a
-                href="/transactions/history"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                History
-              </a>
-              <a
-                href="/goals"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Goals
-              </a>
-              <a
-                href="/settings"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Settings
-              </a>
-            </nav>
-          </div>
-
-          {/* AI Chat Toggle Button */}
-          <button
-            onClick={togglePanel}
-            className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-              isOpen
-                ? "bg-blue-600 text-white"
-                : "bg-primary text-primary-foreground hover:bg-primary/90"
-            }`}
-            aria-label="Toggle AI Assistant (Ctrl+K)"
-            title="Toggle AI Assistant (Ctrl+K)"
-          >
-            <Bot className="h-4 w-4" />
-            AI Assistant
-          </button>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content - adjusts width when panel is open */}
       <main
