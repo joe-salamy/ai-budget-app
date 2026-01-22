@@ -622,7 +622,7 @@ export function TransactionForm({
                   <button
                     type="button"
                     onClick={handleAcceptAISuggestion}
-                    className="text-green-400 hover:text-green-300 transition-colors"
+                    className="text-green-400 hover:text-green-300"
                     title="Accept suggestion"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

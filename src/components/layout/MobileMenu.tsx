@@ -75,7 +75,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0 }}
             onClick={onClose}
             className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
             aria-hidden="true"
@@ -86,7 +86,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            transition={{ duration: 0 }}
             className="fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-purple-900 via-blue-900 to-indigo-900 shadow-2xl"
             role="dialog"
             aria-modal="true"
@@ -120,11 +120,11 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     data-mobile-menu-link
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-[44px] items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-all",
+                      "flex min-h-[44px] items-center gap-3 rounded-lg px-4 py-3 text-base font-medium border border-transparent",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
                       active
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50"
-                        : "text-white/80 hover:bg-white/10 hover:text-white hover:scale-105"
+                        : "text-white/80 hover:bg-white/20 hover:text-white hover:border-white/30"
                     )}
                   >
                     <Icon

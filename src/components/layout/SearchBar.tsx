@@ -94,7 +94,7 @@ export function SearchBar() {
               setIsOpen(true);
             }
           }}
-          className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-10 pr-10 text-sm text-white placeholder-white/50 backdrop-blur-sm transition-all focus:border-blue-400/50 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-10 pr-10 text-sm text-white placeholder-white/50 backdrop-blur-sm focus:border-blue-400/50 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
           aria-label="Search"
           aria-expanded={isOpen}
           aria-controls="search-results"
@@ -125,10 +125,10 @@ export function SearchBar() {
             ref={dropdownRef}
             id="search-results"
             role="listbox"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0 }}
             className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-white/10 bg-card/90 shadow-2xl shadow-blue-900/30 backdrop-blur-xl"
           >
             <div className="max-h-96 overflow-y-auto p-2">
@@ -156,7 +156,7 @@ export function SearchBar() {
                         aria-selected={selectedIndex === globalIndex}
                         onClick={() => handleResultClick(result)}
                         className={cn(
-                          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors",
+                          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left border border-transparent hover:border-white/20",
                           selectedIndex === globalIndex
                             ? "bg-blue-500/20 text-white"
                             : "text-foreground hover:bg-white/10"
@@ -192,7 +192,7 @@ export function SearchBar() {
                         aria-selected={selectedIndex === globalIndex}
                         onClick={() => handleResultClick(result)}
                         className={cn(
-                          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors",
+                          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left border border-transparent hover:border-white/20",
                           selectedIndex === globalIndex
                             ? "bg-purple-500/20 text-white"
                             : "text-foreground hover:bg-white/10"

@@ -101,7 +101,7 @@ export function ChatSessionList({
       {/* Current session button / dropdown trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors text-sm text-gray-200 max-w-[200px]"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-sm text-gray-200 max-w-[200px] border border-transparent hover:border-gray-600"
         title={currentSession?.title || "Select a session"}
       >
         <MessageSquare className="w-4 h-4 flex-shrink-0" />
@@ -137,7 +137,7 @@ export function ChatSessionList({
               sessions.map((session) => (
                 <div
                   key={session.id}
-                  className={`group flex items-center gap-2 p-2 cursor-pointer transition-colors ${
+                  className={`group flex items-center gap-2 p-2 cursor-pointer ${
                     currentSession?.id === session.id ? "bg-blue-900/30" : "hover:bg-gray-700"
                   }`}
                   onClick={() => handleSelectSession(session)}
@@ -184,7 +184,7 @@ export function ChatSessionList({
                           })}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
                         <button
                           onClick={(e) => handleStartEdit(session, e)}
                           className="p-1 text-gray-400 hover:text-blue-400"

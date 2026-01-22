@@ -59,7 +59,7 @@ function LandingPage() {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-          <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-gray-800/50 border border-gray-700 hover:border-gray-600 transition-colors">
+          <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-gray-800/50 border border-gray-700 hover:border-blue-500/50 hover:bg-gray-800">
             <Brain className="w-12 h-12 text-blue-500" />
             <h3 className="text-lg font-semibold text-white">Smart Categorization</h3>
             <p className="text-sm text-gray-400">
@@ -67,7 +67,7 @@ function LandingPage() {
             </p>
           </div>
 
-          <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-gray-800/50 border border-gray-700 hover:border-gray-600 transition-colors">
+          <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-gray-800/50 border border-gray-700 hover:border-blue-500/50 hover:bg-gray-800">
             <TrendingUp className="w-12 h-12 text-green-500" />
             <h3 className="text-lg font-semibold text-white">Financial Insights</h3>
             <p className="text-sm text-gray-400">
@@ -76,7 +76,7 @@ function LandingPage() {
             </p>
           </div>
 
-          <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-gray-800/50 border border-gray-700 hover:border-gray-600 transition-colors">
+          <div className="flex flex-col items-center text-center space-y-3 p-6 rounded-lg bg-gray-800/50 border border-gray-700 hover:border-blue-500/50 hover:bg-gray-800">
             <Zap className="w-12 h-12 text-yellow-500" />
             <h3 className="text-lg font-semibold text-white">Fast & Simple</h3>
             <p className="text-sm text-gray-400">

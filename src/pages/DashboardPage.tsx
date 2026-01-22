@@ -130,7 +130,7 @@ function DashboardPage() {
           <button
             key={preset.label}
             onClick={() => handlePresetClick(preset)}
-            className="px-3 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+            className="px-3 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white hover:border-gray-400"
           >
             {preset.label}
           </button>

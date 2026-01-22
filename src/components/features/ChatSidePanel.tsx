@@ -188,7 +188,7 @@ export function ChatSidePanel() {
       >
         {/* Resize handle */}
         <div
-          className={`absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-blue-500 transition-colors ${
+          className={`absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-blue-500 ${
             isResizing ? "bg-blue-500" : "bg-transparent"
           }`}
           onMouseDown={handleResizeStart}
@@ -213,7 +213,7 @@ export function ChatSidePanel() {
           </div>
           <button
             onClick={closePanel}
-            className="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 transition-colors"
+            className="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gray-700"
             title="Close panel (Esc)"
           >
             <X className="w-5 h-5" />
@@ -226,7 +226,7 @@ export function ChatSidePanel() {
             <button
               key={action.label}
               onClick={() => handleQuickAction(action.prompt)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-xs font-medium transition-colors whitespace-nowrap"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-xs font-medium whitespace-nowrap border border-transparent hover:border-gray-500"
               title={action.prompt}
             >
               <action.icon className="w-3.5 h-3.5" />
@@ -269,7 +269,7 @@ export function ChatSidePanel() {
                   <button
                     key={suggestion}
                     onClick={() => handleQuickAction(suggestion)}
-                    className="block w-full text-left px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm transition-colors"
+                    className="block w-full text-left px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm border border-transparent hover:border-gray-600"
                   >
                     "{suggestion}"
                   </button>
@@ -310,7 +310,7 @@ export function ChatSidePanel() {
                     {message.role === "assistant" && (
                       <button
                         onClick={() => handleCopyMessage(message.id, message.content)}
-                        className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300"
+                        className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300"
                         title="Copy message"
                       >
                         {copiedMessageId === message.id ? (

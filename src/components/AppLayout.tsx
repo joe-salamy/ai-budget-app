@@ -33,7 +33,7 @@ function AppLayout() {
 
       {/* Main Content - adjusts width when panel is open */}
       <main
-        className="container mx-auto p-4 transition-all duration-200"
+        className="container mx-auto p-4"
         style={{
           marginRight: isOpen ? `${panelWidth}px` : undefined,
         }}

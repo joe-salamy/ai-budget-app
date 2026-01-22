@@ -28,7 +28,7 @@ export function UserProfileMenu() {
         className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
         aria-label="User menu"
       >
-        <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-white/20 transition-all hover:ring-blue-400/50">
+        <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-white/20 hover:ring-blue-400/50 hover:ring-4">
           <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
             {userInitial}
           </AvatarFallback>

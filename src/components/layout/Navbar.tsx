@@ -11,7 +11,6 @@ import {
   Bot,
   Menu,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useChatPanel } from "@/hooks/useChatPanel";
 import { SearchBar } from "./SearchBar";
@@ -55,15 +54,11 @@ export function Navbar() {
           {/* Logo */}
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-purple-900 rounded-md"
+            className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-purple-900"
           >
-            <motion.h1
-              className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               AI Budget App
-            </motion.h1>
+            </h1>
           </Link>
 
           {/* Desktop Navigation Links */}
@@ -78,11 +73,11 @@ export function Navbar() {
                   to={item.path}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all motion-reduce:transition-none",
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border border-transparent",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
                     active
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50 animate-neon"
-                      : "text-white/80 hover:bg-white/10 hover:text-white hover:scale-105"
+                      : "text-white/80 hover:bg-white/20 hover:text-white hover:border-white/30"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -100,16 +95,14 @@ export function Navbar() {
             </div>
 
             {/* AI Assistant Button */}
-            <motion.button
+            <button
               onClick={togglePanel}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all shadow-lg",
+                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium shadow-lg border border-transparent",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
                 chatPanelOpen
                   ? "bg-blue-600 text-white shadow-blue-500/50 animate-neon"
-                  : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-purple-500/50"
+                  : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-400 hover:to-purple-500 hover:border-white/30 hover:shadow-xl shadow-purple-500/50"
               )}
               aria-label="Toggle AI Assistant (Ctrl+K)"
               title="Toggle AI Assistant (Ctrl+K)"
@@ -117,7 +110,7 @@ export function Navbar() {
             >
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">AI Assistant</span>
-            </motion.button>
+            </button>
 
             {/* User Profile Menu */}
             <UserProfileMenu />

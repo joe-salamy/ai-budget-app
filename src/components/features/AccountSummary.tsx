@@ -206,7 +206,7 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
     <>
       {/* Main account row */}
       <tr
-        className={`hover:bg-gray-800/30 transition-colors ${
+        className={`hover:bg-gray-800/50 ${
           hasTransactions ? "cursor-pointer" : ""
         }`}
         onClick={hasTransactions ? onToggle : undefined}

@@ -691,7 +691,7 @@ function SettingsPage() {
               <div className="space-y-3">
                 {/* Professional */}
                 <label
-                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                     aiPersonality === "professional"
                       ? "border-blue-500 bg-blue-900/20"
                       : "border-gray-700 hover:border-gray-600 bg-gray-800"
@@ -731,7 +731,7 @@ function SettingsPage() {
 
                 {/* Friendly */}
                 <label
-                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                     aiPersonality === "friendly"
                       ? "border-blue-500 bg-blue-900/20"
                       : "border-gray-700 hover:border-gray-600 bg-gray-800"
@@ -771,7 +771,7 @@ function SettingsPage() {
 
                 {/* Stern */}
                 <label
-                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                     aiPersonality === "stern"
                       ? "border-blue-500 bg-blue-900/20"
                       : "border-gray-700 hover:border-gray-600 bg-gray-800"

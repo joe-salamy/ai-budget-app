@@ -290,7 +290,7 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
         <CardTitle className="text-lg">Financial Health Score</CardTitle>
         <button
           onClick={() => setShowBreakdown(!showBreakdown)}
-          className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+          className="text-sm text-blue-400 hover:text-blue-300 hover:underline"
         >
           {showBreakdown ? "Hide Details" : "Show Details"}
         </button>

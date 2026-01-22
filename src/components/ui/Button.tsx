@@ -1,14 +1,13 @@
 import { forwardRef } from "react";
 import type { ButtonHTMLAttributes } from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { motion } from "framer-motion";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-transparent hover:brightness-110 hover:border-white/20",
   {
     variants: {
       variant: {
@@ -78,10 +77,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       );
     }
 
-    const MotionButton = motion.button;
-
     return (
-      <MotionButton
+      <button
         className={cn(
           buttonVariants({ variant, size, className }),
           fullWidth && "w-full",
@@ -90,10 +87,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         onClick={onClick}
-        whileHover={disabled || isLoading ? {} : { scale: 1.02 }}
-        whileTap={disabled || isLoading ? {} : { scale: 0.98 }}
-        transition={{ duration: 0.1 }}
-        {...(props as any)}
+        {...props}
       >
         {isLoading && (
           <svg
@@ -119,7 +113,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </svg>
         )}
         {children}
-      </MotionButton>
+      </button>
     );
   }
 );

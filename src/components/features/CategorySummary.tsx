@@ -229,7 +229,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
     <>
       {/* Main category row */}
       <tr
-        className={`hover:bg-gray-800/30 transition-colors ${
+        className={`hover:bg-gray-800/50 ${
           hasSubcategories ? "cursor-pointer" : ""
         }`}
         onClick={hasSubcategories ? onToggle : undefined}

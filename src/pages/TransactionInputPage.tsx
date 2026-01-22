@@ -153,10 +153,10 @@ function TransactionInputPage() {
                       setActiveTab(tab.key);
                       setSuccessMessage(null);
                     }}
-                    className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+                    className={`flex-1 rounded-md px-4 py-2 text-sm font-medium border border-transparent ${
                       activeTab === tab.key
                         ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-800"
+                        : "text-muted-foreground hover:text-foreground hover:bg-gray-800 hover:border-gray-600"
                     }`}
                   >
                     {tab.label}
@@ -194,7 +194,7 @@ function TransactionInputPage() {
                       </p>
                       <a
                         href="/setup"
-                        className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                        className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 border border-transparent hover:border-white/20"
                       >
                         Go to Setup
                       </a>

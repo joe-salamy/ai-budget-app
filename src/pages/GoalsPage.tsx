@@ -137,7 +137,7 @@ function SpendingGoalsSection({
               </thead>
               <tbody className="divide-y divide-gray-700/50">
                 {goals.map((goal) => (
-                  <tr key={goal.id} className="hover:bg-gray-800/30 transition-colors">
+                  <tr key={goal.id} className="hover:bg-gray-800/50">
                     <td className="px-4 py-4 text-sm text-gray-200 font-medium">
                       {goal.subcategory_name}
                     </td>
@@ -259,13 +259,13 @@ function SavingGoalsSection({
                     return (
                       <div
                         key={goal.id}
-                        className="p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+                        className="p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-500 hover:bg-gray-800/80"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => onToggleComplete(goal)}
-                              className="text-gray-500 hover:text-green-400 transition-colors"
+                              className="text-gray-500 hover:text-green-400"
                               title="Mark as complete"
                             >
                               <Circle size={18} />
@@ -314,7 +314,7 @@ function SavingGoalsSection({
                             </div>
                             <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                               <div
-                                className={`h-full ${getSavingProgressColor(percent)} transition-all`}
+                                className={`h-full ${getSavingProgressColor(percent)}`}
                                 style={{ width: `${percent}%` }}
                               ></div>
                             </div>
@@ -362,7 +362,7 @@ function SavingGoalsSection({
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => onToggleComplete(goal)}
-                            className="text-green-400 hover:text-gray-400 transition-colors"
+                            className="text-green-400 hover:text-gray-400"
                             title="Mark as incomplete"
                           >
                             <CheckCircle2 size={18} />

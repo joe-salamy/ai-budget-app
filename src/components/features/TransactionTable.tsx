@@ -272,7 +272,7 @@ export function TransactionTable({
               return (
                 <tr
                   key={txn.id}
-                  className={`hover:bg-gray-800/30 transition-colors ${
+                  className={`hover:bg-gray-800/50 ${
                     isSelected ? "bg-blue-500/10" : ""
                   }`}
                 >
@@ -334,7 +334,7 @@ export function TransactionTable({
                   <td className="px-4 py-3 whitespace-nowrap text-right">
                     <button
                       onClick={() => onEditTransaction(txn)}
-                      className="text-gray-400 hover:text-blue-400 transition-colors mr-2"
+                      className="text-gray-400 hover:text-blue-400 mr-2"
                       title="Edit"
                     >
                       <svg
@@ -353,7 +353,7 @@ export function TransactionTable({
                     </button>
                     <button
                       onClick={() => onDeleteTransaction(txn.id)}
-                      className="text-gray-400 hover:text-red-400 transition-colors"
+                      className="text-gray-400 hover:text-red-400"
                       title="Delete"
                     >
                       <svg
