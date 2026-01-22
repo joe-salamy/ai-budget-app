@@ -107,7 +107,7 @@ export function CategoryForm({
         }
       />
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-foreground">{error}</p>}
 
       {!isSystemCategory && (
         <div className="flex gap-3">

@@ -26,7 +26,7 @@ function getAccountTypeLabel(type: string): string {
 }
 
 function getAccountTypeColor(type: string): string {
-  return type === "asset" ? "text-blue-400" : "text-orange-400";
+  return type === "asset" ? "text-foreground" : "text-orange-400";
 }
 
 // ============== MAIN COMPONENT ==============
@@ -49,13 +49,13 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
   if (loading) {
     return (
       <div className="rounded-lg border border-border bg-card overflow-hidden">
-        <div className="px-4 py-3 bg-gray-800/50 border-b border-gray-700">
+        <div className="px-4 py-3 bg-card/50 border-b border-border">
           <h3 className="text-lg font-semibold text-white">Account Summary</h3>
         </div>
         <div className="animate-pulse">
-          <div className="h-12 bg-gray-700/50"></div>
+          <div className="h-12 bg-muted/50"></div>
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-14 bg-gray-800/30 border-t border-gray-700/50"></div>
+            <div key={i} className="h-14 bg-card/30 border-t border-border/50"></div>
           ))}
         </div>
       </div>
@@ -65,12 +65,12 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
   if (accounts.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-card overflow-hidden">
-        <div className="px-4 py-3 bg-gray-800/50 border-b border-gray-700">
+        <div className="px-4 py-3 bg-card/50 border-b border-border">
           <h3 className="text-lg font-semibold text-white">Account Summary</h3>
         </div>
         <div className="p-8 text-center">
           <p className="text-muted-foreground">No accounts found</p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Add some accounts to see your summary
           </p>
         </div>
@@ -84,30 +84,30 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
 
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
-      <div className="px-4 py-3 bg-gray-800/50 border-b border-gray-700">
+      <div className="px-4 py-3 bg-card/50 border-b border-border">
         <h3 className="text-lg font-semibold text-white">Account Summary</h3>
       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
-          <thead className="bg-gray-800/30">
+          <thead className="bg-card/30">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider w-10">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">
                 {/* Expand icon */}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Type
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Account
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Starting Balance
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Changes
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Ending Balance
               </th>
             </tr>
@@ -116,8 +116,8 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
             {/* Asset Accounts */}
             {assetAccounts.length > 0 && (
               <>
-                <tr className="bg-gray-800/20">
-                  <td colSpan={6} className="px-4 py-2 text-xs font-medium text-blue-400 uppercase">
+                <tr className="bg-card/20">
+                  <td colSpan={6} className="px-4 py-2 text-xs font-medium text-foreground uppercase">
                     Assets
                   </td>
                 </tr>
@@ -135,7 +135,7 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
             {/* Liability Accounts */}
             {liabilityAccounts.length > 0 && (
               <>
-                <tr className="bg-gray-800/20">
+                <tr className="bg-card/20">
                   <td colSpan={6} className="px-4 py-2 text-xs font-medium text-orange-400 uppercase">
                     Liabilities
                   </td>
@@ -154,21 +154,21 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
 
           {/* Net Worth Footer */}
           {netWorth && (
-            <tfoot className="bg-gray-800/50 border-t-2 border-gray-600">
+            <tfoot className="bg-card/50 border-t-2 border-border">
               <tr>
                 <td colSpan={2} className="px-4 py-3"></td>
                 <td className="px-4 py-3 text-sm font-semibold text-white">
                   Net Worth
                 </td>
-                <td className="px-4 py-3 text-right text-sm text-gray-400">
+                <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                   Assets: {formatCurrency(netWorth.total_assets)}
                 </td>
-                <td className="px-4 py-3 text-right text-sm text-gray-400">
+                <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                   Liabilities: {formatCurrency(netWorth.total_liabilities)}
                 </td>
                 <td
                   className={`px-4 py-3 text-right text-sm font-bold ${
-                    netWorth.net_worth >= 0 ? "text-green-400" : "text-red-400"
+                    netWorth.net_worth >= 0 ? "text-foreground" : "text-foreground"
                   }`}
                 >
                   {formatCurrency(netWorth.net_worth)}
@@ -195,10 +195,10 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
   const displayChange = account.account_type === "liability" ? -account.total_change : account.total_change;
   const changeColor =
     displayChange > 0
-      ? "text-green-400"
+      ? "text-foreground"
       : displayChange < 0
-      ? "text-red-400"
-      : "text-gray-400";
+      ? "text-foreground"
+      : "text-muted-foreground";
 
   const hasTransactions = account.transactions.length > 0;
 
@@ -206,12 +206,12 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
     <>
       {/* Main account row */}
       <tr
-        className={`hover:bg-gray-800/50 ${
+        className={`hover:bg-card/50 ${
           hasTransactions ? "cursor-pointer" : ""
         }`}
         onClick={hasTransactions ? onToggle : undefined}
       >
-        <td className="px-4 py-3 text-gray-400">
+        <td className="px-4 py-3 text-muted-foreground">
           {hasTransactions && (
             isExpanded ? (
               <ChevronDown className="w-4 h-4" />
@@ -226,12 +226,12 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
         <td className="px-4 py-3 text-sm text-gray-200 font-medium">
           {account.account_name}
           {hasTransactions && (
-            <span className="ml-2 text-xs text-gray-500">
+            <span className="ml-2 text-xs text-muted-foreground">
               ({account.transactions.length} transactions)
             </span>
           )}
         </td>
-        <td className="px-4 py-3 text-sm text-right text-gray-300">
+        <td className="px-4 py-3 text-sm text-right text-foreground">
           {formatCurrency(account.starting_balance)}
         </td>
         <td className={`px-4 py-3 text-sm text-right font-medium ${changeColor}`}>
@@ -247,26 +247,26 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
       {isExpanded && hasTransactions && (
         <tr>
           <td colSpan={6} className="px-0 py-0">
-            <div className="bg-gray-900/50 border-y border-gray-700/50">
+            <div className="bg-background/50 border-y border-border/50">
               <table className="min-w-full">
-                <thead className="bg-gray-800/20">
+                <thead className="bg-card/20">
                   <tr>
-                    <th className="px-8 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Date
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Description
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Amount
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Balance
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Category
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Subcategory
                     </th>
                   </tr>
@@ -276,27 +276,27 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
                     // Display amount from account perspective: flip sign for liability accounts
                     const displayAmount = account.account_type === "liability" ? -txn.amount : txn.amount;
                     const amountColor =
-                      displayAmount >= 0 ? "text-green-400" : "text-red-400";
+                      displayAmount >= 0 ? "text-foreground" : "text-foreground";
 
                     return (
-                      <tr key={txn.id} className="hover:bg-gray-800/20">
-                        <td className="px-8 py-2 text-sm text-gray-400">
+                      <tr key={txn.id} className="hover:bg-card/20">
+                        <td className="px-8 py-2 text-sm text-muted-foreground">
                           {format(new Date(txn.date), "MMM d, yyyy")}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-300 max-w-xs truncate">
+                        <td className="px-4 py-2 text-sm text-foreground max-w-xs truncate">
                           {txn.name}
                         </td>
                         <td className={`px-4 py-2 text-sm text-right ${amountColor}`}>
                           {displayAmount >= 0 ? "+" : ""}
                           {formatCurrency(displayAmount)}
                         </td>
-                        <td className="px-4 py-2 text-sm text-right text-gray-300">
+                        <td className="px-4 py-2 text-sm text-right text-foreground">
                           {formatCurrency(txn.running_balance)}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-400">
+                        <td className="px-4 py-2 text-sm text-muted-foreground">
                           {txn.category_name || "-"}
                         </td>
-                        <td className="px-4 py-2 text-sm text-gray-400">
+                        <td className="px-4 py-2 text-sm text-muted-foreground">
                           {txn.subcategory_name || "-"}
                         </td>
                       </tr>

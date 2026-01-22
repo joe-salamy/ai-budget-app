@@ -217,16 +217,16 @@ function SettingsPage() {
     <div className="max-w-4xl mx-auto space-y-6 p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Settings</h1>
-        <p className="text-gray-400 mt-2">Manage your account preferences</p>
+        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-2">Manage your account preferences</p>
       </div>
 
       {/* User Profile Card */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-blue-600/20 border-2 border-blue-600 flex items-center justify-center">
-              <User className="w-6 h-6 text-blue-500" />
+            <div className="w-12 h-12 rounded-full bg-foreground/20 border-2 border-foreground flex items-center justify-center">
+              <User className="w-6 h-6 text-foreground" />
             </div>
             <div>
               <CardTitle>Profile</CardTitle>
@@ -236,16 +236,16 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-300">Email</label>
-            <p className="text-white mt-1">{user?.email || "Not available"}</p>
+            <label className="text-sm font-medium text-muted-foreground">Email</label>
+            <p className="text-foreground mt-1">{user?.email || "Not available"}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-300">User ID</label>
-            <p className="text-gray-400 text-sm mt-1 font-mono">{user?.id || "Not available"}</p>
+            <label className="text-sm font-medium text-muted-foreground">User ID</label>
+            <p className="text-muted-foreground text-sm mt-1 font-mono">{user?.id || "Not available"}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-300">Account Created</label>
-            <p className="text-gray-400 text-sm mt-1">
+            <label className="text-sm font-medium text-muted-foreground">Account Created</label>
+            <p className="text-muted-foreground text-sm mt-1">
               {user?.created_at
                 ? new Date(user.created_at).toLocaleDateString("en-US", {
                     year: "numeric",
@@ -262,8 +262,8 @@ function SettingsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-yellow-600/20 border-2 border-yellow-600 flex items-center justify-center">
-              <Lock className="w-6 h-6 text-yellow-500" />
+            <div className="w-12 h-12 rounded-full bg-foreground/20 border-2 border-foreground flex items-center justify-center">
+              <Lock className="w-6 h-6 text-foreground" />
             </div>
             <div>
               <CardTitle>Change Password</CardTitle>
@@ -307,13 +307,13 @@ function SettingsPage() {
             />
 
             {error && (
-              <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+              <div className="p-3 rounded-lg bg-foreground/10 border border-border text-foreground text-sm">
                 {error}
               </div>
             )}
 
             {passwordUpdated && (
-              <div className="p-3 rounded-lg bg-green-900/20 border border-green-800 text-green-400 text-sm">
+              <div className="p-3 rounded-lg bg-foreground/10 border border-border text-foreground text-sm">
                 Password updated successfully!
               </div>
             )}
@@ -352,7 +352,7 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {showAddAccount && (
-            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <AccountForm
                 onSubmit={async (data) => {
                   const result = await addAccount(data.name, data.type, data.initialBalance);
@@ -369,8 +369,8 @@ function SettingsPage() {
           )}
 
           {editingAccount && (
-            <div className="p-4 bg-gray-800 rounded-lg border border-blue-600">
-              <h4 className="text-sm font-medium text-blue-400 mb-3">Edit Account</h4>
+            <div className="p-4 bg-muted rounded-lg border border-foreground">
+              <h4 className="text-sm font-medium text-foreground mb-3">Edit Account</h4>
               <AccountForm
                 initialData={editingAccount}
                 onSubmit={async (data) => {
@@ -392,17 +392,17 @@ function SettingsPage() {
           )}
 
           {accountsLoading ? (
-            <p className="text-gray-400">Loading accounts...</p>
+            <p className="text-muted-foreground">Loading accounts...</p>
           ) : accounts.length > 0 ? (
             <div className="space-y-2">
               {accounts.map((account) => (
                 <div
                   key={account.id}
-                  className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+                  className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
                 >
                   <div>
-                    <p className="font-medium text-gray-100">{account.name}</p>
-                    <p className="text-sm text-gray-400">
+                    <p className="font-medium text-foreground">{account.name}</p>
+                    <p className="text-sm text-muted-foreground">
                       {account.type === "asset" ? "Asset" : "Liability"} • Initial Balance: $
                       {account.initial_balance.toFixed(2)}
                     </p>
@@ -412,7 +412,7 @@ function SettingsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEditAccount(account)}
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      className="text-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Pencil size={16} />
                     </Button>
@@ -420,7 +420,7 @@ function SettingsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteAccountItem(account.id, account.name)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      className="text-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Trash2 size={16} />
                     </Button>
@@ -429,12 +429,12 @@ function SettingsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400 text-center py-4">No accounts yet.</p>
+            <p className="text-muted-foreground text-center py-4">No accounts yet.</p>
           )}
 
-          <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
-            <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-300">
+          <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg">
+            <Info size={16} className="text-muted-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-muted-foreground">
               Renaming accounts will automatically update all related transactions via foreign key
               relationships.
             </p>
@@ -464,7 +464,7 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {showAddCategory && (
-            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <CategoryForm
                 onSubmit={async (data) => {
                   const result = await addCategory(data.name, data.type);
@@ -481,8 +481,8 @@ function SettingsPage() {
           )}
 
           {editingCategory && (
-            <div className="p-4 bg-gray-800 rounded-lg border border-blue-600">
-              <h4 className="text-sm font-medium text-blue-400 mb-3">Edit Category</h4>
+            <div className="p-4 bg-card rounded-lg border border-foreground">
+              <h4 className="text-sm font-medium text-foreground mb-3">Edit Category</h4>
               <CategoryForm
                 initialData={editingCategory}
                 onSubmit={async (data) => {
@@ -503,17 +503,17 @@ function SettingsPage() {
           )}
 
           {categoriesLoading ? (
-            <p className="text-gray-400">Loading categories...</p>
+            <p className="text-muted-foreground">Loading categories...</p>
           ) : userCategories.length > 0 ? (
             <div className="space-y-2">
               {userCategories.map((category) => (
                 <div
                   key={category.id}
-                  className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+                  className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
                 >
                   <div>
-                    <p className="font-medium text-gray-100">{category.name}</p>
-                    <p className="text-sm text-gray-400">
+                    <p className="font-medium text-foreground">{category.name}</p>
+                    <p className="text-sm text-muted-foreground">
                       {category.type === "income" ? "Income" : "Expense"}
                     </p>
                   </div>
@@ -522,7 +522,7 @@ function SettingsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleEditCategory(category)}
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      className="text-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Pencil size={16} />
                     </Button>
@@ -530,7 +530,7 @@ function SettingsPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteCategory(category.id, category.name)}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                      className="text-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Trash2 size={16} />
                     </Button>
@@ -539,12 +539,12 @@ function SettingsPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-400 text-center py-4">No categories yet.</p>
+            <p className="text-muted-foreground text-center py-4">No categories yet.</p>
           )}
 
-          <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
-            <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-300">
+          <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg">
+            <Info size={16} className="text-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-foreground">
               Cannot delete categories with subcategories. Delete subcategories first.
             </p>
           </div>
@@ -574,7 +574,7 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {showAddSubcategory && (
-            <div className="p-4 bg-gray-800 rounded-lg border border-gray-700">
+            <div className="p-4 bg-muted rounded-lg border border-border">
               <SubcategoryForm
                 categories={categories}
                 onSubmit={async (data) => {
@@ -592,8 +592,8 @@ function SettingsPage() {
           )}
 
           {editingSubcategory && (
-            <div className="p-4 bg-gray-800 rounded-lg border border-blue-600">
-              <h4 className="text-sm font-medium text-blue-400 mb-3">Edit Subcategory</h4>
+            <div className="p-4 bg-card rounded-lg border border-foreground">
+              <h4 className="text-sm font-medium text-foreground mb-3">Edit Subcategory</h4>
               <SubcategoryForm
                 categories={categories}
                 initialData={editingSubcategory}
@@ -615,7 +615,7 @@ function SettingsPage() {
           )}
 
           {categoriesLoading ? (
-            <p className="text-gray-400">Loading subcategories...</p>
+            <p className="text-muted-foreground">Loading subcategories...</p>
           ) : userSubcategories.length > 0 ? (
             <div className="space-y-2">
               {userSubcategories.map((subcategory) => {
@@ -623,11 +623,11 @@ function SettingsPage() {
                 return (
                   <div
                     key={subcategory.id}
-                    className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700"
+                    className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
                   >
                     <div>
-                      <p className="font-medium text-gray-100">{subcategory.name}</p>
-                      <p className="text-sm text-gray-400">
+                      <p className="font-medium text-foreground">{subcategory.name}</p>
+                      <p className="text-sm text-muted-foreground">
                         Category: {category?.name || "Unknown"}
                       </p>
                     </div>
@@ -636,7 +636,7 @@ function SettingsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditSubcategory(subcategory)}
-                        className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                        className="text-foreground hover:text-foreground hover:bg-muted"
                       >
                         <Pencil size={16} />
                       </Button>
@@ -644,7 +644,7 @@ function SettingsPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        className="text-foreground hover:text-foreground hover:bg-muted"
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -654,12 +654,12 @@ function SettingsPage() {
               })}
             </div>
           ) : (
-            <p className="text-gray-400 text-center py-4">No subcategories yet.</p>
+            <p className="text-muted-foreground text-center py-4">No subcategories yet.</p>
           )}
 
-          <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg">
-            <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-300">
+          <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg">
+            <Info size={16} className="text-foreground mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-foreground">
               Names must be unique across all accounts, categories, and subcategories.
             </p>
           </div>
@@ -670,8 +670,8 @@ function SettingsPage() {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-blue-600/20 border-2 border-blue-600 flex items-center justify-center">
-              <Bot className="w-6 h-6 text-blue-500" />
+            <div className="w-12 h-12 rounded-full bg-foreground/20 border-2 border-foreground flex items-center justify-center">
+              <Bot className="w-6 h-6 text-foreground" />
             </div>
             <div>
               <CardTitle>AI Assistant</CardTitle>
@@ -681,10 +681,10 @@ function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {aiPersonalityLoading ? (
-            <p className="text-gray-400">Loading preferences...</p>
+            <p className="text-muted-foreground">Loading preferences...</p>
           ) : (
             <>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 Choose how your AI assistant communicates with you. This affects the tone and style
                 of responses.
               </p>
@@ -693,8 +693,8 @@ function SettingsPage() {
                 <label
                   className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                     aiPersonality === "professional"
-                      ? "border-blue-500 bg-blue-900/20"
-                      : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                      ? "border-foreground bg-muted"
+                      : "border-border hover:border-border bg-card"
                   }`}
                 >
                   <input
@@ -706,23 +706,23 @@ function SettingsPage() {
                     className="sr-only"
                     disabled={aiPersonalitySaving}
                   />
-                  <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    <Briefcase className="w-5 h-5 text-gray-300" />
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Briefcase className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-white">Professional</span>
+                      <span className="font-medium text-foreground">Professional</span>
                       {aiPersonality === "professional" && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-foreground text-background">
                           Active
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       Clear, concise, and formal. Focused on accuracy and actionable
                       recommendations.
                     </p>
-                    <p className="text-xs text-gray-500 mt-2 italic">
+                    <p className="text-xs text-muted-foreground mt-2 italic">
                       Example: "Your grocery spending increased by 15% this month. Consider
                       reviewing recurring subscriptions."
                     </p>
@@ -733,8 +733,8 @@ function SettingsPage() {
                 <label
                   className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                     aiPersonality === "friendly"
-                      ? "border-blue-500 bg-blue-900/20"
-                      : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                      ? "border-foreground bg-muted"
+                      : "border-border hover:border-border bg-card"
                   }`}
                 >
                   <input
@@ -746,23 +746,23 @@ function SettingsPage() {
                     className="sr-only"
                     disabled={aiPersonalitySaving}
                   />
-                  <div className="w-10 h-10 rounded-full bg-yellow-700/50 flex items-center justify-center flex-shrink-0">
-                    <Smile className="w-5 h-5 text-yellow-400" />
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Smile className="w-5 h-5 text-foreground" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-white">Friendly</span>
+                      <span className="font-medium text-foreground">Friendly</span>
                       {aiPersonality === "friendly" && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-foreground text-background">
                           Active
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       Warm, encouraging, and supportive. Makes financial management feel less
                       intimidating.
                     </p>
-                    <p className="text-xs text-gray-500 mt-2 italic">
+                    <p className="text-xs text-muted-foreground mt-2 italic">
                       Example: "Great job staying under budget! You saved $50 on dining out - that's
                       awesome!"
                     </p>
@@ -773,8 +773,8 @@ function SettingsPage() {
                 <label
                   className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                     aiPersonality === "stern"
-                      ? "border-blue-500 bg-blue-900/20"
-                      : "border-gray-700 hover:border-gray-600 bg-gray-800"
+                      ? "border-foreground bg-muted"
+                      : "border-border hover:border-border bg-card"
                   }`}
                 >
                   <input
@@ -786,22 +786,22 @@ function SettingsPage() {
                     className="sr-only"
                     disabled={aiPersonalitySaving}
                   />
-                  <div className="w-10 h-10 rounded-full bg-red-900/50 flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-red-400" />
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 text-foreground" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-white">Stern</span>
+                      <span className="font-medium text-foreground">Stern</span>
                       {aiPersonality === "stern" && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-600 text-white">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-foreground text-background">
                           Active
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <p className="text-sm text-muted-foreground mt-1">
                       Direct and no-nonsense. Holds you accountable and doesn't sugarcoat reality.
                     </p>
-                    <p className="text-xs text-gray-500 mt-2 italic">
+                    <p className="text-xs text-muted-foreground mt-2 italic">
                       Example: "You overspent by $200 this month. Cut the unnecessary subscriptions
                       immediately."
                     </p>
@@ -810,16 +810,16 @@ function SettingsPage() {
               </div>
 
               {/* Saving indicator */}
-              {aiPersonalitySaving && <p className="text-sm text-blue-400 mt-2">Saving...</p>}
+              {aiPersonalitySaving && <p className="text-sm text-foreground mt-2">Saving...</p>}
               {aiPersonalitySaved && (
-                <p className="text-sm text-green-400 mt-2">Personality updated!</p>
+                <p className="text-sm text-foreground mt-2">Personality updated!</p>
               )}
 
-              <div className="flex items-start gap-2 p-3 bg-blue-900/10 border border-blue-800/50 rounded-lg mt-4">
-                <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-blue-300">
+              <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg mt-4">
+                <Info size={16} className="text-foreground mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-foreground">
                   Press{" "}
-                  <kbd className="px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 text-xs font-mono">
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground text-xs font-mono">
                     Ctrl+K
                   </kbd>{" "}
                   to open the AI Assistant from anywhere in the app.
@@ -831,16 +831,16 @@ function SettingsPage() {
       </Card>
 
       {/* Sign Out & Delete Account */}
-      <Card className="border-2 border-red-900/50">
+      <Card className="border-2 border-foreground/50">
         <CardHeader>
-          <CardTitle className="text-red-400">Danger Zone</CardTitle>
+          <CardTitle className="text-foreground">Danger Zone</CardTitle>
           <CardDescription>Irreversible actions</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-card/50 border border-border">
             <div>
-              <h3 className="font-medium text-white">Sign Out</h3>
-              <p className="text-sm text-gray-400">Sign out of your account on this device</p>
+              <h3 className="font-medium text-foreground">Sign Out</h3>
+              <p className="text-sm text-muted-foreground">Sign out of your account on this device</p>
             </div>
             <Button variant="secondary" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
@@ -848,10 +848,10 @@ function SettingsPage() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-lg bg-red-900/10 border border-red-800/50">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-foreground/10 border border-foreground/50">
             <div>
-              <h3 className="font-medium text-red-400">Delete Account</h3>
-              <p className="text-sm text-gray-400">Permanently delete your account and all data</p>
+              <h3 className="font-medium text-foreground">Delete Account</h3>
+              <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
             </div>
             {!showDeleteConfirm ? (
               <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>

@@ -94,7 +94,7 @@ export function SearchBar() {
               setIsOpen(true);
             }
           }}
-          className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-10 pr-10 text-sm text-white placeholder-white/50 backdrop-blur-sm focus:border-blue-400/50 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-400/20"
+          className="w-full rounded-lg border border-white/10 bg-white/5 py-2 pl-10 pr-10 text-sm text-white placeholder-white/50 backdrop-blur-sm focus:border-foreground/50 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-foreground/20"
           aria-label="Search"
           aria-expanded={isOpen}
           aria-controls="search-results"
@@ -103,7 +103,7 @@ export function SearchBar() {
           }
         />
         {isSearching && (
-          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-blue-400" />
+          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-foreground" />
         )}
         {query && !isSearching && (
           <button
@@ -129,7 +129,7 @@ export function SearchBar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0 }}
-            className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-white/10 bg-card/90 shadow-2xl shadow-blue-900/30 backdrop-blur-xl"
+            className="absolute top-full z-50 mt-2 w-full overflow-hidden rounded-lg border border-border bg-card shadow-2xl backdrop-blur-xl"
           >
             <div className="max-h-96 overflow-y-auto p-2">
               {/* No results */}
@@ -158,11 +158,11 @@ export function SearchBar() {
                         className={cn(
                           "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left border border-transparent hover:border-white/20",
                           selectedIndex === globalIndex
-                            ? "bg-blue-500/20 text-white"
+                            ? "bg-foreground/20 text-white"
                             : "text-foreground hover:bg-white/10"
                         )}
                       >
-                        <Icon className="h-4 w-4 shrink-0 text-blue-400" />
+                        <Icon className="h-4 w-4 shrink-0 text-foreground" />
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-sm font-medium">{result.title}</div>
                           <div className="truncate text-xs text-muted-foreground">
@@ -194,11 +194,11 @@ export function SearchBar() {
                         className={cn(
                           "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left border border-transparent hover:border-white/20",
                           selectedIndex === globalIndex
-                            ? "bg-purple-500/20 text-white"
+                            ? "bg-foreground/20 text-white"
                             : "text-foreground hover:bg-white/10"
                         )}
                       >
-                        <Icon className="h-4 w-4 shrink-0 text-purple-400" />
+                        <Icon className="h-4 w-4 shrink-0 text-foreground" />
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-sm font-medium">{result.title}</div>
                           <div className="truncate text-xs text-muted-foreground">

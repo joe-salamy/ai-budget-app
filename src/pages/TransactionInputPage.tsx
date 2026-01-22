@@ -156,7 +156,7 @@ function TransactionInputPage() {
                     className={`flex-1 rounded-md px-4 py-2 text-sm font-medium border border-transparent ${
                       activeTab === tab.key
                         ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-gray-800 hover:border-gray-600"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border"
                     }`}
                   >
                     {tab.label}
@@ -169,8 +169,8 @@ function TransactionInputPage() {
             <div className="p-4">
               {/* Success Message */}
               {successMessage && (
-                <div className="mb-4 p-3 rounded-md bg-green-500/10 border border-green-500/20">
-                  <p className="text-green-400 text-sm">{successMessage}</p>
+                <div className="mb-4 p-3 rounded-md bg-foreground/10 border border-foreground/20">
+                  <p className="text-foreground text-sm">{successMessage}</p>
                 </div>
               )}
 
@@ -178,10 +178,10 @@ function TransactionInputPage() {
               {isDataLoading ? (
                 <div className="space-y-4">
                   <div className="animate-pulse space-y-4">
-                    <div className="h-10 bg-gray-700 rounded"></div>
-                    <div className="h-10 bg-gray-700 rounded"></div>
-                    <div className="h-10 bg-gray-700 rounded"></div>
-                    <div className="h-10 bg-gray-700 rounded"></div>
+                    <div className="h-10 bg-muted rounded"></div>
+                    <div className="h-10 bg-muted rounded"></div>
+                    <div className="h-10 bg-muted rounded"></div>
+                    <div className="h-10 bg-muted rounded"></div>
                   </div>
                 </div>
               ) : (
@@ -224,8 +224,8 @@ function TransactionInputPage() {
 
           {/* Quick Tips */}
           <div className="mt-4 p-4 rounded-lg border border-border bg-card/50">
-            <h3 className="text-sm font-medium text-gray-300 mb-2">Tips</h3>
-            <ul className="text-sm text-gray-400 space-y-1">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Tips</h3>
+            <ul className="text-sm text-muted-foreground space-y-1">
               {activeTab === "import" ? (
                 <>
                   <li>

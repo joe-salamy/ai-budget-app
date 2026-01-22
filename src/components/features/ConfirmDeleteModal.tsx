@@ -64,9 +64,9 @@ export function ConfirmDeleteModal({
       }
     >
       <div className="space-y-4">
-        <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-red-500/10">
+        <div className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-foreground/10">
           <svg
-            className="w-6 h-6 text-red-400"
+            className="w-6 h-6 text-foreground"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -80,7 +80,7 @@ export function ConfirmDeleteModal({
           </svg>
         </div>
 
-        <p className="text-center text-gray-300">
+        <p className="text-center text-foreground">
           Are you sure you want to delete{" "}
           <span className="font-semibold text-gray-100">
             {itemCount} {itemType}
@@ -89,12 +89,12 @@ export function ConfirmDeleteModal({
           ?
         </p>
 
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-muted-foreground">
           This action cannot be undone.
         </p>
 
         {error && (
-          <p className="text-sm text-red-400 text-center">{error}</p>
+          <p className="text-sm text-foreground text-center">{error}</p>
         )}
       </div>
     </Modal>

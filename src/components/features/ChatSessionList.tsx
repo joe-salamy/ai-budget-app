@@ -101,7 +101,7 @@ export function ChatSessionList({
       {/* Current session button / dropdown trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-sm text-gray-200 max-w-[200px] border border-transparent hover:border-gray-600"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-card hover:bg-muted text-sm text-gray-200 max-w-[200px] border border-transparent hover:border-border"
         title={currentSession?.title || "Select a session"}
       >
         <MessageSquare className="w-4 h-4 flex-shrink-0" />
@@ -113,14 +113,14 @@ export function ChatSessionList({
 
       {/* Dropdown menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-72 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute top-full left-0 mt-1 w-72 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
           {/* New chat button */}
-          <div className="p-2 border-b border-gray-700">
+          <div className="p-2 border-b border-border">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleNewChat}
-              className="w-full justify-start gap-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+              className="w-full justify-start gap-2 text-foreground hover:text-foreground hover:bg-foreground/20"
             >
               <Plus className="w-4 h-4" />
               New Chat
@@ -130,15 +130,15 @@ export function ChatSessionList({
           {/* Sessions list */}
           <div className="max-h-64 overflow-y-auto">
             {loading ? (
-              <div className="p-4 text-center text-gray-400 text-sm">Loading sessions...</div>
+              <div className="p-4 text-center text-muted-foreground text-sm">Loading sessions...</div>
             ) : sessions.length === 0 ? (
-              <div className="p-4 text-center text-gray-400 text-sm">No chat sessions yet</div>
+              <div className="p-4 text-center text-muted-foreground text-sm">No chat sessions yet</div>
             ) : (
               sessions.map((session) => (
                 <div
                   key={session.id}
                   className={`group flex items-center gap-2 p-2 cursor-pointer ${
-                    currentSession?.id === session.id ? "bg-blue-900/30" : "hover:bg-gray-700"
+                    currentSession?.id === session.id ? "bg-foreground/30" : "hover:bg-muted"
                   }`}
                   onClick={() => handleSelectSession(session)}
                 >
@@ -154,12 +154,12 @@ export function ChatSessionList({
                         value={editTitle}
                         onChange={(e) => setEditTitle(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        className="flex-1 px-2 py-1 text-sm bg-gray-900 border border-gray-600 rounded text-white focus:outline-none focus:border-blue-500"
+                        className="flex-1 px-2 py-1 text-sm bg-background border border-border rounded text-white focus:outline-none focus:border-foreground"
                         maxLength={50}
                       />
                       <button
                         type="submit"
-                        className="p-1 text-green-400 hover:text-green-300"
+                        className="p-1 text-foreground hover:text-foreground"
                         title="Save"
                       >
                         <Check className="w-4 h-4" />
@@ -167,7 +167,7 @@ export function ChatSessionList({
                       <button
                         type="button"
                         onClick={handleCancelEdit}
-                        className="p-1 text-gray-400 hover:text-gray-300"
+                        className="p-1 text-muted-foreground hover:text-foreground"
                         title="Cancel"
                       >
                         <X className="w-4 h-4" />
@@ -175,10 +175,10 @@ export function ChatSessionList({
                     </form>
                   ) : (
                     <>
-                      <MessageSquare className="w-4 h-4 flex-shrink-0 text-gray-500" />
+                      <MessageSquare className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-200 truncate">{session.title}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           {formatDistanceToNow(new Date(session.last_message_at), {
                             addSuffix: true,
                           })}
@@ -187,14 +187,14 @@ export function ChatSessionList({
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
                         <button
                           onClick={(e) => handleStartEdit(session, e)}
-                          className="p-1 text-gray-400 hover:text-blue-400"
+                          className="p-1 text-muted-foreground hover:text-foreground"
                           title="Rename"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={(e) => handleDelete(session.id, e)}
-                          className="p-1 text-gray-400 hover:text-red-400"
+                          className="p-1 text-muted-foreground hover:text-foreground"
                           title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

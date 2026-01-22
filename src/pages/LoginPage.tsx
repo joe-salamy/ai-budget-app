@@ -115,21 +115,21 @@ function LoginPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="text-gray-400">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-white">
             {showForgotPassword ? "Reset Password" : "Welcome Back"}
           </h1>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             {showForgotPassword
               ? "Enter your email to receive a password reset link"
               : "Sign in to your account"}
@@ -165,13 +165,13 @@ function LoginPage() {
                 />
 
                 {error && (
-                  <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+                  <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
                     {error}
                   </div>
                 )}
 
                 {resetEmailSent && (
-                  <div className="p-3 rounded-lg bg-green-900/20 border border-green-800 text-green-400 text-sm">
+                  <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
                     Password reset email sent! Check your inbox.
                   </div>
                 )}
@@ -193,7 +193,7 @@ function LoginPage() {
                     setResetEmailSent(false);
                     clearError();
                   }}
-                  className="text-sm text-blue-400 hover:text-blue-300 w-full text-center"
+                  className="text-sm text-foreground hover:text-foreground w-full text-center"
                 >
                   ← Back to login
                 </button>
@@ -228,7 +228,7 @@ function LoginPage() {
                 />
 
                 {error && (
-                  <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+                  <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
                     {error}
                   </div>
                 )}
@@ -237,7 +237,7 @@ function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}
-                    className="text-sm text-blue-400 hover:text-blue-300"
+                    className="text-sm text-foreground hover:text-foreground"
                   >
                     Forgot password?
                   </button>
@@ -256,10 +256,10 @@ function LoginPage() {
                 {/* Divider */}
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-700" />
+                    <div className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-gray-800 text-gray-400">Or continue with</span>
+                    <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
 
@@ -280,9 +280,9 @@ function LoginPage() {
 
           {!showForgotPassword && (
             <CardFooter>
-              <p className="text-sm text-gray-400 text-center w-full">
+              <p className="text-sm text-muted-foreground text-center w-full">
                 Don't have an account?{" "}
-                <Link to="/signup" className="text-blue-400 hover:text-blue-300 font-medium">
+                <Link to="/signup" className="text-foreground hover:text-foreground font-medium">
                   Sign up
                 </Link>
               </p>
@@ -292,7 +292,7 @@ function LoginPage() {
 
         {/* Back to Home */}
         <div className="text-center">
-          <Link to="/" className="text-sm text-gray-400 hover:text-gray-300">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← Back to home
           </Link>
         </div>

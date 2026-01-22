@@ -153,7 +153,7 @@ export function SavingGoalForm({
         disabled={isSubmitting}
       />
 
-      {errors.target && <p className="text-sm text-red-400">{errors.target}</p>}
+      {errors.target && <p className="text-sm text-foreground">{errors.target}</p>}
 
       {/* Current Amount */}
       <Input
@@ -171,13 +171,13 @@ export function SavingGoalForm({
 
       {/* Link to Account (Optional) */}
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-foreground mb-2">
           Link to Account (Optional)
         </label>
         <select
           value={accountId}
           onChange={(e) => setAccountId(e.target.value)}
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full px-3 py-2 bg-card border border-border rounded-md text-white focus:border-foreground focus:ring-1 focus:ring-foreground"
           disabled={isSubmitting}
         >
           <option value="">No linked account</option>
@@ -187,14 +187,14 @@ export function SavingGoalForm({
             </option>
           ))}
         </select>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-muted-foreground">
           Optionally track a specific account's balance for this goal
         </p>
       </div>
 
       {/* Form Error */}
       {formError && (
-        <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+        <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
           {formError}
         </div>
       )}

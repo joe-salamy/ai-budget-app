@@ -97,7 +97,7 @@ export function BulkEditModal({
       }
     >
       <div className="space-y-4">
-        <p className="text-gray-300">
+        <p className="text-foreground">
           Select a subcategory to apply to{" "}
           <span className="font-semibold text-gray-100">
             {selectedCount} transaction{selectedCount !== 1 ? "s" : ""}
@@ -114,7 +114,7 @@ export function BulkEditModal({
         />
 
         {error && (
-          <p className="text-sm text-red-400">{error}</p>
+          <p className="text-sm text-foreground">{error}</p>
         )}
       </div>
     </Modal>

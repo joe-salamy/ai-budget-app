@@ -197,7 +197,7 @@ function TransactionHistoryPage() {
         <h1 className="text-3xl font-bold text-foreground">Transaction History</h1>
 
         {/* Quick stats */}
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-muted-foreground">
           {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? "s" : ""}
           {hasFilters && " (filtered)"}
         </div>
@@ -205,8 +205,8 @@ function TransactionHistoryPage() {
 
       {/* Success Message */}
       {successMessage && (
-        <div className="p-3 rounded-md bg-green-500/10 border border-green-500/20">
-          <p className="text-green-400 text-sm">{successMessage}</p>
+        <div className="p-3 rounded-md bg-foreground/10 border border-foreground/20">
+          <p className="text-foreground text-sm">{successMessage}</p>
         </div>
       )}
 
@@ -262,9 +262,9 @@ function TransactionHistoryPage() {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
+        <div className="rounded-lg border border-foreground/30 bg-foreground/10 p-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-blue-300">
+            <p className="text-sm text-foreground">
               {selectedIds.size} transaction{selectedIds.size !== 1 ? "s" : ""} selected
             </p>
             <div className="flex gap-2">

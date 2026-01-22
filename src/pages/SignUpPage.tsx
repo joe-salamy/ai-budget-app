@@ -108,19 +108,19 @@ function SignUpPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="text-gray-400">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-white">Create Account</h1>
-          <p className="text-gray-400">Start managing your finances with AI</p>
+          <p className="text-muted-foreground">Start managing your finances with AI</p>
         </div>
 
         {/* Sign Up Form Card */}
@@ -177,14 +177,14 @@ function SignUpPage() {
 
               {/* Auth Error Message */}
               {error && (
-                <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+                <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
                   {error}
                 </div>
               )}
 
               {/* Success Message */}
               {successMessage && (
-                <div className="p-3 rounded-lg bg-green-900/20 border border-green-800 text-green-400 text-sm">
+                <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
                   {successMessage}
                 </div>
               )}
@@ -204,10 +204,10 @@ function SignUpPage() {
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-800 text-gray-400">Or continue with</span>
+                <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
               </div>
             </div>
 
@@ -224,9 +224,9 @@ function SignUpPage() {
           </CardContent>
 
           <CardFooter>
-            <p className="text-sm text-gray-400 text-center w-full">
+            <p className="text-sm text-muted-foreground text-center w-full">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">
+              <Link to="/login" className="text-foreground hover:text-foreground font-medium">
                 Log in
               </Link>
             </p>
@@ -235,7 +235,7 @@ function SignUpPage() {
 
         {/* Back to Home */}
         <div className="text-center">
-          <Link to="/" className="text-sm text-gray-400 hover:text-gray-300">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             ← Back to home
           </Link>
         </div>

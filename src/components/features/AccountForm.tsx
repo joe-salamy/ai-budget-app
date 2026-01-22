@@ -116,7 +116,7 @@ export function AccountForm({
         required
       />
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-foreground">{error}</p>}
 
       <div className="flex gap-3">
         <Button type="submit" disabled={submitting} className="flex-1">

@@ -183,22 +183,22 @@ export function ChatSidePanel() {
       {/* Panel */}
       <div
         ref={panelRef}
-        className="fixed right-0 top-0 h-full bg-gray-900 border-l border-gray-700 z-50 flex flex-col shadow-2xl"
+        className="fixed right-0 top-0 h-full bg-background border-l border-border z-50 flex flex-col shadow-2xl"
         style={{ width: `${panelWidth}px` }}
       >
         {/* Resize handle */}
         <div
-          className={`absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-blue-500 ${
-            isResizing ? "bg-blue-500" : "bg-transparent"
+          className={`absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-foreground ${
+            isResizing ? "bg-foreground" : "bg-transparent"
           }`}
           onMouseDown={handleResizeStart}
         />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-blue-400" />
+              <Bot className="w-5 h-5 text-foreground" />
               <span className="font-semibold text-white">AI Assistant</span>
             </div>
             <ChatSessionList
@@ -213,7 +213,7 @@ export function ChatSidePanel() {
           </div>
           <button
             onClick={closePanel}
-            className="p-1.5 rounded-md text-gray-400 hover:text-white hover:bg-gray-700"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-white hover:bg-muted"
             title="Close panel (Esc)"
           >
             <X className="w-5 h-5" />
@@ -221,12 +221,12 @@ export function ChatSidePanel() {
         </div>
 
         {/* Quick Actions Bar */}
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-gray-700 bg-gray-800/50 overflow-x-auto">
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-card/50 overflow-x-auto">
           {QUICK_ACTIONS.map((action) => (
             <button
               key={action.label}
               onClick={() => handleQuickAction(action.prompt)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white text-xs font-medium whitespace-nowrap border border-transparent hover:border-gray-500"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted hover:bg-muted text-foreground hover:text-white text-xs font-medium whitespace-nowrap border border-transparent hover:border-border"
               title={action.prompt}
             >
               <action.icon className="w-3.5 h-3.5" />
@@ -237,10 +237,10 @@ export function ChatSidePanel() {
 
         {/* Error banner */}
         {error && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-red-900/30 border-b border-red-800 text-red-400 text-sm">
+          <div className="flex items-center gap-2 px-4 py-2 bg-foreground/30 border-b border-foreground text-foreground text-sm">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span className="flex-1">{error}</span>
-            <button onClick={clearError} className="p-1 hover:text-red-300" title="Dismiss">
+            <button onClick={clearError} className="p-1 hover:text-foreground" title="Dismiss">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -249,18 +249,18 @@ export function ChatSidePanel() {
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messagesLoading ? (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-muted-foreground">
               <Loader2 className="w-6 h-6 animate-spin" />
             </div>
           ) : messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-6">
-              <Sparkles className="w-12 h-12 text-blue-400 mb-4" />
+              <Sparkles className="w-12 h-12 text-foreground mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">How can I help you today?</h3>
-              <p className="text-gray-400 text-sm mb-6">
+              <p className="text-muted-foreground text-sm mb-6">
                 I can help you manage your budget, track spending, add transactions, and more.
               </p>
               <div className="space-y-2 w-full max-w-xs">
-                <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Try asking:</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Try asking:</p>
                 {[
                   "What's my spending this month?",
                   "Add a $50 grocery expense",
@@ -269,7 +269,7 @@ export function ChatSidePanel() {
                   <button
                     key={suggestion}
                     onClick={() => handleQuickAction(suggestion)}
-                    className="block w-full text-left px-3 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm border border-transparent hover:border-gray-600"
+                    className="block w-full text-left px-3 py-2 rounded-lg bg-card hover:bg-muted text-foreground hover:text-white text-sm border border-transparent hover:border-border"
                   >
                     "{suggestion}"
                   </button>
@@ -286,16 +286,16 @@ export function ChatSidePanel() {
                   }`}
                 >
                   {message.role === "assistant" && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-blue-400" />
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-foreground/20 flex items-center justify-center">
+                      <Bot className="w-4 h-4 text-foreground" />
                     </div>
                   )}
 
                   <div
                     className={`group relative max-w-[85%] rounded-lg px-4 py-2.5 ${
                       message.role === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-800 text-gray-100"
+                        ? "bg-foreground text-white"
+                        : "bg-card text-gray-100"
                     }`}
                   >
                     {message.role === "assistant" ? (
@@ -310,7 +310,7 @@ export function ChatSidePanel() {
                     {message.role === "assistant" && (
                       <button
                         onClick={() => handleCopyMessage(message.id, message.content)}
-                        className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 flex items-center gap-1 text-xs text-gray-500 hover:text-gray-300"
+                        className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                         title="Copy message"
                       >
                         {copiedMessageId === message.id ? (
@@ -329,8 +329,8 @@ export function ChatSidePanel() {
                   </div>
 
                   {message.role === "user" && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                      <User className="w-4 h-4 text-gray-300" />
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <User className="w-4 h-4 text-foreground" />
                     </div>
                   )}
                 </div>
@@ -339,10 +339,10 @@ export function ChatSidePanel() {
               {/* Sending indicator */}
               {sendingMessage && (
                 <div className="flex gap-3 justify-start">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-blue-400" />
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-foreground/20 flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-foreground" />
                   </div>
-                  <div className="bg-gray-800 rounded-lg px-4 py-2.5 text-gray-400">
+                  <div className="bg-card rounded-lg px-4 py-2.5 text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span className="text-sm">Thinking...</span>
@@ -357,7 +357,7 @@ export function ChatSidePanel() {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-700 p-4 bg-gray-800">
+        <div className="border-t border-border p-4 bg-card">
           <form onSubmit={handleSubmit} className="flex gap-2">
             <div className="flex-1 relative">
               <textarea
@@ -366,12 +366,12 @@ export function ChatSidePanel() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message..."
-                className="w-full px-4 py-2.5 pr-12 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none min-h-[44px] max-h-[150px]"
+                className="w-full px-4 py-2.5 pr-12 bg-background border border-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-foreground resize-none min-h-[44px] max-h-[150px]"
                 rows={1}
                 disabled={sendingMessage}
               />
               {inputValue.length > 0 && (
-                <span className="absolute right-3 bottom-2 text-xs text-gray-500">
+                <span className="absolute right-3 bottom-2 text-xs text-muted-foreground">
                   {inputValue.length}/2000
                 </span>
               )}
@@ -389,7 +389,7 @@ export function ChatSidePanel() {
               )}
             </Button>
           </form>
-          <p className="mt-2 text-xs text-gray-500 text-center">
+          <p className="mt-2 text-xs text-muted-foreground text-center">
             Press Enter to send, Shift+Enter for new line
           </p>
         </div>

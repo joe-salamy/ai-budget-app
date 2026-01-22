@@ -49,14 +49,14 @@ export function Navbar() {
 
   return (
     <>
-      <header className="border-b border-border/50 bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 shadow-2xl shadow-blue-900/50 backdrop-blur-lg">
+      <header className="border-b border-border bg-card shadow-sm">
         <div className="container mx-auto flex h-20 items-center justify-between gap-4 px-6">
           {/* Logo */}
           <Link
             to="/dashboard"
-            className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-purple-900"
+            className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold text-foreground">
               AI Budget App
             </h1>
           </Link>
@@ -73,11 +73,11 @@ export function Navbar() {
                   to={item.path}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border border-transparent",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     active
-                      ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50 animate-neon"
-                      : "text-white/80 hover:bg-white/20 hover:text-white hover:border-white/30"
+                      ? "bg-foreground text-background border-foreground"
+                      : "text-foreground/80 hover:bg-muted hover:text-foreground border-transparent hover:border-border"
                   )}
                 >
                   <Icon className="h-4 w-4" />
@@ -98,11 +98,11 @@ export function Navbar() {
             <button
               onClick={togglePanel}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium shadow-lg border border-transparent",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 chatPanelOpen
-                  ? "bg-blue-600 text-white shadow-blue-500/50 animate-neon"
-                  : "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-400 hover:to-purple-500 hover:border-white/30 hover:shadow-xl shadow-purple-500/50"
+                  ? "bg-foreground text-background border-foreground"
+                  : "bg-card text-foreground hover:bg-muted border-border"
               )}
               aria-label="Toggle AI Assistant (Ctrl+K)"
               title="Toggle AI Assistant (Ctrl+K)"
@@ -118,7 +118,7 @@ export function Navbar() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden rounded-lg p-2 text-white/80 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+              className="lg:hidden rounded-lg p-2 text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Open menu"
               aria-expanded={mobileMenuOpen}
             >

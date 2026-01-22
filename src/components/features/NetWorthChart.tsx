@@ -18,24 +18,24 @@ interface NetWorthChartProps {
   loading?: boolean;
 }
 
-// Color palette for account lines
+// Grayscale color palettes for black and white theme
 const ASSET_COLORS = [
-  "#22c55e", // green-500
-  "#4ade80", // green-400
-  "#86efac", // green-300
-  "#16a34a", // green-600
-  "#15803d", // green-700
+  "#ffffff", // white
+  "#e5e5e5", // light gray
+  "#cccccc", // lighter gray
+  "#b3b3b3", // medium light gray
+  "#999999", // medium gray
 ];
 
 const LIABILITY_COLORS = [
-  "#ef4444", // red-500
-  "#f87171", // red-400
-  "#fca5a5", // red-300
-  "#dc2626", // red-600
-  "#b91c1c", // red-700
+  "#666666", // medium dark gray
+  "#555555", // darker gray
+  "#444444", // even darker gray
+  "#333333", // very dark gray
+  "#222222", // nearly black
 ];
 
-const NET_WORTH_COLOR = "#3b82f6"; // blue-500
+const NET_WORTH_COLOR = "#ffffff"; // white
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -70,8 +70,8 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-lg">
-      <p className="text-gray-300 font-medium mb-2">{label}</p>
+    <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+      <p className="text-foreground font-medium mb-2">{label}</p>
       <div className="space-y-1">
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center justify-between gap-4">
@@ -80,14 +80,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-sm text-gray-300">{entry.name}</span>
+              <span className="text-sm text-foreground">{entry.name}</span>
             </div>
             <span
               className={`text-sm font-medium ${
                 entry.dataKey === "netWorth"
                   ? entry.value >= 0
-                    ? "text-blue-400"
-                    : "text-red-400"
+                    ? "text-foreground"
+                    : "text-foreground"
                   : "text-white"
               }`}
             >
@@ -104,17 +104,17 @@ export function NetWorthChart({ data, accounts, loading }: NetWorthChartProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground"></div>
       </div>
     );
   }
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 border border-dashed border-gray-600 rounded-lg">
+      <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-lg">
         <div className="text-center">
           <svg
-            className="w-12 h-12 mx-auto text-gray-500 mb-3"
+            className="w-12 h-12 mx-auto text-muted-foreground mb-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -126,8 +126,8 @@ export function NetWorthChart({ data, accounts, loading }: NetWorthChartProps) {
               d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
             />
           </svg>
-          <p className="text-gray-400">No data available</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-muted-foreground">No data available</p>
+          <p className="text-sm text-muted-foreground">
             Add transactions to see your net worth over time
           </p>
         </div>
@@ -174,7 +174,7 @@ export function NetWorthChart({ data, accounts, loading }: NetWorthChartProps) {
         <Legend
           wrapperStyle={{ paddingTop: 10 }}
           formatter={(value) => (
-            <span className="text-gray-300 text-sm">{value}</span>
+            <span className="text-foreground text-sm">{value}</span>
           )}
         />
 

@@ -85,7 +85,7 @@ function SetupPage() {
     <div className="max-w-4xl mx-auto space-y-6 p-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-100">Welcome! Let's Set Up Your Budget</h1>
-        <p className="mt-2 text-gray-400">
+        <p className="mt-2 text-muted-foreground">
           Follow these 3 steps to get started with tracking your finances
         </p>
       </div>
@@ -98,21 +98,21 @@ function SetupPage() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                   step === currentStep
-                    ? "bg-blue-600 text-white"
+                    ? "bg-foreground text-white"
                     : step < currentStep
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-700 text-gray-400"
+                      ? "bg-foreground text-white"
+                      : "bg-muted text-muted-foreground"
                 }`}
               >
                 {step}
               </div>
               <div className="text-sm">
                 <div
-                  className={step === currentStep ? "text-blue-400 font-medium" : "text-gray-400"}
+                  className={step === currentStep ? "text-foreground font-medium" : "text-muted-foreground"}
                 >
                   Step {step}
                 </div>
-                <div className="text-gray-500 text-xs">
+                <div className="text-muted-foreground text-xs">
                   {step === 1 && "Accounts"}
                   {step === 2 && "Categories"}
                   {step === 3 && "Subcategories"}
@@ -121,7 +121,7 @@ function SetupPage() {
             </div>
             {step < 3 && (
               <div
-                className={`flex-1 h-1 mx-4 ${step < currentStep ? "bg-green-600" : "bg-gray-700"}`}
+                className={`flex-1 h-1 mx-4 ${step < currentStep ? "bg-foreground" : "bg-muted"}`}
               ></div>
             )}
           </div>
@@ -133,14 +133,14 @@ function SetupPage() {
         <Card>
           <CardHeader>
             <CardTitle>Step 1: Add Your Accounts</CardTitle>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               Add bank accounts, credit cards, investment accounts, or any other accounts you want
               to track
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Account Form */}
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div className="bg-card p-4 rounded-lg border border-border">
               <h3 className="text-lg font-semibold text-gray-200 mb-4">Create New Account</h3>
               <AccountForm
                 onSubmit={async (data) => {
@@ -153,7 +153,7 @@ function SetupPage() {
 
             {/* Accounts List */}
             {accountsLoading ? (
-              <p className="text-gray-400">Loading accounts...</p>
+              <p className="text-muted-foreground">Loading accounts...</p>
             ) : accounts.length > 0 ? (
               <div>
                 <h3 className="text-lg font-semibold text-gray-200 mb-3">
@@ -163,11 +163,11 @@ function SetupPage() {
                   {accounts.map((account) => (
                     <div
                       key={account.id}
-                      className="flex items-center justify-between bg-gray-800 p-4 rounded-lg border border-gray-700"
+                      className="flex items-center justify-between bg-card p-4 rounded-lg border border-border"
                     >
                       <div>
                         <p className="font-medium text-gray-100">{account.name}</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {account.type === "asset" ? "Asset" : "Liability"} • Initial Balance: $
                           {account.initial_balance.toFixed(2)}
                         </p>
@@ -176,7 +176,7 @@ function SetupPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteAccount(account.id)}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        className="text-foreground hover:text-foreground hover:bg-foreground/20"
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -185,7 +185,7 @@ function SetupPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400 text-center py-4">
+              <p className="text-muted-foreground text-center py-4">
                 No accounts yet. Add your first account above.
               </p>
             )}
@@ -205,13 +205,13 @@ function SetupPage() {
         <Card>
           <CardHeader>
             <CardTitle>Step 2: Create Categories</CardTitle>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               Organize your transactions with income and expense categories
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Category Form */}
-            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div className="bg-card p-4 rounded-lg border border-border">
               <h3 className="text-lg font-semibold text-gray-200 mb-4">Create New Category</h3>
               <CategoryForm
                 onSubmit={async (data) => {
@@ -224,7 +224,7 @@ function SetupPage() {
 
             {/* Categories List */}
             {categoriesLoading ? (
-              <p className="text-gray-400">Loading categories...</p>
+              <p className="text-muted-foreground">Loading categories...</p>
             ) : userCategories.length > 0 ? (
               <div>
                 <h3 className="text-lg font-semibold text-gray-200 mb-3">
@@ -234,11 +234,11 @@ function SetupPage() {
                   {userCategories.map((category) => (
                     <div
                       key={category.id}
-                      className="flex items-center justify-between bg-gray-800 p-4 rounded-lg border border-gray-700"
+                      className="flex items-center justify-between bg-card p-4 rounded-lg border border-border"
                     >
                       <div>
                         <p className="font-medium text-gray-100">{category.name}</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {category.type === "income" ? "Income" : "Expense"}
                         </p>
                       </div>
@@ -246,7 +246,7 @@ function SetupPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteCategory(category.id, category.name)}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        className="text-foreground hover:text-foreground hover:bg-foreground/20"
                       >
                         <Trash2 size={16} />
                       </Button>
@@ -255,7 +255,7 @@ function SetupPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400 text-center py-4">
+              <p className="text-muted-foreground text-center py-4">
                 No categories yet. Add your first category above.
               </p>
             )}
@@ -282,14 +282,14 @@ function SetupPage() {
         <Card>
           <CardHeader>
             <CardTitle>Step 3: Add Subcategories</CardTitle>
-            <p className="text-gray-400 text-sm mt-1">
+            <p className="text-muted-foreground text-sm mt-1">
               Add specific subcategories to further organize your spending and income
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Subcategory Form */}
             {categories.length > 0 ? (
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+              <div className="bg-card p-4 rounded-lg border border-border">
                 <h3 className="text-lg font-semibold text-gray-200 mb-4">Create New Subcategory</h3>
                 <SubcategoryForm
                   categories={categories}
@@ -301,12 +301,12 @@ function SetupPage() {
                 />
               </div>
             ) : (
-              <p className="text-gray-400">Please create at least one category first.</p>
+              <p className="text-muted-foreground">Please create at least one category first.</p>
             )}
 
             {/* Subcategories List */}
             {categoriesLoading ? (
-              <p className="text-gray-400">Loading subcategories...</p>
+              <p className="text-muted-foreground">Loading subcategories...</p>
             ) : userSubcategories.length > 0 ? (
               <div>
                 <h3 className="text-lg font-semibold text-gray-200 mb-3">
@@ -318,11 +318,11 @@ function SetupPage() {
                     return (
                       <div
                         key={subcategory.id}
-                        className="flex items-center justify-between bg-gray-800 p-4 rounded-lg border border-gray-700"
+                        className="flex items-center justify-between bg-card p-4 rounded-lg border border-border"
                       >
                         <div>
                           <p className="font-medium text-gray-100">{subcategory.name}</p>
-                          <p className="text-sm text-gray-400">
+                          <p className="text-sm text-muted-foreground">
                             Category: {category?.name || "Unknown"}
                           </p>
                         </div>
@@ -330,7 +330,7 @@ function SetupPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                          className="text-foreground hover:text-foreground hover:bg-foreground/20"
                         >
                           <Trash2 size={16} />
                         </Button>
@@ -340,7 +340,7 @@ function SetupPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-400 text-center py-4">
+              <p className="text-muted-foreground text-center py-4">
                 No subcategories yet. Add your first subcategory above.
               </p>
             )}

@@ -50,7 +50,7 @@ function ColumnHeader({
   return (
     <th
       onClick={() => onSort(field)}
-      className={`px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:text-gray-200 ${className}`}
+      className={`px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer hover:text-foreground ${className}`}
     >
       {label}
       {sortIndicator && <span className="ml-1">{sortIndicator}</span>}
@@ -169,9 +169,9 @@ export function TransactionTable({
     return (
       <div className="rounded-lg border border-border bg-card overflow-hidden">
         <div className="animate-pulse">
-          <div className="h-12 bg-gray-700/50"></div>
+          <div className="h-12 bg-muted/50"></div>
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-14 bg-gray-800/30 border-t border-gray-700/50"></div>
+            <div key={i} className="h-14 bg-card/30 border-t border-border/50"></div>
           ))}
         </div>
       </div>
@@ -182,7 +182,7 @@ export function TransactionTable({
     return (
       <div className="rounded-lg border border-border bg-card p-8 text-center">
         <p className="text-muted-foreground">No transactions found</p>
-        <p className="text-sm text-gray-500 mt-2">
+        <p className="text-sm text-muted-foreground mt-2">
           Try adjusting your filters or add some transactions
         </p>
       </div>
@@ -196,7 +196,7 @@ export function TransactionTable({
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
-          <thead className="bg-gray-800/50">
+          <thead className="bg-card/50">
             <tr>
               {/* Checkbox column */}
               <th className="px-4 py-3 w-10">
@@ -207,7 +207,7 @@ export function TransactionTable({
                     if (el) el.indeterminate = someSelected;
                   }}
                   onChange={handleSelectAll}
-                  className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900"
+                  className="rounded border-border bg-muted text-foreground focus:ring-foreground focus:ring-offset-gray-900"
                 />
               </th>
               <ColumnHeader
@@ -254,10 +254,10 @@ export function TransactionTable({
                 sortDirection={sortDirection}
                 onSort={handleSort}
               />
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Comment
               </th>
-              <th className="px-4 py-3 w-24 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <th className="px-4 py-3 w-24 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -267,13 +267,13 @@ export function TransactionTable({
               const isSelected = selectedIds.has(txn.id);
               // Display amount from account perspective: flip sign for liability accounts
               const displayAmount = txn.account_type === "liability" ? -txn.amount : txn.amount;
-              const amountColor = displayAmount >= 0 ? "text-green-400" : "text-red-400";
+              const amountColor = displayAmount >= 0 ? "text-foreground" : "text-foreground";
 
               return (
                 <tr
                   key={txn.id}
-                  className={`hover:bg-gray-800/50 ${
-                    isSelected ? "bg-blue-500/10" : ""
+                  className={`hover:bg-card/50 ${
+                    isSelected ? "bg-foreground/10" : ""
                   }`}
                 >
                   {/* Checkbox */}
@@ -283,12 +283,12 @@ export function TransactionTable({
                       checked={isSelected}
                       onClick={(e) => handleRowSelect(txn.id, index, e)}
                       onChange={() => {}} // Controlled by onClick
-                      className="rounded border-gray-600 bg-gray-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900"
+                      className="rounded border-border bg-muted text-foreground focus:ring-foreground focus:ring-offset-gray-900"
                     />
                   </td>
 
                   {/* Date */}
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-foreground">
                     {format(new Date(txn.date), "MMM d, yyyy")}
                   </td>
 
@@ -296,7 +296,7 @@ export function TransactionTable({
                   <td className="px-4 py-3 whitespace-nowrap text-sm">
                     <span className="text-gray-200">{txn.account_name}</span>
                     {txn.is_transfer && (
-                      <span className="ml-2 px-2 py-0.5 text-xs rounded bg-purple-500/20 text-purple-400">
+                      <span className="ml-2 px-2 py-0.5 text-xs rounded bg-foreground/20 text-foreground">
                         Transfer
                       </span>
                     )}
@@ -314,19 +314,19 @@ export function TransactionTable({
                   </td>
 
                   {/* Subcategory */}
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-foreground">
                     {txn.subcategory_name || (
-                      <span className="text-gray-500 italic">Unassigned</span>
+                      <span className="text-muted-foreground italic">Unassigned</span>
                     )}
                   </td>
 
                   {/* Category */}
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-400">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
                     {txn.category_name || "-"}
                   </td>
 
                   {/* Comment */}
-                  <td className="px-4 py-3 text-sm text-gray-400 max-w-xs truncate">
+                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
                     {txn.comment || "-"}
                   </td>
 
@@ -334,7 +334,7 @@ export function TransactionTable({
                   <td className="px-4 py-3 whitespace-nowrap text-right">
                     <button
                       onClick={() => onEditTransaction(txn)}
-                      className="text-gray-400 hover:text-blue-400 mr-2"
+                      className="text-muted-foreground hover:text-foreground mr-2"
                       title="Edit"
                     >
                       <svg
@@ -353,7 +353,7 @@ export function TransactionTable({
                     </button>
                     <button
                       onClick={() => onDeleteTransaction(txn.id)}
-                      className="text-gray-400 hover:text-red-400"
+                      className="text-muted-foreground hover:text-foreground"
                       title="Delete"
                     >
                       <svg
@@ -379,8 +379,8 @@ export function TransactionTable({
       </div>
 
       {/* Footer with count */}
-      <div className="px-4 py-3 bg-gray-800/30 border-t border-gray-700/50">
-        <p className="text-sm text-gray-400">
+      <div className="px-4 py-3 bg-card/30 border-t border-border/50">
+        <p className="text-sm text-muted-foreground">
           {selectedIds.size > 0 ? (
             <>
               {selectedIds.size} of {transactions.length} selected

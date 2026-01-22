@@ -566,7 +566,7 @@ export function TransactionForm({
 
           {/* AI Categorization Status */}
           {aiState.isLoading && (
-            <div className="flex items-center gap-2 mt-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
               <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
@@ -589,14 +589,14 @@ export function TransactionForm({
 
           {/* Lookup match hint */}
           {aiState.source === "lookup" && aiState.suggestion && (
-            <p className="text-sm text-green-400 mt-2">
+            <p className="text-sm text-foreground mt-2">
               Based on previous entry
             </p>
           )}
 
           {/* User correction match hint */}
           {aiState.source === "correction" && aiState.suggestion && (
-            <p className="text-sm text-blue-400 mt-2">
+            <p className="text-sm text-foreground mt-2">
               Based on your preference
             </p>
           )}
@@ -605,7 +605,7 @@ export function TransactionForm({
           {aiState.source === "ai" && aiState.suggestion && !aiState.isLoading && (
             <div className="mt-2">
               {aiState.userAccepted ? (
-                <p className="text-sm text-green-400 flex items-center gap-1">
+                <p className="text-sm text-foreground flex items-center gap-1">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -613,16 +613,16 @@ export function TransactionForm({
                 </p>
               ) : formData.subcategory_id === aiState.suggestion.subcategory_id ? (
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-yellow-400">
+                  <p className="text-sm text-foreground">
                     AI suggests: {aiState.suggestion.category_name} &gt; {aiState.suggestion.subcategory_name}
-                    <span className="text-gray-500 ml-1">
+                    <span className="text-muted-foreground ml-1">
                       ({Math.round(aiState.suggestion.confidence * 100)}% confident)
                     </span>
                   </p>
                   <button
                     type="button"
                     onClick={handleAcceptAISuggestion}
-                    className="text-green-400 hover:text-green-300"
+                    className="text-foreground hover:text-foreground"
                     title="Accept suggestion"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -644,7 +644,7 @@ export function TransactionForm({
           <label className="block text-sm font-medium text-gray-200 mb-1.5">
             Category
           </label>
-          <div className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-300">
+          <div className="px-3 py-2 bg-muted border border-border rounded-md text-foreground">
             {selectedCategory ? selectedCategory.name : "Select a subcategory first"}
           </div>
         </div>

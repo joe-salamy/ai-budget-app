@@ -16,9 +16,10 @@ interface FinancialHealthScoreProps {
 // ============== HELPER FUNCTIONS ==============
 
 function getScoreColor(score: number): string {
-  if (score <= 40) return "#ef4444"; // red-500
-  if (score <= 70) return "#eab308"; // yellow-500
-  return "#22c55e"; // green-500
+  // Black and white theme - use grayscale only
+  if (score <= 40) return "#666666"; // dark gray
+  if (score <= 70) return "#999999"; // medium gray
+  return "#ffffff"; // white
 }
 
 function getScoreLabel(score: number): string {
@@ -55,7 +56,7 @@ function CircularProgress({ score, size = 160 }: { score: number; size?: number 
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-gray-700"
+          className="text-muted"
         />
         {/* Progress circle */}
         <circle
@@ -76,7 +77,7 @@ function CircularProgress({ score, size = 160 }: { score: number; size?: number 
         <span className="text-4xl font-bold" style={{ color }}>
           {score}
         </span>
-        <span className="text-sm text-gray-400">/ 100</span>
+        <span className="text-sm text-muted-foreground">/ 100</span>
       </div>
     </div>
   );
@@ -101,13 +102,13 @@ function ScoreFactor({ label, score, maxScore, details, icon }: ScoreFactorProps
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-lg">{icon}</span>
-          <span className="text-sm font-medium text-gray-300">{label}</span>
+          <span className="text-sm font-medium text-foreground">{label}</span>
         </div>
         <span className="text-sm font-semibold" style={{ color: barColor }}>
           {score}/{maxScore}
         </span>
       </div>
-      <div className="w-full bg-gray-700 rounded-full h-2">
+      <div className="w-full bg-muted rounded-full h-2">
         <div
           className="h-2 rounded-full transition-all duration-500"
           style={{
@@ -116,7 +117,7 @@ function ScoreFactor({ label, score, maxScore, details, icon }: ScoreFactorProps
           }}
         />
       </div>
-      <p className="text-xs text-gray-500">{details}</p>
+      <p className="text-xs text-muted-foreground">{details}</p>
     </div>
   );
 }
@@ -132,7 +133,7 @@ function HistoryChart({ data, loading }: HistoryChartProps) {
   if (loading) {
     return (
       <div className="h-32 flex items-center justify-center">
-        <div className="animate-pulse text-gray-500">Loading history...</div>
+        <div className="animate-pulse text-muted-foreground">Loading history...</div>
       </div>
     );
   }
@@ -140,7 +141,7 @@ function HistoryChart({ data, loading }: HistoryChartProps) {
   if (data.length === 0) {
     return (
       <div className="h-32 flex items-center justify-center">
-        <p className="text-gray-500 text-sm">Not enough data for history</p>
+        <p className="text-muted-foreground text-sm">Not enough data for history</p>
       </div>
     );
   }
@@ -170,20 +171,20 @@ function HistoryChart({ data, loading }: HistoryChartProps) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#1f2937",
-              border: "1px solid #374151",
+              backgroundColor: "#0a0a0a",
+              border: "1px solid #333333",
               borderRadius: "0.375rem",
-              color: "#fff",
+              color: "#ffffff",
             }}
             formatter={(value) => [`${value}`, "Score"]}
           />
           <Line
             type="monotone"
             dataKey="score"
-            stroke="#22c55e"
+            stroke="#ffffff"
             strokeWidth={2}
-            dot={{ fill: "#22c55e", strokeWidth: 0, r: 3 }}
-            activeDot={{ fill: "#22c55e", strokeWidth: 0, r: 5 }}
+            dot={{ fill: "#ffffff", strokeWidth: 0, r: 3 }}
+            activeDot={{ fill: "#ffffff", strokeWidth: 0, r: 5 }}
           />
         </LineChart>
       </ResponsiveContainer>
@@ -247,10 +248,10 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
-              <div className="w-40 h-40 rounded-full border-4 border-gray-700 flex items-center justify-center mx-auto mb-4 animate-pulse">
-                <span className="text-3xl font-bold text-gray-500">--</span>
+              <div className="w-40 h-40 rounded-full border-4 border-border700 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <span className="text-3xl font-bold text-muted-foreground500">--</span>
               </div>
-              <p className="text-gray-400">Calculating...</p>
+              <p className="text-muted-foreground">Calculating...</p>
             </div>
           </div>
         </CardContent>
@@ -268,11 +269,11 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
-              <div className="w-40 h-40 rounded-full border-4 border-gray-600 flex items-center justify-center mx-auto mb-4">
-                <span className="text-3xl font-bold text-gray-400">--</span>
+              <div className="w-40 h-40 rounded-full border-4 border-border flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl font-bold text-muted-foreground">--</span>
               </div>
-              <p className="text-red-400">{error || "Unable to calculate score"}</p>
-              <p className="text-sm text-gray-500 mt-1">Try adding more transactions and goals</p>
+              <p className="text-foreground">{error || "Unable to calculate score"}</p>
+              <p className="text-sm text-muted-foreground mt-1">Try adding more transactions and goals</p>
             </div>
           </div>
         </CardContent>
@@ -290,7 +291,7 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
         <CardTitle className="text-lg">Financial Health Score</CardTitle>
         <button
           onClick={() => setShowBreakdown(!showBreakdown)}
-          className="text-sm text-blue-400 hover:text-blue-300 hover:underline"
+          className="text-sm text-foreground hover:text-muted-foreground hover:underline"
         >
           {showBreakdown ? "Hide Details" : "Show Details"}
         </button>
@@ -303,7 +304,7 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
             <p className="mt-2 text-lg font-semibold" style={{ color: scoreColor }}>
               {scoreLabel}
             </p>
-            <p className="text-sm text-gray-500">For selected period</p>
+            <p className="text-sm text-muted-foreground">For selected period</p>
           </div>
 
           {/* Score Breakdown (when expanded) */}
@@ -349,8 +350,8 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
             <div className="flex-1 flex flex-col gap-4">
               {/* Quick Summary */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-400">Spending</p>
+                <div className="bg-muted rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">Spending</p>
                   <p
                     className="text-sm font-medium"
                     style={{ color: getScoreColor((breakdown.spendingVsGoals.score / 40) * 100) }}
@@ -358,8 +359,8 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
                     {breakdown.spendingVsGoals.score}/40
                   </p>
                 </div>
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-400">Savings</p>
+                <div className="bg-muted rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">Savings</p>
                   <p
                     className="text-sm font-medium"
                     style={{ color: getScoreColor((breakdown.savingsRate.score / 30) * 100) }}
@@ -367,8 +368,8 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
                     {breakdown.savingsRate.score}/30
                   </p>
                 </div>
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-400">Goals</p>
+                <div className="bg-muted rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">Goals</p>
                   <p
                     className="text-sm font-medium"
                     style={{
@@ -378,8 +379,8 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
                     {breakdown.savingGoalsProgress.score}/20
                   </p>
                 </div>
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <p className="text-xs text-gray-400">Net Worth</p>
+                <div className="bg-muted rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">Net Worth</p>
                   <p
                     className="text-sm font-medium"
                     style={{ color: getScoreColor((breakdown.netWorthTrend.score / 10) * 100) }}
@@ -391,12 +392,12 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
 
               {/* Tips */}
               {tips.length > 0 && (
-                <div className="bg-gray-800/30 rounded-lg p-3">
-                  <p className="text-xs text-gray-400 mb-2">Tips for Improvement</p>
+                <div className="bg-muted rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground mb-2">Tips for Improvement</p>
                   <ul className="space-y-1">
                     {tips.map((tip, index) => (
-                      <li key={index} className="text-sm text-gray-300 flex items-start gap-2">
-                        <span className="text-yellow-500 mt-0.5">*</span>
+                      <li key={index} className="text-sm text-foreground flex items-start gap-2">
+                        <span className="text-foreground mt-0.5">*</span>
                         {tip}
                       </li>
                     ))}
@@ -409,8 +410,8 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
 
         {/* History Chart */}
         {showBreakdown && (
-          <div className="mt-6 pt-4 border-t border-gray-700">
-            <p className="text-sm text-gray-400 mb-2">Score History (Last 6 Months)</p>
+          <div className="mt-6 pt-4 border-t border-border700">
+            <p className="text-sm text-muted-foreground mb-2">Score History (Last 6 Months)</p>
             <HistoryChart data={history} loading={historyLoading} />
           </div>
         )}

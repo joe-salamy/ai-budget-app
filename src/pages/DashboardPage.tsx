@@ -104,21 +104,21 @@ function DashboardPage() {
         {/* Date Range Selector */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-400">From:</label>
+            <label className="text-sm text-muted-foreground">From:</label>
             <input
               type="date"
               value={dateRange.startDate}
               onChange={handleStartDateChange}
-              className="px-3 py-1.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 bg-card border border-border rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-foreground"
             />
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-400">To:</label>
+            <label className="text-sm text-muted-foreground">To:</label>
             <input
               type="date"
               value={dateRange.endDate}
               onChange={handleEndDateChange}
-              className="px-3 py-1.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1.5 bg-card border border-border rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-foreground"
             />
           </div>
         </div>
@@ -130,7 +130,7 @@ function DashboardPage() {
           <button
             key={preset.label}
             onClick={() => handlePresetClick(preset)}
-            className="px-3 py-1 text-xs rounded-full border border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white hover:border-gray-400"
+            className="px-3 py-1 text-xs rounded-full border border-border text-foreground hover:bg-muted hover:text-white hover:border-border"
           >
             {preset.label}
           </button>
@@ -142,77 +142,77 @@ function DashboardPage() {
         {/* Net Worth Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-400">Net Worth</CardTitle>
+            <CardTitle className="text-base font-medium text-muted-foreground">Net Worth</CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             {accountSummaryLoading ? (
-              <div className="h-8 bg-gray-700/50 rounded animate-pulse"></div>
+              <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
               <p
                 className={`text-2xl font-bold ${
-                  (netWorth?.net_worth ?? 0) >= 0 ? "text-green-400" : "text-red-400"
+                  (netWorth?.net_worth ?? 0) >= 0 ? "text-foreground" : "text-foreground"
                 }`}
               >
                 {formatCurrency(netWorth?.net_worth ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">Assets - Liabilities</p>
+            <p className="text-xs text-muted-foreground mt-1">Assets - Liabilities</p>
           </CardContent>
         </Card>
 
         {/* Income Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-400">Income</CardTitle>
+            <CardTitle className="text-base font-medium text-muted-foreground">Income</CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             {metricsLoading ? (
-              <div className="h-8 bg-gray-700/50 rounded animate-pulse"></div>
+              <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
-              <p className="text-2xl font-bold text-green-400">
+              <p className="text-2xl font-bold text-foreground">
                 +{formatCurrency(metrics?.totalIncome ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">In selected period</p>
+            <p className="text-xs text-muted-foreground mt-1">In selected period</p>
           </CardContent>
         </Card>
 
         {/* Expenses Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-400">Expenses</CardTitle>
+            <CardTitle className="text-base font-medium text-muted-foreground">Expenses</CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             {metricsLoading ? (
-              <div className="h-8 bg-gray-700/50 rounded animate-pulse"></div>
+              <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
-              <p className="text-2xl font-bold text-red-400">
+              <p className="text-2xl font-bold text-foreground">
                 -{formatCurrency(metrics?.totalExpenses ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">In selected period</p>
+            <p className="text-xs text-muted-foreground mt-1">In selected period</p>
           </CardContent>
         </Card>
 
         {/* Net Change Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-medium text-gray-400">Net Change</CardTitle>
+            <CardTitle className="text-base font-medium text-muted-foreground">Net Change</CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             {metricsLoading ? (
-              <div className="h-8 bg-gray-700/50 rounded animate-pulse"></div>
+              <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
               <p
                 className={`text-2xl font-bold ${
-                  (metrics?.netChange ?? 0) >= 0 ? "text-green-400" : "text-red-400"
+                  (metrics?.netChange ?? 0) >= 0 ? "text-foreground" : "text-foreground"
                 }`}
               >
                 {(metrics?.netChange ?? 0) >= 0 ? "+" : ""}
                 {formatCurrency(metrics?.netChange ?? 0)}
               </p>
             )}
-            <p className="text-xs text-gray-500 mt-1">Income - Expenses</p>
+            <p className="text-xs text-muted-foreground mt-1">Income - Expenses</p>
           </CardContent>
         </Card>
       </div>

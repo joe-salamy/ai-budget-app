@@ -43,7 +43,7 @@ interface CustomNodeProps {
 
 function CustomNodeTooltip({ node }: CustomNodeProps) {
   return (
-    <div className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 shadow-lg">
+    <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-lg">
       <span className="text-white font-medium">{getDisplayName(node.id)}</span>
     </div>
   );
@@ -60,11 +60,11 @@ interface CustomLinkProps {
 
 function CustomLinkTooltip({ link }: CustomLinkProps) {
   return (
-    <div className="bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 shadow-lg">
+    <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-lg">
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-gray-300">{getDisplayName(link.source.id)}</span>
-        <span className="text-gray-500">→</span>
-        <span className="text-gray-300">{getDisplayName(link.target.id)}</span>
+        <span className="text-foreground">{getDisplayName(link.source.id)}</span>
+        <span className="text-muted-foreground">→</span>
+        <span className="text-foreground">{getDisplayName(link.target.id)}</span>
       </div>
       <div className="text-white font-medium mt-1">
         {formatCurrency(link.value)}
@@ -77,17 +77,17 @@ export function SankeyDiagram({ data, loading }: SankeyDiagramProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground"></div>
       </div>
     );
   }
 
   if (!data || data.nodes.length === 0 || data.links.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 border border-dashed border-gray-600 rounded-lg">
+      <div className="flex items-center justify-center h-64 border border-dashed border-border rounded-lg">
         <div className="text-center">
           <svg
-            className="w-12 h-12 mx-auto text-gray-500 mb-3"
+            className="w-12 h-12 mx-auto text-muted-foreground mb-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -99,8 +99,8 @@ export function SankeyDiagram({ data, loading }: SankeyDiagramProps) {
               d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
             />
           </svg>
-          <p className="text-gray-400">No cash flow data</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-muted-foreground">No cash flow data</p>
+          <p className="text-sm text-muted-foreground">
             Add categorized transactions to see your cash flow
           </p>
         </div>
@@ -126,7 +126,7 @@ export function SankeyDiagram({ data, loading }: SankeyDiagramProps) {
         linkHoverOpacity={0.8}
         linkHoverOthersOpacity={0.1}
         linkContract={3}
-        enableLinkGradient={true}
+        enableLinkGradient={false}
         labelPosition="outside"
         labelOrientation="horizontal"
         labelPadding={12}

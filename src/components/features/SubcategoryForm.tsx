@@ -121,7 +121,7 @@ export function SubcategoryForm({
         disabled={isSystemSubcategory}
       />
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-foreground">{error}</p>}
 
       {!isSystemSubcategory && (
         <div className="flex gap-3">

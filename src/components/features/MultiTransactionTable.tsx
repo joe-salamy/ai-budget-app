@@ -363,13 +363,13 @@ export function MultiTransactionTable({
 
     switch (row.categorizationSource) {
       case "lookup":
-        return <span className="text-xs text-green-400">Previous</span>;
+        return <span className="text-xs text-foreground">Previous</span>;
       case "correction":
-        return <span className="text-xs text-blue-400">Preferred</span>;
+        return <span className="text-xs text-foreground">Preferred</span>;
       case "ai":
         return row.user_corrected
           ? <span className="text-xs text-orange-400">Corrected</span>
-          : <span className="text-xs text-yellow-400">AI</span>;
+          : <span className="text-xs text-foreground">AI</span>;
       default:
         return null;
     }
@@ -406,29 +406,29 @@ export function MultiTransactionTable({
 
       {/* Error message */}
       {submitError && (
-        <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20">
-          <p className="text-red-400 text-sm">{submitError}</p>
+        <div className="p-3 rounded-md bg-foreground/10 border border-foreground/20">
+          <p className="text-foreground text-sm">{submitError}</p>
         </div>
       )}
 
       {/* Transaction Table */}
       <div className="overflow-x-auto border border-border rounded-lg">
         <table className="w-full text-sm">
-          <thead className="bg-gray-800">
+          <thead className="bg-card">
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-gray-300 w-32">Date</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-300 w-40">
+              <th className="px-3 py-2 text-left font-medium text-foreground w-32">Date</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground w-40">
                 {isTransfer ? "From Account" : "Account"}
               </th>
               {isTransfer && (
-                <th className="px-3 py-2 text-left font-medium text-gray-300 w-40">To Account</th>
+                <th className="px-3 py-2 text-left font-medium text-foreground w-40">To Account</th>
               )}
-              <th className="px-3 py-2 text-left font-medium text-gray-300">Description</th>
-              <th className="px-3 py-2 text-left font-medium text-gray-300 w-28">Amount</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground">Description</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground w-28">Amount</th>
               {!isTransfer && (
-                <th className="px-3 py-2 text-left font-medium text-gray-300 w-48">Subcategory</th>
+                <th className="px-3 py-2 text-left font-medium text-foreground w-48">Subcategory</th>
               )}
-              <th className="px-3 py-2 text-left font-medium text-gray-300 w-32">Comment</th>
+              <th className="px-3 py-2 text-left font-medium text-foreground w-32">Comment</th>
               <th className="px-3 py-2 w-12"></th>
             </tr>
           </thead>
@@ -445,15 +445,15 @@ export function MultiTransactionTable({
                 }));
 
               return (
-                <tr key={row.id} className="bg-card hover:bg-gray-800/50">
+                <tr key={row.id} className="bg-card hover:bg-card/50">
                   {/* Date */}
                   <td className="px-2 py-1">
                     <input
                       type="date"
                       value={row.date}
                       onChange={(e) => handleRowChange(row.id, "date", e.target.value)}
-                      className={`w-full px-2 py-1.5 bg-gray-700 border rounded text-sm text-foreground ${
-                        rowErrors.date ? "border-red-500" : "border-gray-600"
+                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground ${
+                        rowErrors.date ? "border-foreground" : "border-border"
                       }`}
                     />
                   </td>
@@ -463,8 +463,8 @@ export function MultiTransactionTable({
                     <select
                       value={row.account_id}
                       onChange={(e) => handleRowChange(row.id, "account_id", e.target.value)}
-                      className={`w-full px-2 py-1.5 bg-gray-700 border rounded text-sm text-foreground ${
-                        rowErrors.account_id ? "border-red-500" : "border-gray-600"
+                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground ${
+                        rowErrors.account_id ? "border-foreground" : "border-border"
                       }`}
                     >
                       <option value="">Select...</option>
@@ -483,8 +483,8 @@ export function MultiTransactionTable({
                         value={row.transfer_to_account_id || ""}
                         onChange={(e) => handleRowChange(row.id, "transfer_to_account_id", e.target.value)}
                         disabled={!row.account_id}
-                        className={`w-full px-2 py-1.5 bg-gray-700 border rounded text-sm text-foreground disabled:opacity-50 ${
-                          rowErrors.transfer_to_account_id ? "border-red-500" : "border-gray-600"
+                        className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground disabled:opacity-50 ${
+                          rowErrors.transfer_to_account_id ? "border-foreground" : "border-border"
                         }`}
                       >
                         <option value="">Select...</option>
@@ -504,8 +504,8 @@ export function MultiTransactionTable({
                       value={row.name}
                       onChange={(e) => handleRowChange(row.id, "name", e.target.value)}
                       placeholder="e.g., Grocery shopping"
-                      className={`w-full px-2 py-1.5 bg-gray-700 border rounded text-sm text-foreground placeholder:text-gray-500 ${
-                        rowErrors.name ? "border-red-500" : "border-gray-600"
+                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
+                        rowErrors.name ? "border-foreground" : "border-border"
                       }`}
                     />
                   </td>
@@ -519,8 +519,8 @@ export function MultiTransactionTable({
                       value={row.amount}
                       onChange={(e) => handleRowChange(row.id, "amount", e.target.value)}
                       placeholder="0.00"
-                      className={`w-full px-2 py-1.5 bg-gray-700 border rounded text-sm text-foreground placeholder:text-gray-500 ${
-                        rowErrors.amount ? "border-red-500" : "border-gray-600"
+                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
+                        rowErrors.amount ? "border-foreground" : "border-border"
                       }`}
                     />
                   </td>
@@ -532,7 +532,7 @@ export function MultiTransactionTable({
                         <select
                           value={row.subcategory_id}
                           onChange={(e) => handleRowChange(row.id, "subcategory_id", e.target.value)}
-                          className="flex-1 px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-foreground"
+                          className="flex-1 px-2 py-1.5 bg-muted border border-border rounded text-sm text-foreground"
                         >
                           <option value="">Select...</option>
                           {subcategoryOptions.map((opt) => (
@@ -553,7 +553,7 @@ export function MultiTransactionTable({
                       value={row.comment}
                       onChange={(e) => handleRowChange(row.id, "comment", e.target.value)}
                       placeholder="Note..."
-                      className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-foreground placeholder:text-gray-500"
+                      className="w-full px-2 py-1.5 bg-muted border border-border rounded text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </td>
 
@@ -563,7 +563,7 @@ export function MultiTransactionTable({
                       type="button"
                       onClick={() => removeRow(row.id)}
                       disabled={rows.length <= 1}
-                      className="p-1 text-gray-400 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
                       title="Remove row"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

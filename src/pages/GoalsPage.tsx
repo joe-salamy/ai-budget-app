@@ -51,9 +51,9 @@ function formatDate(dateStr: string): string {
 }
 
 function getSavingProgressColor(percent: number): string {
-  if (percent >= 100) return "bg-green-500";
-  if (percent >= 50) return "bg-blue-500";
-  return "bg-gray-500";
+  if (percent >= 100) return "bg-foreground";
+  if (percent >= 50) return "bg-foreground";
+  return "bg-muted";
 }
 
 // ============== SPENDING GOALS SECTION ==============
@@ -81,8 +81,8 @@ function SpendingGoalsSection({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-600/20 border border-red-600 flex items-center justify-center">
-              <Target className="w-5 h-5 text-red-400" />
+            <div className="w-10 h-10 rounded-full bg-foreground/20 border border-foreground flex items-center justify-center">
+              <Target className="w-5 h-5 text-foreground" />
             </div>
             <div>
               <CardTitle>Spending Goals</CardTitle>
@@ -99,58 +99,58 @@ function SpendingGoalsSection({
         {loading ? (
           <div className="animate-pulse space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-800 rounded-lg"></div>
+              <div key={i} className="h-20 bg-muted rounded-lg"></div>
             ))}
           </div>
         ) : goals.length === 0 ? (
           <div className="text-center py-8">
-            <Target className="w-12 h-12 mx-auto text-gray-600 mb-3" />
-            <p className="text-gray-400">No spending goals set</p>
-            <p className="text-sm text-gray-500 mt-1">
+            <Target className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+            <p className="text-muted-foreground">No spending goals set</p>
+            <p className="text-sm text-muted-foreground mt-1">
               Create a spending goal to track your budget
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-700">
-              <thead className="bg-gray-800/30">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                     Subcategory
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                     Category
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">
                     Budget
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase">
                     Period
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase">
                     Date Range
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-400 uppercase">
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-700/50">
+              <tbody className="divide-y divide-border">
                 {goals.map((goal) => (
-                  <tr key={goal.id} className="hover:bg-gray-800/50">
-                    <td className="px-4 py-4 text-sm text-gray-200 font-medium">
+                  <tr key={goal.id} className="hover:bg-muted">
+                    <td className="px-4 py-4 text-sm text-foreground font-medium">
                       {goal.subcategory_name}
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-400">{goal.category_name}</td>
-                    <td className="px-4 py-4 text-sm text-right text-red-400 font-medium">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">{goal.category_name}</td>
+                    <td className="px-4 py-4 text-sm text-right text-foreground font-medium">
                       {formatCurrency(goal.amount)}
                     </td>
                     <td className="px-4 py-4 text-sm text-center">
-                      <span className="px-2 py-1 bg-gray-700 rounded text-gray-300 text-xs">
+                      <span className="px-2 py-1 bg-muted rounded text-muted-foreground text-xs">
                         {formatPeriod(goal.period)}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-sm text-center text-gray-400">
+                    <td className="px-4 py-4 text-sm text-center text-muted-foreground">
                       {formatDate(goal.start_date)}
                       {goal.end_date ? ` - ${formatDate(goal.end_date)}` : " - Ongoing"}
                     </td>
@@ -160,7 +160,7 @@ function SpendingGoalsSection({
                           variant="ghost"
                           size="sm"
                           onClick={() => onEdit(goal)}
-                          className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                          className="text-foreground hover:text-foreground hover:bg-muted"
                         >
                           <Pencil size={16} />
                         </Button>
@@ -168,7 +168,7 @@ function SpendingGoalsSection({
                           variant="ghost"
                           size="sm"
                           onClick={() => onDelete(goal.id, goal.subcategory_name)}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                          className="text-foreground hover:text-foreground hover:bg-muted"
                         >
                           <Trash2 size={16} />
                         </Button>
@@ -214,8 +214,8 @@ function SavingGoalsSection({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-600/20 border border-green-600 flex items-center justify-center">
-              <PiggyBank className="w-5 h-5 text-green-400" />
+            <div className="w-10 h-10 rounded-full bg-foreground/20 border border-foreground flex items-center justify-center">
+              <PiggyBank className="w-5 h-5 text-foreground" />
             </div>
             <div>
               <CardTitle>Saving Goals</CardTitle>
@@ -232,14 +232,14 @@ function SavingGoalsSection({
         {loading ? (
           <div className="animate-pulse grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-40 bg-gray-800 rounded-lg"></div>
+              <div key={i} className="h-40 bg-muted rounded-lg"></div>
             ))}
           </div>
         ) : goals.length === 0 ? (
           <div className="text-center py-8">
-            <PiggyBank className="w-12 h-12 mx-auto text-gray-600 mb-3" />
-            <p className="text-gray-400">No saving goals set</p>
-            <p className="text-sm text-gray-500 mt-1">
+            <PiggyBank className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+            <p className="text-muted-foreground">No saving goals set</p>
+            <p className="text-sm text-muted-foreground mt-1">
               Create a saving goal to track your progress
             </p>
           </div>
@@ -248,7 +248,7 @@ function SavingGoalsSection({
             {/* Active Goals */}
             {activeGoals.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-400 uppercase mb-3">Active Goals</h3>
+                <h3 className="text-sm font-medium text-muted-foreground uppercase mb-3">Active Goals</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {activeGoals.map((goal) => {
                     const percent =
@@ -259,25 +259,25 @@ function SavingGoalsSection({
                     return (
                       <div
                         key={goal.id}
-                        className="p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-500 hover:bg-gray-800/80"
+                        className="p-4 bg-muted rounded-lg border border-border hover:border-foreground hover:bg-muted"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => onToggleComplete(goal)}
-                              className="text-gray-500 hover:text-green-400"
+                              className="text-muted-foreground hover:text-foreground"
                               title="Mark as complete"
                             >
                               <Circle size={18} />
                             </button>
-                            <h4 className="font-medium text-gray-200">{goal.name}</h4>
+                            <h4 className="font-medium text-foreground">{goal.name}</h4>
                           </div>
                           <div className="flex gap-1">
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => onAddAmount(goal)}
-                              className="text-green-400 hover:text-green-300 hover:bg-green-900/20 p-1"
+                              className="text-foreground hover:text-foreground hover:bg-muted p-1"
                               title="Add to savings"
                             >
                               <DollarSign size={16} />
@@ -286,7 +286,7 @@ function SavingGoalsSection({
                               variant="ghost"
                               size="sm"
                               onClick={() => onEdit(goal)}
-                              className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 p-1"
+                              className="text-foreground hover:text-foreground hover:bg-muted p-1"
                             >
                               <Pencil size={16} />
                             </Button>
@@ -294,7 +294,7 @@ function SavingGoalsSection({
                               variant="ghost"
                               size="sm"
                               onClick={() => onDelete(goal.id, goal.name)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-900/20 p-1"
+                              className="text-foreground hover:text-foreground hover:bg-muted p-1"
                             >
                               <Trash2 size={16} />
                             </Button>
@@ -305,27 +305,27 @@ function SavingGoalsSection({
                         {goal.target_amount && (
                           <div className="mb-3">
                             <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-400">
+                              <span className="text-muted-foreground">
                                 {formatCurrency(goal.current_amount)}
                               </span>
-                              <span className="text-gray-400">
+                              <span className="text-muted-foreground">
                                 {formatCurrency(goal.target_amount)}
                               </span>
                             </div>
-                            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div
                                 className={`h-full ${getSavingProgressColor(percent)}`}
                                 style={{ width: `${percent}%` }}
                               ></div>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1 text-right">
+                            <div className="text-xs text-muted-foreground mt-1 text-right">
                               {percent.toFixed(0)}% complete
                             </div>
                           </div>
                         )}
 
                         {/* Meta info */}
-                        <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                           {goal.target_date && (
                             <div className="flex items-center gap-1">
                               <Calendar size={12} />
@@ -349,27 +349,27 @@ function SavingGoalsSection({
             {/* Completed Goals */}
             {completedGoals.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-400 uppercase mb-3">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase mb-3">
                   Completed Goals ({completedGoals.length})
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {completedGoals.map((goal) => (
                     <div
                       key={goal.id}
-                      className="p-4 bg-gray-800/50 rounded-lg border border-gray-700/50"
+                      className="p-4 bg-muted rounded-lg border border-border"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => onToggleComplete(goal)}
-                            className="text-green-400 hover:text-gray-400"
+                            className="text-foreground hover:text-muted-foreground"
                             title="Mark as incomplete"
                           >
                             <CheckCircle2 size={18} />
                           </button>
                           <div>
-                            <h4 className="font-medium text-gray-400 line-through">{goal.name}</h4>
-                            <p className="text-xs text-gray-500">
+                            <h4 className="font-medium text-muted-foreground line-through">{goal.name}</h4>
+                            <p className="text-xs text-muted-foreground">
                               {goal.target_amount
                                 ? `Saved ${formatCurrency(goal.current_amount)}`
                                 : "Completed"}
@@ -381,7 +381,7 @@ function SavingGoalsSection({
                           variant="ghost"
                           size="sm"
                           onClick={() => onDelete(goal.id, goal.name)}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 p-1"
+                          className="text-foreground hover:text-foreground hover:bg-foreground/20 p-1"
                         >
                           <Trash2 size={16} />
                         </Button>
@@ -421,16 +421,16 @@ function AddAmountModal({ goal, onSubmit, onClose }: AddAmountModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 w-full max-w-md mx-4">
-        <h3 className="text-lg font-semibold text-white mb-4">Add to "{goal.name}"</h3>
-        <p className="text-sm text-gray-400 mb-4">
+    <div className="fixed inset-0 bg-background/50 flex items-center justify-center z-50">
+      <div className="bg-card border border-border rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Add to "{goal.name}"</h3>
+        <p className="text-sm text-muted-foreground mb-4">
           Current progress: {formatCurrency(goal.current_amount)}
           {goal.target_amount && ` of ${formatCurrency(goal.target_amount)}`}
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Amount to Add</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-2">Amount to Add</label>
             <input
               type="number"
               value={amount}
@@ -438,7 +438,7 @@ function AddAmountModal({ goal, onSubmit, onClose }: AddAmountModalProps) {
               placeholder="0.00"
               min="0.01"
               step="0.01"
-              className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-muted border border-border rounded-md text-foreground focus:border-foreground focus:ring-1 focus:ring-ring"
               autoFocus
               disabled={isSubmitting}
             />
@@ -521,8 +521,8 @@ function GoalsPage() {
     <div className="max-w-6xl mx-auto space-y-6 p-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Budget Goals</h1>
-        <p className="text-gray-400 mt-2">Set spending limits and track your savings progress</p>
+        <h1 className="text-3xl font-bold text-foreground">Budget Goals</h1>
+        <p className="text-muted-foreground mt-2">Set spending limits and track your savings progress</p>
       </div>
 
       {/* Spending Goals Section */}

@@ -34,8 +34,8 @@ export function RecentActivityPanel({
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-4 bg-gray-700 rounded w-1/3 mb-2"></div>
-              <div className="h-3 bg-gray-700 rounded w-1/2"></div>
+              <div className="h-4 bg-muted rounded w-1/3 mb-2"></div>
+              <div className="h-3 bg-muted rounded w-1/2"></div>
             </div>
           ))}
         </div>
@@ -45,9 +45,9 @@ export function RecentActivityPanel({
 
   if (error) {
     return (
-      <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4">
+      <div className="rounded-lg border border-foreground/20 bg-foreground/10 p-4">
         <h2 className="text-lg font-semibold text-foreground mb-2">Recent Activity</h2>
-        <p className="text-red-400 text-sm">{error}</p>
+        <p className="text-foreground text-sm">{error}</p>
       </div>
     );
   }
@@ -81,17 +81,17 @@ interface AccountActivityCardProps {
 
 function AccountActivityCard({ activity }: AccountActivityCardProps) {
   const isAsset = activity.account_type === "asset";
-  const balanceColor = activity.current_balance >= 0 ? "text-green-400" : "text-red-400";
+  const balanceColor = activity.current_balance >= 0 ? "text-foreground" : "text-foreground";
 
   return (
-    <div className="p-3 rounded-md bg-gray-800/50 border border-gray-700/50">
+    <div className="p-3 rounded-md bg-card/50 border border-border/50">
       {/* Account header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span
             className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
               isAsset
-                ? "bg-green-500/20 text-green-400"
+                ? "bg-foreground/20 text-foreground"
                 : "bg-orange-500/20 text-orange-400"
             }`}
           >
@@ -112,10 +112,10 @@ function AccountActivityCard({ activity }: AccountActivityCardProps) {
           return (
             <div className="flex items-center justify-between text-sm">
               <div className="flex-1 min-w-0">
-                <p className="text-gray-300 truncate">
+                <p className="text-foreground truncate">
                   {activity.recent_transaction.name}
                 </p>
-                <p className="text-gray-500 text-xs">
+                <p className="text-muted-foreground text-xs">
                   {formatDistanceToNow(new Date(activity.recent_transaction.date), {
                     addSuffix: true,
                   })}
@@ -123,7 +123,7 @@ function AccountActivityCard({ activity }: AccountActivityCardProps) {
               </div>
               <span
                 className={`ml-2 font-medium ${
-                  displayAmount >= 0 ? "text-green-400" : "text-red-400"
+                  displayAmount >= 0 ? "text-foreground" : "text-foreground"
                 }`}
               >
                 {displayAmount >= 0 ? "+" : ""}
@@ -133,7 +133,7 @@ function AccountActivityCard({ activity }: AccountActivityCardProps) {
           );
         })()
       ) : (
-        <p className="text-gray-500 text-sm">No transactions yet</p>
+        <p className="text-muted-foreground text-sm">No transactions yet</p>
       )}
     </div>
   );

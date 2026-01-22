@@ -136,9 +136,9 @@ export function SpendingGoalForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Subcategory Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Subcategory</label>
+        <label className="block text-sm font-medium text-foreground mb-2">Subcategory</label>
         {disableSubcategoryChange ? (
-          <div className="px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-md text-gray-300">
+          <div className="px-3 py-2 bg-muted/50 border border-border rounded-md text-foreground">
             {subcategories.find((s) => s.id === subcategoryId)?.name || "Unknown"}
           </div>
         ) : (
@@ -148,7 +148,7 @@ export function SpendingGoalForm({
               setSubcategoryId(e.target.value);
               setErrors({});
             }}
-            className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full px-3 py-2 bg-card border border-border rounded-md text-white focus:border-foreground focus:ring-1 focus:ring-foreground"
             disabled={isSubmitting}
           >
             <option value="">Select a subcategory...</option>
@@ -166,10 +166,10 @@ export function SpendingGoalForm({
           </select>
         )}
         {errors.subcategoryId && (
-          <p className="mt-1 text-sm text-red-400">{errors.subcategoryId}</p>
+          <p className="mt-1 text-sm text-foreground">{errors.subcategoryId}</p>
         )}
         {availableSubcategories.length === 0 && (
-          <p className="mt-1 text-sm text-yellow-400">
+          <p className="mt-1 text-sm text-foreground">
             All expense subcategories already have goals
           </p>
         )}
@@ -228,7 +228,7 @@ export function SpendingGoalForm({
 
       {/* Form Error */}
       {formError && (
-        <div className="p-3 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+        <div className="p-3 rounded-lg bg-foreground/20 border border-foreground text-foreground text-sm">
           {formError}
         </div>
       )}

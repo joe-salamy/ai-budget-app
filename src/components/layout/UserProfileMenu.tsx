@@ -25,39 +25,39 @@ export function UserProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+        className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         aria-label="User menu"
       >
-        <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-white/20 hover:ring-blue-400/50 hover:ring-4">
-          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+        <Avatar className="h-10 w-10 cursor-pointer ring-2 ring-border hover:ring-foreground">
+          <AvatarFallback className="bg-foreground text-background font-semibold">
             {userInitial}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56 bg-gradient-to-br from-gray-900 to-indigo-900 border border-blue-500/30 shadow-xl shadow-blue-500/20 backdrop-blur-xl"
+        className="w-56 bg-card border border-border shadow-xl"
       >
-        <DropdownMenuLabel className="text-white/90">{user?.email}</DropdownMenuLabel>
-        <DropdownMenuSeparator className="bg-white/10" />
+        <DropdownMenuLabel className="text-foreground">{user?.email}</DropdownMenuLabel>
+        <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
           onClick={() => navigate("/dashboard")}
-          className="gap-2 cursor-pointer text-white/80 focus:bg-white/10 focus:text-white"
+          className="gap-2 cursor-pointer text-foreground/80 focus:bg-muted focus:text-foreground"
         >
           <LayoutDashboard className="h-4 w-4" />
           Dashboard
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => navigate("/settings")}
-          className="gap-2 cursor-pointer text-white/80 focus:bg-white/10 focus:text-white"
+          className="gap-2 cursor-pointer text-foreground/80 focus:bg-muted focus:text-foreground"
         >
           <Settings className="h-4 w-4" />
           Settings
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-white/10" />
+        <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
           onClick={handleSignOut}
-          className="gap-2 cursor-pointer text-red-400 focus:bg-red-500/20 focus:text-red-300"
+          className="gap-2 cursor-pointer text-foreground focus:bg-muted focus:text-foreground"
         >
           <LogOut className="h-4 w-4" />
           Sign Out

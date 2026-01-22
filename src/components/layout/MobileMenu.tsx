@@ -87,19 +87,19 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ duration: 0 }}
-            className="fixed inset-y-0 left-0 z-50 w-80 bg-gradient-to-b from-purple-900 via-blue-900 to-indigo-900 shadow-2xl"
+            className="fixed inset-y-0 left-0 z-50 w-80 bg-card border-r border-border shadow-2xl"
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation menu"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/10 p-4">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <div className="flex items-center justify-between border-b border-border p-4">
+              <h2 className="text-xl font-bold text-foreground">
                 AI Budget App
               </h2>
               <button
                 onClick={onClose}
-                className="rounded-md p-2 text-white/70 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                className="rounded-md p-2 text-foreground/70 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Close menu"
               >
                 <X className="h-6 w-6" />
@@ -120,17 +120,17 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     data-mobile-menu-link
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-[44px] items-center gap-3 rounded-lg px-4 py-3 text-base font-medium border border-transparent",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+                      "flex min-h-[44px] items-center gap-3 rounded-lg px-4 py-3 text-base font-medium border",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       active
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/50"
-                        : "text-white/80 hover:bg-white/20 hover:text-white hover:border-white/30"
+                        ? "bg-foreground text-background border-foreground"
+                        : "text-foreground/80 hover:bg-muted hover:text-foreground border-transparent hover:border-border"
                     )}
                   >
                     <Icon
                       className={cn(
                         "h-5 w-5 shrink-0",
-                        active ? "text-white" : "text-white/70"
+                        active ? "text-background" : "text-foreground/70"
                       )}
                     />
                     <span>{item.label}</span>
@@ -140,9 +140,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </nav>
 
             {/* Footer */}
-            <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 p-4">
-              <p className="text-center text-xs text-white/50">
-                Press <kbd className="rounded bg-white/10 px-1.5 py-0.5">Esc</kbd> to close
+            <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+              <p className="text-center text-xs text-muted-foreground">
+                Press <kbd className="rounded bg-muted px-1.5 py-0.5">Esc</kbd> to close
               </p>
             </div>
           </motion.div>
