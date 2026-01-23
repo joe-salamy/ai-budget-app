@@ -25,11 +25,7 @@ function getDifferenceColor(difference: number | null, categoryType: string): st
 
   // For expenses: positive difference = under budget (good), negative = over budget (bad)
   // For income: positive difference = under goal (bad), negative = over goal (good)
-  if (categoryType === "expense") {
-    return difference >= 0 ? "text-foreground" : "text-foreground";
-  } else {
-    return difference <= 0 ? "text-foreground" : "text-foreground";
-  }
+  return "text-foreground";
 }
 
 function getDifferenceLabel(difference: number | null, categoryType: string): string {
@@ -219,11 +215,7 @@ export function CategorySummary({
                 </div>
               </td>
               <td className="px-4 py-3"></td>
-              <td
-                className={`px-4 py-3 text-right text-sm font-bold ${
-                  netIncome >= 0 ? "text-foreground" : "text-foreground"
-                }`}
-              >
+              <td className="px-4 py-3 text-right text-sm font-bold text-foreground">
                 Net{hasUncategorizedTransactions ? "*" : ""}: {netIncome >= 0 ? "+" : ""}
                 {formatCurrency(netIncome)}
               </td>
@@ -251,7 +243,7 @@ interface CategoryRowProps {
 
 function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
   const hasSubcategories = category.subcategories.length > 0;
-  const totalColor = category.category_type === "income" ? "text-foreground" : "text-foreground";
+  const totalColor = "text-foreground";
 
   return (
     <>
@@ -340,8 +332,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
                 </thead>
                 <tbody className="divide-y divide-gray-800/50">
                   {category.subcategories.map((subcategory) => {
-                    const subTotalColor =
-                      category.category_type === "income" ? "text-foreground" : "text-foreground";
+                    const subTotalColor = "text-foreground";
 
                     return (
                       <tr key={subcategory.subcategory_id} className="hover:bg-card/20">

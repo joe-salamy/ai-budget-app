@@ -267,7 +267,7 @@ export function TransactionTable({
               const isSelected = selectedIds.has(txn.id);
               // Display amount from account perspective: flip sign for liability accounts
               const displayAmount = txn.account_type === "liability" ? -txn.amount : txn.amount;
-              const amountColor = displayAmount >= 0 ? "text-foreground" : "text-foreground";
+              const amountColor = "text-foreground";
 
               return (
                 <tr

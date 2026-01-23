@@ -130,11 +130,7 @@ function DashboardPage() {
             {accountSummaryLoading ? (
               <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
-              <p
-                className={`text-2xl font-bold ${
-                  (netWorth?.net_worth ?? 0) >= 0 ? "text-foreground" : "text-foreground"
-                }`}
-              >
+              <p className="text-2xl font-bold text-foreground">
                 {formatCurrency(netWorth?.net_worth ?? 0)}
               </p>
             )}
@@ -185,11 +181,7 @@ function DashboardPage() {
             {metricsLoading ? (
               <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
-              <p
-                className={`text-2xl font-bold ${
-                  (metrics?.netChange ?? 0) >= 0 ? "text-foreground" : "text-foreground"
-                }`}
-              >
+              <p className="text-2xl font-bold text-foreground">
                 {(metrics?.netChange ?? 0) >= 0 ? "+" : ""}
                 {formatCurrency(metrics?.netChange ?? 0)}
               </p>

@@ -1,15 +1,12 @@
 ### To do
 
-Change date range selector to be more like the image: have its own row, dates on RH side
-
 - Read full repo
 - Test all functionality
 - Go through each page, test for UI; afterwards, do full CC sweep to ensure consistency
 
-Did: data loads to page so no lag when you go back to dashboard; switched date picker to shadcn date range; tried to fix the dropdown and calendar background color (transparent), said it was caused by this: "You're using Tailwind CSS v4, which has a completely different configuration system. The color mappings in your tailwind.config.js are being ignored because Tailwind v4 uses the @theme directive in CSS instead." so combing through tailwind implementation since that's probably what's fucking it up. That fixed the background colors. Also, connected to chrome dev tools mcp, so clutch. Impossible for web dev without.
-
 ### General
 
+- Eliminate useless ?, like line 121 of recent activity panel .tsx: displayAmount >= 0 ? "text-foreground" : "text-foreground"
 - **Data types**: Why don't all data types in index.ts have created at, updated at, deleted at?
 - **Fix dropdowns**: Still transparent
 - **Color**: Maybe add some color back, but make it very intentional
@@ -42,6 +39,9 @@ Did: data loads to page so no lag when you go back to dashboard; switched date p
 - **Tables**: cols still look weird
 - **Sankey**: Fix colors, text overlaps, don't like the savings bar - just eliminate
 - **Date range selector**: days of week messed up, should default to last 30 days
+  - Date range selector buttons: this month, this year, last 30 days, last 365 days, date range selector
+  - Add last 3 months? Last 6 months? Input for "last x months"?
+  - Could just see when users access the calendar, add that as input if enough ppl do it
 
 ### Setup
 
@@ -61,6 +61,7 @@ Did: data loads to page so no lag when you go back to dashboard; switched date p
 - **Transactions table**
   - Allow for table copy/paste (like when copying rows)
   - Auto expands when you reach bottom, and to get full paste
+- **Color**: Liability still orange
 
 ### History
 

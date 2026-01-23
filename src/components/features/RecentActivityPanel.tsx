@@ -22,11 +22,7 @@ function formatCurrency(amount: number): string {
  * Panel showing the most recent transaction for each account
  * Helps users know which transactions to add next
  */
-export function RecentActivityPanel({
-  recentActivity,
-  loading,
-  error,
-}: RecentActivityPanelProps) {
+export function RecentActivityPanel({ recentActivity, loading, error }: RecentActivityPanelProps) {
   if (loading) {
     return (
       <div className="rounded-lg border border-border bg-card p-4">
@@ -81,20 +77,14 @@ interface AccountActivityCardProps {
 
 function AccountActivityCard({ activity }: AccountActivityCardProps) {
   const isAsset = activity.account_type === "asset";
-  const balanceColor = activity.current_balance >= 0 ? "text-foreground" : "text-foreground";
+  const balanceColor = "text-foreground";
 
   return (
     <div className="p-3 rounded-md bg-card/50 border border-border/50">
       {/* Account header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span
-            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-              isAsset
-                ? "bg-foreground/20 text-foreground"
-                : "bg-orange-500/20 text-orange-400"
-            }`}
-          >
+          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-foreground/20 text-foreground">
             {isAsset ? "Asset" : "Liability"}
           </span>
           <span className="font-medium text-gray-100">{activity.account_name}</span>
@@ -108,24 +98,21 @@ function AccountActivityCard({ activity }: AccountActivityCardProps) {
       {activity.recent_transaction ? (
         (() => {
           // Display amount from account perspective: flip sign for liability accounts
-          const displayAmount = activity.account_type === "liability" ? -activity.recent_transaction.amount : activity.recent_transaction.amount;
+          const displayAmount =
+            activity.account_type === "liability"
+              ? -activity.recent_transaction.amount
+              : activity.recent_transaction.amount;
           return (
             <div className="flex items-center justify-between text-sm">
               <div className="flex-1 min-w-0">
-                <p className="text-foreground truncate">
-                  {activity.recent_transaction.name}
-                </p>
+                <p className="text-foreground truncate">{activity.recent_transaction.name}</p>
                 <p className="text-muted-foreground text-xs">
                   {formatDistanceToNow(new Date(activity.recent_transaction.date), {
                     addSuffix: true,
                   })}
                 </p>
               </div>
-              <span
-                className={`ml-2 font-medium ${
-                  displayAmount >= 0 ? "text-foreground" : "text-foreground"
-                }`}
-              >
+              <span className="ml-2 font-medium text-foreground">
                 {displayAmount >= 0 ? "+" : ""}
                 {formatCurrency(displayAmount)}
               </span>

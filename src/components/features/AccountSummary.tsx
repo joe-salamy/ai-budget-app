@@ -165,11 +165,7 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
                 <td className="px-4 py-3 text-right text-sm text-muted-foreground">
                   Liabilities: {formatCurrency(netWorth.total_liabilities)}
                 </td>
-                <td
-                  className={`px-4 py-3 text-right text-sm font-bold ${
-                    netWorth.net_worth >= 0 ? "text-foreground" : "text-foreground"
-                  }`}
-                >
+                <td className="px-4 py-3 text-right text-sm font-bold text-foreground">
                   {formatCurrency(netWorth.net_worth)}
                 </td>
               </tr>
@@ -268,7 +264,7 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
                     // Display amount from account perspective: flip sign for liability accounts
                     const displayAmount =
                       account.account_type === "liability" ? -txn.amount : txn.amount;
-                    const amountColor = displayAmount >= 0 ? "text-foreground" : "text-foreground";
+                    const amountColor = "text-foreground";
 
                     return (
                       <tr key={txn.id} className="hover:bg-card/20">

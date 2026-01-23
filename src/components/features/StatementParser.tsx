@@ -438,11 +438,7 @@ Example formats supported:
                       </td>
 
                       {/* Amount */}
-                      <td
-                        className={`px-3 py-2 text-right font-mono ${
-                          isIncome ? "text-foreground" : "text-foreground"
-                        }`}
-                      >
+                      <td className="px-3 py-2 text-right font-mono text-foreground">
                         {isIncome ? "+" : ""}${Math.abs(txn.amount).toFixed(2)}
                       </td>
 
