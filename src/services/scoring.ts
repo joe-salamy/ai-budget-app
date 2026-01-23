@@ -1,4 +1,6 @@
 // Scoring service - Financial Health Score calculations
+// NOTE: This feature is currently shelved (as of January 2026) and will be revamped in the future.
+// The logic is preserved here for when we revisit the financial health score feature.
 import { supabase } from "../lib/supabaseClient";
 import { calculateNetWorth, getDashboardMetrics } from "./dashboard";
 import type { GoalPeriod } from "../types";

@@ -141,7 +141,9 @@ function SpendingGoalsSection({
                     <td className="px-4 py-4 text-sm text-foreground font-medium">
                       {goal.subcategory_name}
                     </td>
-                    <td className="px-4 py-4 text-sm text-muted-foreground">{goal.category_name}</td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground">
+                      {goal.category_name}
+                    </td>
                     <td className="px-4 py-4 text-sm text-right text-foreground font-medium">
                       {formatCurrency(goal.amount)}
                     </td>
@@ -248,7 +250,9 @@ function SavingGoalsSection({
             {/* Active Goals */}
             {activeGoals.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground uppercase mb-3">Active Goals</h3>
+                <h3 className="text-sm font-medium text-muted-foreground uppercase mb-3">
+                  Active Goals
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {activeGoals.map((goal) => {
                     const percent =
@@ -354,10 +358,7 @@ function SavingGoalsSection({
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {completedGoals.map((goal) => (
-                    <div
-                      key={goal.id}
-                      className="p-4 bg-muted rounded-lg border border-border"
-                    >
+                    <div key={goal.id} className="p-4 bg-muted rounded-lg border border-border">
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <button
@@ -368,7 +369,9 @@ function SavingGoalsSection({
                             <CheckCircle2 size={18} />
                           </button>
                           <div>
-                            <h4 className="font-medium text-muted-foreground line-through">{goal.name}</h4>
+                            <h4 className="font-medium text-muted-foreground line-through">
+                              {goal.name}
+                            </h4>
                             <p className="text-xs text-muted-foreground">
                               {goal.target_amount
                                 ? `Saved ${formatCurrency(goal.current_amount)}`
@@ -430,7 +433,9 @@ function AddAmountModal({ goal, onSubmit, onClose }: AddAmountModalProps) {
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-2">Amount to Add</label>
+            <label className="block text-sm font-medium text-muted-foreground mb-2">
+              Amount to Add
+            </label>
             <input
               type="number"
               value={amount}
@@ -518,11 +523,13 @@ function GoalsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 p-6">
+    <div className="space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Budget Goals</h1>
-        <p className="text-muted-foreground mt-2">Set spending limits and track your savings progress</p>
+        <p className="text-muted-foreground mt-2">
+          Set spending limits and track your savings progress
+        </p>
       </div>
 
       {/* Spending Goals Section */}

@@ -316,12 +316,12 @@ export async function prepareSankeyData(
       const categoryNodeId = `Income:${mapping.categoryName}`;
 
       if (!nodeSet.has(subcategoryNodeId)) {
-        nodes.push({ id: subcategoryNodeId, nodeColor: "#22c55e" }); // green-500
+        nodes.push({ id: subcategoryNodeId, nodeColor: "#003804" }); // dark green
         nodeSet.add(subcategoryNodeId);
       }
 
       if (!nodeSet.has(categoryNodeId)) {
-        nodes.push({ id: categoryNodeId, nodeColor: "#16a34a" }); // green-600
+        nodes.push({ id: categoryNodeId, nodeColor: "#334f35" }); // mix of dark green and gray
         nodeSet.add(categoryNodeId);
       }
 
@@ -336,7 +336,7 @@ export async function prepareSankeyData(
     if (totalIncome > 0) {
       const incomeNodeId = "Total Income";
       if (!nodeSet.has(incomeNodeId)) {
-        nodes.push({ id: incomeNodeId, nodeColor: "#15803d" }); // green-700
+        nodes.push({ id: incomeNodeId, nodeColor: "#676767" }); // gray
         nodeSet.add(incomeNodeId);
       }
 
@@ -356,7 +356,7 @@ export async function prepareSankeyData(
     if (totalExpenses > 0) {
       const expenseNodeId = "Total Expenses";
       if (!nodeSet.has(expenseNodeId)) {
-        nodes.push({ id: expenseNodeId, nodeColor: "#dc2626" }); // red-600
+        nodes.push({ id: expenseNodeId, nodeColor: "#676767" }); // gray
         nodeSet.add(expenseNodeId);
       }
 
@@ -375,7 +375,7 @@ export async function prepareSankeyData(
         if (total > 0) {
           const categoryNodeId = `Expense:${categoryName}`;
           if (!nodeSet.has(categoryNodeId)) {
-            nodes.push({ id: categoryNodeId, nodeColor: "#ef4444" }); // red-500
+            nodes.push({ id: categoryNodeId, nodeColor: "#6b3434" }); // mix of gray and red
             nodeSet.add(categoryNodeId);
           }
 
@@ -396,7 +396,7 @@ export async function prepareSankeyData(
         const subcategoryNodeId = `Expense:${mapping.categoryName}:${mapping.subcategoryName}`;
 
         if (!nodeSet.has(subcategoryNodeId)) {
-          nodes.push({ id: subcategoryNodeId, nodeColor: "#f87171" }); // red-400
+          nodes.push({ id: subcategoryNodeId, nodeColor: "#6f0000" }); // red
           nodeSet.add(subcategoryNodeId);
         }
 
@@ -412,7 +412,7 @@ export async function prepareSankeyData(
     if (totalIncome > totalExpenses) {
       const savings = totalIncome - totalExpenses;
       const savingsNodeId = "Savings";
-      nodes.push({ id: savingsNodeId, nodeColor: "#3b82f6" }); // blue-500
+      nodes.push({ id: savingsNodeId, nodeColor: "#090088" }); // blue
 
       links.push({
         source: "Total Income",

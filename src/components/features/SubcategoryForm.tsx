@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { Select } from "../ui/Select";
-import type { SelectOption } from "../ui/Select";
+import { SimpleSelect } from "../ui/SimpleSelect";
+import type { SelectOption } from "../ui/SimpleSelect";
 import type { Subcategory, Category } from "../../types";
 
 interface SubcategoryFormProps {
@@ -96,7 +96,7 @@ export function SubcategoryForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Select
+      <SimpleSelect
         label="Parent Category"
         options={categoryOptions}
         value={categoryId}

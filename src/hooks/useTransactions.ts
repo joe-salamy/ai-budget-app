@@ -1,5 +1,6 @@
 // useTransactions hook - Fetch and manage transactions
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   getTransactions,
   getTransactionsWithDetails,
@@ -12,6 +13,7 @@ import {
   bulkUpdateTransactions,
 } from "../services/transactions";
 import { useAuth } from "./useAuth";
+import { queryKeys } from "../lib/queryKeys";
 import { toast } from "../lib/toast";
 import type { Transaction } from "../types";
 import type {
@@ -80,73 +82,60 @@ interface UseRecentActivityReturn {
  * ```
  */
 export function useTransactions(initialFilters?: TransactionFilters): UseTransactionsReturn {
-  const { user, loading: authLoading } = useAuth();
-  const [transactions, setTransactions] = useState<TransactionWithDetails[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<TransactionFilters>(initialFilters || {});
 
-  // Fetch transactions with current filters
-  const fetchTransactions = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const response = await getTransactionsWithDetails(filters);
-
-    if (response.success && response.data) {
-      setTransactions(response.data);
-    } else {
-      setError(response.error || "Failed to fetch transactions");
-    }
-
-    setLoading(false);
-  }, [user, filters]);
-
-  // Load transactions when auth is ready and user is authenticated
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchTransactions();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-      setTransactions([]);
-    }
-  }, [authLoading, user, fetchTransactions]);
-
-  // Add a new transaction
-  const addTransaction = useCallback(
-    async (data: CreateTransactionData) => {
-      const response = await createTransaction(data);
-
-      if (response.success && response.data) {
-        // Refresh to get the full details with joins
-        await fetchTransactions();
-        toast.success("Transaction created", "Your transaction has been added successfully");
-        return { success: true, data: response.data };
-      } else {
-        toast.error("Failed to create transaction", response.error || "An error occurred");
-        return { success: false, error: response.error };
+  // Read query with filters
+  const {
+    data: transactions = [],
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.transactions.list(filters),
+    queryFn: async () => {
+      const response = await getTransactionsWithDetails(filters);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch transactions");
       }
+      return response.data || [];
     },
-    [fetchTransactions]
-  );
+    enabled: !!user,
+  });
 
-  // Add a transfer (creates two transactions)
-  const addTransfer = useCallback(
-    async (
-      fromAccountId: string,
-      toAccountId: string,
-      date: string,
-      name: string,
-      amount: number,
-      subcategoryId?: string | null,
-      comment?: string | null
-    ) => {
-      const response = await createTransfer(
+  // Add transaction mutation
+  const addTransactionMutation = useMutation({
+    mutationFn: async (data: CreateTransactionData) => {
+      return await createTransaction(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    },
+  });
+
+  // Add transfer mutation
+  const addTransferMutation = useMutation({
+    mutationFn: async ({
+      fromAccountId,
+      toAccountId,
+      date,
+      name,
+      amount,
+      subcategoryId,
+      comment,
+    }: {
+      fromAccountId: string;
+      toAccountId: string;
+      date: string;
+      name: string;
+      amount: number;
+      subcategoryId?: string | null;
+      comment?: string | null;
+    }) => {
+      return await createTransfer(
         fromAccountId,
         toAccountId,
         date,
@@ -155,93 +144,150 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
         subcategoryId,
         comment
       );
-
-      if (response.success) {
-        // Refresh to get the full details
-        await fetchTransactions();
-        toast.success("Transfer created", "Your transfer has been recorded successfully");
-        return { success: true };
-      } else {
-        toast.error("Failed to create transfer", response.error || "An error occurred");
-        return { success: false, error: response.error };
-      }
     },
-    [fetchTransactions]
-  );
-
-  // Edit an existing transaction
-  const editTransaction = useCallback(
-    async (id: string, updates: UpdateTransactionData) => {
-      const response = await updateTransaction(id, updates);
-
-      if (response.success && response.data) {
-        // Refresh to get updated details
-        await fetchTransactions();
-        toast.success("Transaction updated", "Your changes have been saved");
-        return { success: true, data: response.data };
-      } else {
-        toast.error("Failed to update transaction", response.error || "An error occurred");
-        return { success: false, error: response.error };
-      }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
     },
-    [fetchTransactions]
-  );
+  });
 
-  // Remove a transaction (soft delete)
-  const removeTransaction = useCallback(async (id: string) => {
-    const response = await deleteTransaction(id);
+  // Update transaction mutation
+  const updateTransactionMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: UpdateTransactionData }) => {
+      return await updateTransaction(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    },
+  });
 
-    if (response.success) {
-      // Optimistic update
-      setTransactions((prev) => prev.filter((txn) => txn.id !== id));
+  // Delete transaction mutation
+  const deleteTransactionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteTransaction(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    },
+  });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      return await bulkDeleteTransactions(ids);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    },
+  });
+
+  // Bulk update mutation
+  const bulkUpdateMutation = useMutation({
+    mutationFn: async ({ ids, subcategoryId }: { ids: string[]; subcategoryId: string | null }) => {
+      return await bulkUpdateTransactions(ids, { subcategory_id: subcategoryId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+    },
+  });
+
+  // Wrapper functions to maintain interface
+  const addTransaction = async (data: CreateTransactionData) => {
+    const result = await addTransactionMutation.mutateAsync(data);
+    if (result.success) {
+      toast.success("Transaction created", "Your transaction has been added successfully");
+    } else {
+      toast.error("Failed to create transaction", result.error || "An error occurred");
+    }
+    return result;
+  };
+
+  const addTransfer = async (
+    fromAccountId: string,
+    toAccountId: string,
+    date: string,
+    name: string,
+    amount: number,
+    subcategoryId?: string | null,
+    comment?: string | null
+  ) => {
+    const result = await addTransferMutation.mutateAsync({
+      fromAccountId,
+      toAccountId,
+      date,
+      name,
+      amount,
+      subcategoryId,
+      comment,
+    });
+    if (result.success) {
+      toast.success("Transfer created", "Your transfer has been recorded successfully");
+    } else {
+      toast.error("Failed to create transfer", result.error || "An error occurred");
+    }
+    return result;
+  };
+
+  const editTransaction = async (id: string, updates: UpdateTransactionData) => {
+    const result = await updateTransactionMutation.mutateAsync({ id, updates });
+    if (result.success) {
+      toast.success("Transaction updated", "Your changes have been saved");
+    } else {
+      toast.error("Failed to update transaction", result.error || "An error occurred");
+    }
+    return result;
+  };
+
+  const removeTransaction = async (id: string) => {
+    const result = await deleteTransactionMutation.mutateAsync(id);
+    if (result.success) {
       toast.success("Transaction deleted", "The transaction has been removed");
-      return { success: true };
     } else {
-      toast.error("Failed to delete transaction", response.error || "An error occurred");
-      return { success: false, error: response.error };
+      toast.error("Failed to delete transaction", result.error || "An error occurred");
     }
-  }, []);
+    return result;
+  };
 
-  // Bulk remove transactions
-  const bulkRemove = useCallback(async (ids: string[]) => {
-    const response = await bulkDeleteTransactions(ids);
-
-    if (response.success) {
-      // Optimistic update
-      setTransactions((prev) => prev.filter((txn) => !ids.includes(txn.id)));
-      toast.success("Transactions deleted", `${response.count} transactions have been removed`);
-      return { success: true, count: response.count };
+  const bulkRemove = async (ids: string[]) => {
+    const result = await bulkDeleteMutation.mutateAsync(ids);
+    if (result.success) {
+      toast.success("Transactions deleted", `${result.count} transactions have been removed`);
     } else {
-      toast.error("Failed to delete transactions", response.error || "An error occurred");
-      return { success: false, error: response.error };
+      toast.error("Failed to delete transactions", result.error || "An error occurred");
     }
-  }, []);
+    return result;
+  };
 
-  // Bulk update subcategory
-  const bulkUpdateSubcategory = useCallback(
-    async (ids: string[], subcategoryId: string | null) => {
-      const response = await bulkUpdateTransactions(ids, { subcategory_id: subcategoryId });
+  const bulkUpdateSubcategory = async (ids: string[], subcategoryId: string | null) => {
+    const result = await bulkUpdateMutation.mutateAsync({ ids, subcategoryId });
+    if (result.success) {
+      toast.success("Categories updated", `${result.count} transactions have been updated`);
+    } else {
+      toast.error("Failed to update categories", result.error || "An error occurred");
+    }
+    return result;
+  };
 
-      if (response.success) {
-        // Refresh to get updated details with joined data
-        await fetchTransactions();
-        toast.success("Categories updated", `${response.count} transactions have been updated`);
-        return { success: true, count: response.count };
-      } else {
-        toast.error("Failed to update categories", response.error || "An error occurred");
-        return { success: false, error: response.error };
-      }
-    },
-    [fetchTransactions]
-  );
+  const refresh = async () => {
+    await refetch();
+  };
 
   return {
     transactions,
     loading,
-    error,
+    error: queryError?.message || null,
     filters,
     setFilters,
-    refresh: fetchTransactions,
+    refresh,
     addTransaction,
     addTransfer,
     editTransaction,
@@ -260,45 +306,34 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
  * ```
  */
 export function useRecentActivity(): UseRecentActivityReturn {
-  const { user, loading: authLoading } = useAuth();
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  const fetchRecentActivity = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+  const {
+    data: recentActivity = [],
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.transactions.recentActivity(),
+    queryFn: async () => {
+      const response = await getRecentActivityByAccount();
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch recent activity");
+      }
+      return response.data || [];
+    },
+    enabled: !!user,
+  });
 
-    setLoading(true);
-    setError(null);
-
-    const response = await getRecentActivityByAccount();
-
-    if (response.success && response.data) {
-      setRecentActivity(response.data);
-    } else {
-      setError(response.error || "Failed to fetch recent activity");
-    }
-
-    setLoading(false);
-  }, [user]);
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchRecentActivity();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-      setRecentActivity([]);
-    }
-  }, [authLoading, user, fetchRecentActivity]);
+  const refresh = async () => {
+    await refetch();
+  };
 
   return {
     recentActivity,
     loading,
-    error,
-    refresh: fetchRecentActivity,
+    error: queryError?.message || null,
+    refresh,
   };
 }
 
@@ -307,47 +342,36 @@ export function useRecentActivity(): UseRecentActivityReturn {
  * Use this when you just need basic transaction data
  */
 export function useSimpleTransactions(initialFilters?: TransactionFilters) {
-  const { user, loading: authLoading } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
   const [filters, setFilters] = useState<TransactionFilters>(initialFilters || {});
 
-  const fetchTransactions = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+  const {
+    data: transactions = [],
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: [...queryKeys.transactions.all, "simple", filters],
+    queryFn: async () => {
+      const response = await getTransactions(filters);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch transactions");
+      }
+      return response.data || [];
+    },
+    enabled: !!user,
+  });
 
-    setLoading(true);
-    setError(null);
-
-    const response = await getTransactions(filters);
-
-    if (response.success && response.data) {
-      setTransactions(response.data);
-    } else {
-      setError(response.error || "Failed to fetch transactions");
-    }
-
-    setLoading(false);
-  }, [user, filters]);
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchTransactions();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-      setTransactions([]);
-    }
-  }, [authLoading, user, fetchTransactions]);
+  const refresh = async () => {
+    await refetch();
+  };
 
   return {
     transactions,
     loading,
-    error,
+    error: queryError?.message || null,
     filters,
     setFilters,
-    refresh: fetchTransactions,
+    refresh,
   };
 }

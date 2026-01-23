@@ -1,5 +1,6 @@
 // useCategories hook - Fetch and manage categories and subcategories
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import {
   getCategories,
   createCategory,
@@ -11,6 +12,7 @@ import {
   deleteSubcategory,
 } from "../services/categories";
 import { useAuth } from "./useAuth";
+import { queryKeys } from "../lib/queryKeys";
 import type { Category, Subcategory, CategoryType } from "../types";
 
 interface UseCategoriesReturn {
@@ -62,128 +64,153 @@ interface UseCategoriesReturn {
  * ```
  */
 export function useCategories(): UseCategoriesReturn {
-  const { user, loading: authLoading } = useAuth();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Fetch categories and subcategories
-  const fetchData = useCallback(async () => {
-    // Don't fetch if not authenticated
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const [categoriesResponse, subcategoriesResponse] = await Promise.all([
-      getCategories(),
-      getSubcategories(),
-    ]);
-
-    if (categoriesResponse.success && categoriesResponse.data) {
-      setCategories(categoriesResponse.data);
-    } else {
-      setError(categoriesResponse.error || "Failed to fetch categories");
-    }
-
-    if (subcategoriesResponse.success && subcategoriesResponse.data) {
-      setSubcategories(subcategoriesResponse.data);
-    } else {
-      setError(
-        (prevError) => prevError || subcategoriesResponse.error || "Failed to fetch subcategories"
-      );
-    }
-
-    setLoading(false);
-  }, [user]);
-
-  // Load data when auth is ready and user is authenticated
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchData();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-      setCategories([]);
-      setSubcategories([]);
-    }
-  }, [authLoading, user, fetchData]);
-
-  // Category operations
-
-  const addCategory = useCallback(async (name: string, type: CategoryType) => {
-    const response = await createCategory({ name, type });
-
-    if (response.success && response.data) {
-      setCategories((prev) => [...prev, response.data!]);
-      return { success: true, data: response.data };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
-
-  const editCategory = useCallback(async (id: string, updates: { name?: string }) => {
-    const response = await updateCategory(id, updates);
-
-    if (response.success && response.data) {
-      setCategories((prev) => prev.map((cat) => (cat.id === id ? response.data! : cat)));
-      return { success: true, data: response.data };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
-
-  const removeCategory = useCallback(async (id: string) => {
-    const response = await deleteCategory(id);
-
-    if (response.success) {
-      setCategories((prev) => prev.filter((cat) => cat.id !== id));
-      return { success: true };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
-
-  // Subcategory operations
-
-  const addSubcategory = useCallback(async (name: string, categoryId: string) => {
-    const response = await createSubcategory({ name, category_id: categoryId });
-
-    if (response.success && response.data) {
-      setSubcategories((prev) => [...prev, response.data!]);
-      return { success: true, data: response.data };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
-
-  const editSubcategory = useCallback(
-    async (id: string, updates: { name?: string; category_id?: string }) => {
-      const response = await updateSubcategory(id, updates);
-
-      if (response.success && response.data) {
-        setSubcategories((prev) => prev.map((sub) => (sub.id === id ? response.data! : sub)));
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
+  // Categories query
+  const {
+    data: categories = [],
+    isLoading: categoriesLoading,
+    error: categoriesError,
+    refetch: refetchCategories,
+  } = useQuery({
+    queryKey: queryKeys.categories.list(),
+    queryFn: async () => {
+      const response = await getCategories();
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch categories");
       }
+      return response.data || [];
     },
-    []
-  );
+    enabled: !!user,
+  });
 
-  const removeSubcategory = useCallback(async (id: string) => {
-    const response = await deleteSubcategory(id);
+  // Subcategories query
+  const {
+    data: subcategories = [],
+    isLoading: subcategoriesLoading,
+    error: subcategoriesError,
+    refetch: refetchSubcategories,
+  } = useQuery({
+    queryKey: queryKeys.categories.subcategories.list(),
+    queryFn: async () => {
+      const response = await getSubcategories();
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch subcategories");
+      }
+      return response.data || [];
+    },
+    enabled: !!user,
+  });
 
-    if (response.success) {
-      setSubcategories((prev) => prev.filter((sub) => sub.id !== id));
-      return { success: true };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
+  // Category mutations
+  const addCategoryMutation = useMutation({
+    mutationFn: async (data: { name: string; type: CategoryType }) => {
+      return await createCategory(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: { name?: string } }) => {
+      return await updateCategory(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteCategory(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  // Subcategory mutations
+  const addSubcategoryMutation = useMutation({
+    mutationFn: async (data: { name: string; category_id: string }) => {
+      return await createSubcategory(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.subcategories.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  const updateSubcategoryMutation = useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { name?: string; category_id?: string };
+    }) => {
+      return await updateSubcategory(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.subcategories.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  const deleteSubcategoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteSubcategory(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.subcategories.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  // Wrapper functions to maintain interface
+  const addCategory = async (name: string, type: CategoryType) => {
+    const result = await addCategoryMutation.mutateAsync({ name, type });
+    return result;
+  };
+
+  const editCategory = async (id: string, updates: { name?: string }) => {
+    const result = await updateCategoryMutation.mutateAsync({ id, updates });
+    return result;
+  };
+
+  const removeCategory = async (id: string) => {
+    const result = await deleteCategoryMutation.mutateAsync(id);
+    return result;
+  };
+
+  const addSubcategory = async (name: string, categoryId: string) => {
+    const result = await addSubcategoryMutation.mutateAsync({
+      name,
+      category_id: categoryId,
+    });
+    return result;
+  };
+
+  const editSubcategory = async (
+    id: string,
+    updates: { name?: string; category_id?: string }
+  ) => {
+    const result = await updateSubcategoryMutation.mutateAsync({ id, updates });
+    return result;
+  };
+
+  const removeSubcategory = async (id: string) => {
+    const result = await deleteSubcategoryMutation.mutateAsync(id);
+    return result;
+  };
+
+  const refresh = async () => {
+    await Promise.all([refetchCategories(), refetchSubcategories()]);
+  };
 
   // Helper function to get subcategories for a specific category
   const getSubcategoriesByCategory = useCallback(
@@ -193,12 +220,15 @@ export function useCategories(): UseCategoriesReturn {
     [subcategories]
   );
 
+  const loading = categoriesLoading || subcategoriesLoading;
+  const error = categoriesError?.message || subcategoriesError?.message || null;
+
   return {
     categories,
     subcategories,
     loading,
     error,
-    refresh: fetchData,
+    refresh,
     addCategory,
     editCategory,
     removeCategory,

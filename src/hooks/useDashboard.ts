@@ -1,5 +1,6 @@
 // useDashboard hook - Fetch and manage dashboard data
-import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { format, subDays } from "date-fns";
 import {
@@ -9,6 +10,7 @@ import {
   getDashboardMetrics,
 } from "../services/dashboard";
 import { prepareNetWorthData, prepareSankeyData } from "../services/charts";
+import { queryKeys } from "../lib/queryKeys";
 import type { AccountSummary, CategorySummary, NetWorthSummary } from "../services/dashboard";
 import type { NetWorthDataPoint, SankeyData } from "../services/charts";
 import type { AccountType } from "../types";
@@ -39,6 +41,7 @@ interface UseDashboardReturn {
   categorySummary: CategorySummary[];
   categorySummaryLoading: boolean;
   categorySummaryError: string | null;
+  hasUncategorizedTransactions: boolean;
 
   // Net worth data
   netWorth: NetWorthSummary | null;
@@ -85,7 +88,7 @@ interface UseDashboardReturn {
  * ```
  */
 export function useDashboard(): UseDashboardReturn {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
 
   // Default to last 90 days
   const [dateRange, setDateRange] = useState<DateRange>(() => {
@@ -97,211 +100,146 @@ export function useDashboard(): UseDashboardReturn {
     };
   });
 
-  // Account summary state
-  const [accountSummary, setAccountSummary] = useState<AccountSummary[]>([]);
-  const [accountSummaryLoading, setAccountSummaryLoading] = useState<boolean>(true);
-  const [accountSummaryError, setAccountSummaryError] = useState<string | null>(null);
-
-  // Category summary state
-  const [categorySummary, setCategorySummary] = useState<CategorySummary[]>([]);
-  const [categorySummaryLoading, setCategorySummaryLoading] = useState<boolean>(true);
-  const [categorySummaryError, setCategorySummaryError] = useState<string | null>(null);
-
-  // Net worth state
-  const [netWorth, setNetWorth] = useState<NetWorthSummary | null>(null);
-  const [netWorthLoading, setNetWorthLoading] = useState<boolean>(true);
-  const [netWorthError, setNetWorthError] = useState<string | null>(null);
-
-  // Metrics state
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
-  const [metricsLoading, setMetricsLoading] = useState<boolean>(true);
-  const [metricsError, setMetricsError] = useState<string | null>(null);
-
-  // Chart state - Net Worth
-  const [netWorthChartData, setNetWorthChartData] = useState<NetWorthDataPoint[]>([]);
-  const [netWorthChartAccounts, setNetWorthChartAccounts] = useState<
-    Array<{ name: string; type: AccountType }>
-  >([]);
-  const [netWorthChartLoading, setNetWorthChartLoading] = useState<boolean>(true);
-  const [netWorthChartError, setNetWorthChartError] = useState<string | null>(null);
-
-  // Chart state - Sankey
-  const [sankeyData, setSankeyData] = useState<SankeyData | null>(null);
-  const [sankeyLoading, setSankeyLoading] = useState<boolean>(true);
-  const [sankeyError, setSankeyError] = useState<string | null>(null);
-
-  // Fetch account summary
-  const fetchAccountSummary = useCallback(async () => {
-    if (!user) {
-      setAccountSummaryLoading(false);
-      return;
-    }
-
-    setAccountSummaryLoading(true);
-    setAccountSummaryError(null);
-
-    const response = await getAccountSummary(dateRange.startDate, dateRange.endDate);
-
-    if (response.success) {
-      setAccountSummary(response.data || []);
-      if (response.netWorth) {
-        setNetWorth(response.netWorth);
+  // Query 1: Account Summary
+  const {
+    data: accountSummaryData,
+    isLoading: accountSummaryLoading,
+    error: accountSummaryQueryError,
+    refetch: refetchAccountSummary,
+  } = useQuery({
+    queryKey: queryKeys.dashboard.accountSummary(dateRange.startDate, dateRange.endDate),
+    queryFn: async () => {
+      const response = await getAccountSummary(dateRange.startDate, dateRange.endDate);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch account summary");
       }
-    } else {
-      setAccountSummaryError(response.error || "Failed to fetch account summary");
-    }
+      return { data: response.data || [], netWorth: response.netWorth || null };
+    },
+    enabled: !!user,
+  });
 
-    setAccountSummaryLoading(false);
-  }, [user, dateRange.startDate, dateRange.endDate]);
+  const accountSummary = accountSummaryData?.data || [];
+  const netWorth = accountSummaryData?.netWorth || null;
 
-  // Fetch category summary
-  const fetchCategorySummary = useCallback(async () => {
-    if (!user) {
-      setCategorySummaryLoading(false);
-      return;
-    }
+  // Query 2: Category Summary
+  const {
+    data: categorySummaryData,
+    isLoading: categorySummaryLoading,
+    error: categorySummaryQueryError,
+    refetch: refetchCategorySummary,
+  } = useQuery({
+    queryKey: queryKeys.dashboard.categorySummary(dateRange.startDate, dateRange.endDate),
+    queryFn: async () => {
+      const response = await getCategorySummary(dateRange.startDate, dateRange.endDate);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch category summary");
+      }
+      return {
+        data: response.data || [],
+        hasUncategorizedTransactions: response.hasUncategorizedTransactions || false,
+      };
+    },
+    enabled: !!user,
+  });
 
-    setCategorySummaryLoading(true);
-    setCategorySummaryError(null);
+  const categorySummary = categorySummaryData?.data || [];
+  const hasUncategorizedTransactions = categorySummaryData?.hasUncategorizedTransactions || false;
 
-    const response = await getCategorySummary(dateRange.startDate, dateRange.endDate);
+  // Query 3: Metrics
+  const {
+    data: metrics,
+    isLoading: metricsLoading,
+    error: metricsQueryError,
+    refetch: refetchMetrics,
+  } = useQuery({
+    queryKey: queryKeys.dashboard.metrics(dateRange.startDate, dateRange.endDate),
+    queryFn: async () => {
+      const response = await getDashboardMetrics(dateRange.startDate, dateRange.endDate);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch metrics");
+      }
+      return response.data || null;
+    },
+    enabled: !!user,
+  });
 
-    if (response.success) {
-      setCategorySummary(response.data || []);
-    } else {
-      setCategorySummaryError(response.error || "Failed to fetch category summary");
-    }
+  // Query 4: Net Worth Chart
+  const {
+    data: netWorthChartDataResult,
+    isLoading: netWorthChartLoading,
+    error: netWorthChartQueryError,
+    refetch: refetchNetWorthChart,
+  } = useQuery({
+    queryKey: queryKeys.dashboard.charts.netWorth(dateRange.startDate, dateRange.endDate),
+    queryFn: async () => {
+      const response = await prepareNetWorthData(dateRange.startDate, dateRange.endDate);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch net worth chart data");
+      }
+      return { data: response.data || [], accounts: response.accounts || [] };
+    },
+    enabled: !!user,
+  });
 
-    setCategorySummaryLoading(false);
-  }, [user, dateRange.startDate, dateRange.endDate]);
+  const netWorthChartData = netWorthChartDataResult?.data || [];
+  const netWorthChartAccounts = netWorthChartDataResult?.accounts || [];
 
-  // Fetch net worth
-  const fetchNetWorth = useCallback(async () => {
-    if (!user) {
-      setNetWorthLoading(false);
-      return;
-    }
+  // Query 5: Sankey Chart
+  const {
+    data: sankeyData,
+    isLoading: sankeyLoading,
+    error: sankeyQueryError,
+    refetch: refetchSankeyData,
+  } = useQuery({
+    queryKey: queryKeys.dashboard.charts.sankey(dateRange.startDate, dateRange.endDate),
+    queryFn: async () => {
+      const response = await prepareSankeyData(dateRange.startDate, dateRange.endDate);
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch Sankey chart data");
+      }
+      return response.data || null;
+    },
+    enabled: !!user,
+  });
 
-    setNetWorthLoading(true);
-    setNetWorthError(null);
+  // Refresh functions
+  const refreshAccountSummary = async () => {
+    await refetchAccountSummary();
+  };
 
-    const response = await calculateNetWorth(dateRange.endDate);
+  const refreshCategorySummary = async () => {
+    await refetchCategorySummary();
+  };
 
-    if (response.success) {
-      setNetWorth(response.data || null);
-    } else {
-      setNetWorthError(response.error || "Failed to calculate net worth");
-    }
+  const refreshNetWorth = async () => {
+    await refetchAccountSummary(); // Net worth comes from account summary
+  };
 
-    setNetWorthLoading(false);
-  }, [user, dateRange.endDate]);
+  const refreshMetrics = async () => {
+    await refetchMetrics();
+  };
 
-  // Fetch metrics
-  const fetchMetrics = useCallback(async () => {
-    if (!user) {
-      setMetricsLoading(false);
-      return;
-    }
+  const refreshCharts = async () => {
+    await Promise.all([refetchNetWorthChart(), refetchSankeyData()]);
+  };
 
-    setMetricsLoading(true);
-    setMetricsError(null);
-
-    const response = await getDashboardMetrics(dateRange.startDate, dateRange.endDate);
-
-    if (response.success) {
-      setMetrics(response.data || null);
-    } else {
-      setMetricsError(response.error || "Failed to fetch metrics");
-    }
-
-    setMetricsLoading(false);
-  }, [user, dateRange.startDate, dateRange.endDate]);
-
-  // Fetch net worth chart data
-  const fetchNetWorthChart = useCallback(async () => {
-    if (!user) {
-      setNetWorthChartLoading(false);
-      return;
-    }
-
-    setNetWorthChartLoading(true);
-    setNetWorthChartError(null);
-
-    const response = await prepareNetWorthData(dateRange.startDate, dateRange.endDate);
-
-    if (response.success) {
-      setNetWorthChartData(response.data || []);
-      setNetWorthChartAccounts(response.accounts || []);
-    } else {
-      setNetWorthChartError(response.error || "Failed to fetch net worth chart data");
-    }
-
-    setNetWorthChartLoading(false);
-  }, [user, dateRange.startDate, dateRange.endDate]);
-
-  // Fetch Sankey chart data
-  const fetchSankeyData = useCallback(async () => {
-    if (!user) {
-      setSankeyLoading(false);
-      return;
-    }
-
-    setSankeyLoading(true);
-    setSankeyError(null);
-
-    const response = await prepareSankeyData(dateRange.startDate, dateRange.endDate);
-
-    if (response.success) {
-      setSankeyData(response.data || null);
-    } else {
-      setSankeyError(response.error || "Failed to fetch Sankey chart data");
-    }
-
-    setSankeyLoading(false);
-  }, [user, dateRange.startDate, dateRange.endDate]);
-
-  // Refresh all charts
-  const refreshCharts = useCallback(async () => {
-    await Promise.all([fetchNetWorthChart(), fetchSankeyData()]);
-  }, [fetchNetWorthChart, fetchSankeyData]);
-
-  // Refresh all data
-  const refreshAll = useCallback(async () => {
+  const refreshAll = async () => {
     await Promise.all([
-      fetchAccountSummary(),
-      fetchCategorySummary(),
-      fetchMetrics(),
-      fetchNetWorthChart(),
-      fetchSankeyData(),
+      refetchAccountSummary(),
+      refetchCategorySummary(),
+      refetchMetrics(),
+      refetchNetWorthChart(),
+      refetchSankeyData(),
     ]);
-  }, [
-    fetchAccountSummary,
-    fetchCategorySummary,
-    fetchMetrics,
-    fetchNetWorthChart,
-    fetchSankeyData,
-  ]);
+  };
 
-  // Load data when auth is ready and date range changes
-  useEffect(() => {
-    if (!authLoading && user) {
-      refreshAll();
-    } else if (!authLoading && !user) {
-      setAccountSummaryLoading(false);
-      setCategorySummaryLoading(false);
-      setNetWorthLoading(false);
-      setMetricsLoading(false);
-      setNetWorthChartLoading(false);
-      setSankeyLoading(false);
-      setAccountSummary([]);
-      setCategorySummary([]);
-      setNetWorth(null);
-      setMetrics(null);
-      setNetWorthChartData([]);
-      setNetWorthChartAccounts([]);
-      setSankeyData(null);
-    }
-  }, [authLoading, user, dateRange.startDate, dateRange.endDate, refreshAll]);
+  // Error messages
+  const accountSummaryError = accountSummaryQueryError?.message || null;
+  const categorySummaryError = categorySummaryQueryError?.message || null;
+  const netWorthError = accountSummaryQueryError?.message || null;
+  const metricsError = metricsQueryError?.message || null;
+  const netWorthChartError = netWorthChartQueryError?.message || null;
+  const sankeyError = sankeyQueryError?.message || null;
 
   return {
     // Date range
@@ -317,14 +255,15 @@ export function useDashboard(): UseDashboardReturn {
     categorySummary,
     categorySummaryLoading,
     categorySummaryError,
+    hasUncategorizedTransactions,
 
     // Net worth
     netWorth,
-    netWorthLoading,
+    netWorthLoading: accountSummaryLoading,
     netWorthError,
 
     // Metrics
-    metrics,
+    metrics: metrics || null,
     metricsLoading,
     metricsError,
 
@@ -333,15 +272,15 @@ export function useDashboard(): UseDashboardReturn {
     netWorthChartAccounts,
     netWorthChartLoading,
     netWorthChartError,
-    sankeyData,
+    sankeyData: sankeyData || null,
     sankeyLoading,
     sankeyError,
 
     // Refresh functions
-    refreshAccountSummary: fetchAccountSummary,
-    refreshCategorySummary: fetchCategorySummary,
-    refreshNetWorth: fetchNetWorth,
-    refreshMetrics: fetchMetrics,
+    refreshAccountSummary,
+    refreshCategorySummary,
+    refreshNetWorth,
+    refreshMetrics,
     refreshCharts,
     refreshAll,
   };

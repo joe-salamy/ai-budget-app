@@ -4,8 +4,8 @@ import { AccountSummary } from "../components/features/AccountSummary";
 import { CategorySummary } from "../components/features/CategorySummary";
 import { NetWorthChart } from "../components/features/NetWorthChart";
 import { SankeyDiagram } from "../components/features/SankeyDiagram";
-import { FinancialHealthScore } from "../components/features/FinancialHealthScore";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
+import { DateRangePicker } from "../components/ui/DateRangePicker";
 import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
 
 // ============== HELPERS ==============
@@ -73,6 +73,7 @@ function DashboardPage() {
     accountSummaryLoading,
     categorySummary,
     categorySummaryLoading,
+    hasUncategorizedTransactions,
     netWorth,
     metrics,
     metricsLoading,
@@ -83,12 +84,8 @@ function DashboardPage() {
     sankeyLoading,
   } = useDashboard();
 
-  const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDateRange((prev) => ({ ...prev, startDate: e.target.value }));
-  };
-
-  const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDateRange((prev) => ({ ...prev, endDate: e.target.value }));
+  const handleDateRangeChange = (range: { startDate: string; endDate: string }) => {
+    setDateRange(range);
   };
 
   const handlePresetClick = (preset: (typeof DATE_PRESETS)[0]) => {
@@ -101,27 +98,12 @@ function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
 
-        {/* Date Range Selector */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">From:</label>
-            <input
-              type="date"
-              value={dateRange.startDate}
-              onChange={handleStartDateChange}
-              className="px-3 py-1.5 bg-card border border-border rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-foreground"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-muted-foreground">To:</label>
-            <input
-              type="date"
-              value={dateRange.endDate}
-              onChange={handleEndDateChange}
-              className="px-3 py-1.5 bg-card border border-border rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-foreground"
-            />
-          </div>
-        </div>
+        {/* Date Range Picker */}
+        <DateRangePicker
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
+          onDateChange={handleDateRangeChange}
+        />
       </div>
 
       {/* Date Presets */}
@@ -217,9 +199,6 @@ function DashboardPage() {
         </Card>
       </div>
 
-      {/* Financial Health Score */}
-      <FinancialHealthScore startDate={dateRange.startDate} endDate={dateRange.endDate} />
-
       {/* Account Summary */}
       <AccountSummary
         accounts={accountSummary}
@@ -228,7 +207,11 @@ function DashboardPage() {
       />
 
       {/* Category Summary */}
-      <CategorySummary categories={categorySummary} loading={categorySummaryLoading} />
+      <CategorySummary 
+        categories={categorySummary} 
+        loading={categorySummaryLoading}
+        hasUncategorizedTransactions={hasUncategorizedTransactions}
+      />
 
       {/* Charts */}
       <div className="grid gap-4 lg:grid-cols-2">

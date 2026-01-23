@@ -2,8 +2,8 @@
 import { useState, useMemo } from "react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
-import { Select } from "../ui/Select";
-import type { SelectOption } from "../ui/Select";
+import { SimpleSelect } from "../ui/SimpleSelect";
+import type { SelectOption } from "../ui/SimpleSelect";
 import type { Category, Subcategory } from "../../types";
 
 interface BulkEditModalProps {
@@ -105,7 +105,7 @@ export function BulkEditModal({
           .
         </p>
 
-        <Select
+        <SimpleSelect
           label="New Subcategory"
           options={subcategoryOptions}
           value={selectedSubcategory}

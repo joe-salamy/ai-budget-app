@@ -58,6 +58,7 @@ export interface AccountSummaryResponse {
 export interface CategorySummaryResponse {
   success: boolean;
   data?: CategorySummary[];
+  hasUncategorizedTransactions?: boolean;
   error?: string;
 }
 
@@ -354,7 +355,10 @@ export async function getCategorySummary(
       };
     });
 
-    return { success: true, data: categorySummaries };
+    // Check if there are any uncategorized transactions
+    const hasUncategorizedTransactions = (transactions || []).some((txn) => !txn.subcategory_id);
+
+    return { success: true, data: categorySummaries, hasUncategorizedTransactions };
   } catch (error) {
     return {
       success: false,

@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { Select } from "../ui/Select";
-import type { SelectOption } from "../ui/Select";
+import { SimpleSelect } from "../ui/SimpleSelect";
+import type { SelectOption } from "../ui/SimpleSelect";
 import type { AccountType, Account } from "../../types";
 
 interface AccountFormProps {
@@ -97,7 +97,7 @@ export function AccountForm({
         required
       />
 
-      <Select
+      <SimpleSelect
         label="Account Type"
         options={accountTypeOptions}
         value={type}

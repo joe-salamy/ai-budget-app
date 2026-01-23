@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { Select } from "../ui/Select";
-import type { SelectOption } from "../ui/Select";
+import { SimpleSelect } from "../ui/SimpleSelect";
+import type { SelectOption } from "../ui/SimpleSelect";
 import type { CategoryType, Category } from "../../types";
 
 interface CategoryFormProps {
@@ -93,7 +93,7 @@ export function CategoryForm({
         }
       />
 
-      <Select
+      <SimpleSelect
         label="Category Type"
         options={categoryTypeOptions}
         value={type}

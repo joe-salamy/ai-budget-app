@@ -1,5 +1,5 @@
 // useGoals hook - Fetch and manage spending and saving goals
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getSpendingGoalsWithDetails,
   createSpendingGoal,
@@ -15,6 +15,7 @@ import {
   addToSavingGoal,
   getSavingProgress,
 } from "../services/goals";
+import { queryKeys } from "../lib/queryKeys";
 import type {
   SpendingGoalWithDetails,
   SavingGoalWithDetails,
@@ -108,283 +109,267 @@ interface UseGoalsReturn {
  * Custom hook for managing spending and saving goals
  */
 export function useGoals(): UseGoalsReturn {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Spending goals state
-  const [spendingGoals, setSpendingGoals] = useState<SpendingGoalWithDetails[]>([]);
-  const [spendingGoalsLoading, setSpendingGoalsLoading] = useState<boolean>(true);
-  const [spendingGoalsError, setSpendingGoalsError] = useState<string | null>(null);
-
-  // Saving goals state
-  const [savingGoals, setSavingGoals] = useState<SavingGoalWithDetails[]>([]);
-  const [savingGoalsLoading, setSavingGoalsLoading] = useState<boolean>(true);
-  const [savingGoalsError, setSavingGoalsError] = useState<string | null>(null);
-
-  // ============== FETCH FUNCTIONS ==============
-
-  const fetchSpendingGoals = useCallback(async () => {
-    if (!user) {
-      setSpendingGoalsLoading(false);
-      return;
-    }
-
-    setSpendingGoalsLoading(true);
-    setSpendingGoalsError(null);
-
-    const response = await getSpendingGoalsWithDetails();
-
-    if (response.success && response.data) {
-      setSpendingGoals(response.data);
-    } else {
-      setSpendingGoalsError(response.error || "Failed to fetch spending goals");
-    }
-
-    setSpendingGoalsLoading(false);
-  }, [user]);
-
-  const fetchSavingGoals = useCallback(async () => {
-    if (!user) {
-      setSavingGoalsLoading(false);
-      return;
-    }
-
-    setSavingGoalsLoading(true);
-    setSavingGoalsError(null);
-
-    const response = await getSavingGoalsWithDetails();
-
-    if (response.success && response.data) {
-      setSavingGoals(response.data);
-    } else {
-      setSavingGoalsError(response.error || "Failed to fetch saving goals");
-    }
-
-    setSavingGoalsLoading(false);
-  }, [user]);
-
-  const fetchAll = useCallback(async () => {
-    await Promise.all([fetchSpendingGoals(), fetchSavingGoals()]);
-  }, [fetchSpendingGoals, fetchSavingGoals]);
-
-  // Load data when auth is ready
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAll();
-    } else if (!authLoading && !user) {
-      setSpendingGoalsLoading(false);
-      setSavingGoalsLoading(false);
-      setSpendingGoals([]);
-      setSavingGoals([]);
-    }
-  }, [authLoading, user, fetchAll]);
-
-  // ============== SPENDING GOAL OPERATIONS ==============
-
-  const addSpendingGoal = useCallback(
-    async (
-      subcategoryId: string,
-      amount: number,
-      period: GoalPeriod,
-      startDate: string,
-      endDate?: string | null
-    ) => {
-      const data: CreateSpendingGoalData = {
-        subcategory_id: subcategoryId,
-        amount,
-        period,
-        start_date: startDate,
-        end_date: endDate,
-      };
-
-      const response = await createSpendingGoal(data);
-
-      if (response.success && response.data) {
-        // Refresh to get the full details
-        await fetchSpendingGoals();
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
+  // Spending goals query
+  const {
+    data: spendingGoals = [],
+    isLoading: spendingGoalsLoading,
+    error: spendingGoalsQueryError,
+    refetch: refetchSpendingGoals,
+  } = useQuery({
+    queryKey: queryKeys.goals.spending.list(),
+    queryFn: async () => {
+      const response = await getSpendingGoalsWithDetails();
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch spending goals");
       }
+      return response.data || [];
     },
-    [fetchSpendingGoals]
-  );
+    enabled: !!user,
+  });
 
-  const editSpendingGoal = useCallback(
-    async (id: string, updates: UpdateSpendingGoalData) => {
-      const response = await updateSpendingGoal(id, updates);
-
-      if (response.success && response.data) {
-        // Refresh to get updated details
-        await fetchSpendingGoals();
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
+  // Saving goals query
+  const {
+    data: savingGoals = [],
+    isLoading: savingGoalsLoading,
+    error: savingGoalsQueryError,
+    refetch: refetchSavingGoals,
+  } = useQuery({
+    queryKey: queryKeys.goals.saving.list(),
+    queryFn: async () => {
+      const response = await getSavingGoalsWithDetails();
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch saving goals");
       }
+      return response.data || [];
     },
-    [fetchSpendingGoals]
-  );
+    enabled: !!user,
+  });
 
-  const removeSpendingGoal = useCallback(async (id: string) => {
-    const response = await deleteSpendingGoal(id);
+  // ============== SPENDING GOAL MUTATIONS ==============
 
-    if (response.success) {
-      setSpendingGoals((prev) => prev.filter((g) => g.id !== id));
-      return { success: true };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
+  const addSpendingGoalMutation = useMutation({
+    mutationFn: async (data: CreateSpendingGoalData) => {
+      return await createSpendingGoal(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.spending.all });
+    },
+  });
 
-  const getSpendingGoalProgressFn = useCallback(async (goalId: string, referenceDate?: string) => {
+  const updateSpendingGoalMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: UpdateSpendingGoalData }) => {
+      return await updateSpendingGoal(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.spending.all });
+    },
+  });
+
+  const deleteSpendingGoalMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteSpendingGoal(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.spending.all });
+    },
+  });
+
+  // ============== SAVING GOAL MUTATIONS ==============
+
+  const addSavingGoalMutation = useMutation({
+    mutationFn: async (data: CreateSavingGoalData) => {
+      return await createSavingGoal(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.saving.all });
+    },
+  });
+
+  const updateSavingGoalMutation = useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: UpdateSavingGoalData }) => {
+      return await updateSavingGoal(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.saving.all });
+    },
+  });
+
+  const deleteSavingGoalMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteSavingGoal(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.saving.all });
+    },
+  });
+
+  const completeSavingGoalMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await completeSavingGoal(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.saving.all });
+    },
+  });
+
+  const uncompleteSavingGoalMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await uncompleteSavingGoal(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.saving.all });
+    },
+  });
+
+  const addToSavingGoalMutation = useMutation({
+    mutationFn: async ({ id, amount }: { id: string; amount: number }) => {
+      return await addToSavingGoal(id, amount);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.saving.all });
+    },
+  });
+
+  // ============== WRAPPER FUNCTIONS ==============
+
+  const addSpendingGoal = async (
+    subcategoryId: string,
+    amount: number,
+    period: GoalPeriod,
+    startDate: string,
+    endDate?: string | null
+  ) => {
+    const data: CreateSpendingGoalData = {
+      subcategory_id: subcategoryId,
+      amount,
+      period,
+      start_date: startDate,
+      end_date: endDate,
+    };
+    const result = await addSpendingGoalMutation.mutateAsync(data);
+    return result;
+  };
+
+  const editSpendingGoal = async (id: string, updates: UpdateSpendingGoalData) => {
+    const result = await updateSpendingGoalMutation.mutateAsync({ id, updates });
+    return result;
+  };
+
+  const removeSpendingGoal = async (id: string) => {
+    const result = await deleteSpendingGoalMutation.mutateAsync(id);
+    return result;
+  };
+
+  const getSpendingGoalProgress = async (goalId: string, referenceDate?: string) => {
     const response = await getSpendingProgress(goalId, referenceDate);
-
     if (response.success && response.data) {
       return { success: true, data: response.data };
     } else {
       return { success: false, error: response.error };
     }
-  }, []);
+  };
 
-  // ============== SAVING GOAL OPERATIONS ==============
-
-  const addSavingGoal = useCallback(
-    async (
-      name: string,
-      options?: {
-        targetAmount?: number | null;
-        targetDate?: string | null;
-        currentAmount?: number;
-        accountId?: string | null;
-      }
-    ) => {
-      const data: CreateSavingGoalData = {
-        name,
-        target_amount: options?.targetAmount,
-        target_date: options?.targetDate,
-        current_amount: options?.currentAmount,
-        account_id: options?.accountId,
-      };
-
-      const response = await createSavingGoal(data);
-
-      if (response.success && response.data) {
-        // Refresh to get full details
-        await fetchSavingGoals();
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    [fetchSavingGoals]
-  );
-
-  const editSavingGoal = useCallback(
-    async (id: string, updates: UpdateSavingGoalData) => {
-      const response = await updateSavingGoal(id, updates);
-
-      if (response.success && response.data) {
-        // Refresh to get updated details
-        await fetchSavingGoals();
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    [fetchSavingGoals]
-  );
-
-  const removeSavingGoal = useCallback(async (id: string) => {
-    const response = await deleteSavingGoal(id);
-
-    if (response.success) {
-      setSavingGoals((prev) => prev.filter((g) => g.id !== id));
-      return { success: true };
-    } else {
-      return { success: false, error: response.error };
+  const addSavingGoal = async (
+    name: string,
+    options?: {
+      targetAmount?: number | null;
+      targetDate?: string | null;
+      currentAmount?: number;
+      accountId?: string | null;
     }
-  }, []);
+  ) => {
+    const data: CreateSavingGoalData = {
+      name,
+      target_amount: options?.targetAmount,
+      target_date: options?.targetDate,
+      current_amount: options?.currentAmount,
+      account_id: options?.accountId,
+    };
+    const result = await addSavingGoalMutation.mutateAsync(data);
+    return result;
+  };
 
-  const markSavingGoalComplete = useCallback(
-    async (id: string) => {
-      const response = await completeSavingGoal(id);
+  const editSavingGoal = async (id: string, updates: UpdateSavingGoalData) => {
+    const result = await updateSavingGoalMutation.mutateAsync({ id, updates });
+    return result;
+  };
 
-      if (response.success) {
-        await fetchSavingGoals();
-        return { success: true };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    [fetchSavingGoals]
-  );
+  const removeSavingGoal = async (id: string) => {
+    const result = await deleteSavingGoalMutation.mutateAsync(id);
+    return result;
+  };
 
-  const markSavingGoalIncomplete = useCallback(
-    async (id: string) => {
-      const response = await uncompleteSavingGoal(id);
+  const markSavingGoalComplete = async (id: string) => {
+    const result = await completeSavingGoalMutation.mutateAsync(id);
+    return result;
+  };
 
-      if (response.success) {
-        await fetchSavingGoals();
-        return { success: true };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    [fetchSavingGoals]
-  );
+  const markSavingGoalIncomplete = async (id: string) => {
+    const result = await uncompleteSavingGoalMutation.mutateAsync(id);
+    return result;
+  };
 
-  const addAmountToSavingGoal = useCallback(
-    async (id: string, amount: number) => {
-      const response = await addToSavingGoal(id, amount);
+  const addAmountToSavingGoal = async (id: string, amount: number) => {
+    const result = await addToSavingGoalMutation.mutateAsync({ id, amount });
+    return result;
+  };
 
-      if (response.success && response.data) {
-        await fetchSavingGoals();
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
-      }
-    },
-    [fetchSavingGoals]
-  );
-
-  const getSavingGoalProgressFn = useCallback(async (goalId: string) => {
+  const getSavingGoalProgress = async (goalId: string) => {
     const response = await getSavingProgress(goalId);
-
     if (response.success && response.data) {
       return { success: true, data: response.data };
     } else {
       return { success: false, error: response.error };
     }
-  }, []);
+  };
+
+  const refreshSpendingGoals = async () => {
+    await refetchSpendingGoals();
+  };
+
+  const refreshSavingGoals = async () => {
+    await refetchSavingGoals();
+  };
+
+  const refresh = async () => {
+    await Promise.all([refetchSpendingGoals(), refetchSavingGoals()]);
+  };
 
   // ============== RETURN ==============
+
+  const spendingGoalsError = spendingGoalsQueryError?.message || null;
+  const savingGoalsError = savingGoalsQueryError?.message || null;
 
   return {
     // Spending goals
     spendingGoals,
     spendingGoalsLoading,
     spendingGoalsError,
-    refreshSpendingGoals: fetchSpendingGoals,
+    refreshSpendingGoals,
     addSpendingGoal,
     editSpendingGoal,
     removeSpendingGoal,
-    getSpendingGoalProgress: getSpendingGoalProgressFn,
+    getSpendingGoalProgress,
 
     // Saving goals
     savingGoals,
     savingGoalsLoading,
     savingGoalsError,
-    refreshSavingGoals: fetchSavingGoals,
+    refreshSavingGoals,
     addSavingGoal,
     editSavingGoal,
     removeSavingGoal,
     markSavingGoalComplete,
     markSavingGoalIncomplete,
     addAmountToSavingGoal,
-    getSavingGoalProgress: getSavingGoalProgressFn,
+    getSavingGoalProgress,
 
     // Combined
     loading: spendingGoalsLoading || savingGoalsLoading,
     error: spendingGoalsError || savingGoalsError,
-    refresh: fetchAll,
+    refresh,
   };
 }

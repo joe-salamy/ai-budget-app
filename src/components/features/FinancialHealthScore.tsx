@@ -1,4 +1,6 @@
 // FinancialHealthScore - Visual display of financial health with breakdown and history
+// NOTE: This component is currently shelved (as of January 2026) and not displayed on the dashboard.
+// It will be revamped and re-integrated in a future update.
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { calculateFinancialHealthScore, getScoreHistory } from "../../services/scoring";

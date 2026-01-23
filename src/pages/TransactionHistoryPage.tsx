@@ -6,7 +6,7 @@ import { ConfirmDeleteModal } from "../components/features/ConfirmDeleteModal";
 import { Modal } from "../components/ui/Modal";
 import { TransactionForm } from "../components/features/TransactionForm";
 import { Input } from "../components/ui/Input";
-import { Select } from "../components/ui/Select";
+import { SimpleSelect } from "../components/ui/SimpleSelect";
 import { Button } from "../components/ui/Button";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
@@ -74,13 +74,10 @@ function TransactionHistoryPage() {
 
   // Build account options for filter dropdown
   const accountOptions = useMemo(() => {
-    return [
-      { value: "", label: "All Accounts" },
-      ...accounts.map((acc) => ({
-        value: acc.id,
-        label: acc.name,
-      })),
-    ];
+    return accounts.map((acc) => ({
+      value: acc.id,
+      label: acc.name,
+    }));
   }, [accounts]);
 
   // Handle date filter changes
@@ -224,7 +221,7 @@ function TransactionHistoryPage() {
           </div>
 
           {/* Account filter */}
-          <Select
+          <SimpleSelect
             options={accountOptions}
             value={accountFilter}
             onChange={setAccountFilter}

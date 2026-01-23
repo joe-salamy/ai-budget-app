@@ -66,9 +66,7 @@ function CustomLinkTooltip({ link }: CustomLinkProps) {
         <span className="text-muted-foreground">→</span>
         <span className="text-foreground">{getDisplayName(link.target.id)}</span>
       </div>
-      <div className="text-white font-medium mt-1">
-        {formatCurrency(link.value)}
-      </div>
+      <div className="text-white font-medium mt-1">{formatCurrency(link.value)}</div>
     </div>
   );
 }
@@ -112,28 +110,37 @@ export function SankeyDiagram({ data, loading }: SankeyDiagramProps) {
     <div style={{ height: 320 }}>
       <ResponsiveSankey
         data={data}
-        margin={{ top: 20, right: 140, bottom: 20, left: 140 }}
-        align="justify"
+        margin={{ top: 20, right: 120, bottom: 20, left: 120 }}
+        align="center"
         colors={(node) => node.nodeColor || "#4b5563"}
         nodeOpacity={1}
         nodeHoverOpacity={1}
         nodeHoverOthersOpacity={0.35}
         nodeThickness={18}
         nodeSpacing={24}
-        nodeBorderWidth={0}
+        nodeBorderWidth={1}
         nodeBorderRadius={3}
-        linkOpacity={0.5}
-        linkHoverOpacity={0.8}
+        linkOpacity={0.8}
+        linkHoverOpacity={1}
         linkHoverOthersOpacity={0.1}
         linkContract={3}
-        enableLinkGradient={false}
+        linkBlendMode="normal"
+        enableLinkGradient={true}
         labelPosition="outside"
         labelOrientation="horizontal"
         labelPadding={12}
-        labelTextColor="#9ca3af"
+        labelTextColor="#ffffff"
         label={(node) => getDisplayName(node.id)}
         nodeTooltip={CustomNodeTooltip}
         linkTooltip={CustomLinkTooltip}
+        theme={{
+          labels: {
+            text: {
+              fontSize: 14,
+              fontWeight: 600,
+            },
+          },
+        }}
         animate={true}
         motionConfig="gentle"
       />

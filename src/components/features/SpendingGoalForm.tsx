@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { SimpleSelect } from "@/components/ui/SimpleSelect";
+import type { SelectGroup } from "@/components/ui/SimpleSelect";
 import type { Subcategory, Category, GoalPeriod } from "@/types";
 
 interface SpendingGoalFormProps {
@@ -72,11 +73,18 @@ export function SpendingGoalForm({
       (!existingGoalSubcategoryIds.includes(s.id) || s.id === initialData?.subcategory_id)
   );
 
-  // Group subcategories by category
-  const groupedSubcategories = expenseCategories.map((category) => ({
-    category,
-    subcategories: availableSubcategories.filter((s) => s.category_id === category.id),
-  }));
+  // Group subcategories by category for the select component
+  const selectGroups: SelectGroup[] = expenseCategories
+    .map((category) => ({
+      label: category.name,
+      options: availableSubcategories
+        .filter((s) => s.category_id === category.id)
+        .map((sub) => ({
+          value: sub.id,
+          label: sub.name,
+        })),
+    }))
+    .filter((group) => group.options.length > 0);
 
   useEffect(() => {
     if (initialData) {
@@ -135,45 +143,32 @@ export function SpendingGoalForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Subcategory Selection */}
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-2">Subcategory</label>
-        {disableSubcategoryChange ? (
+      {disableSubcategoryChange ? (
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">Subcategory</label>
           <div className="px-3 py-2 bg-muted/50 border border-border rounded-md text-foreground">
             {subcategories.find((s) => s.id === subcategoryId)?.name || "Unknown"}
           </div>
-        ) : (
-          <select
-            value={subcategoryId}
-            onChange={(e) => {
-              setSubcategoryId(e.target.value);
-              setErrors({});
-            }}
-            className="w-full px-3 py-2 bg-card border border-border rounded-md text-white focus:border-foreground focus:ring-1 focus:ring-foreground"
-            disabled={isSubmitting}
-          >
-            <option value="">Select a subcategory...</option>
-            {groupedSubcategories.map(({ category, subcategories: subs }) =>
-              subs.length > 0 ? (
-                <optgroup key={category.id} label={category.name}>
-                  {subs.map((sub) => (
-                    <option key={sub.id} value={sub.id}>
-                      {sub.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ) : null
-            )}
-          </select>
-        )}
-        {errors.subcategoryId && (
-          <p className="mt-1 text-sm text-foreground">{errors.subcategoryId}</p>
-        )}
-        {availableSubcategories.length === 0 && (
-          <p className="mt-1 text-sm text-foreground">
-            All expense subcategories already have goals
-          </p>
-        )}
-      </div>
+        </div>
+      ) : (
+        <SimpleSelect
+          label="Subcategory"
+          groups={selectGroups}
+          value={subcategoryId}
+          onChange={(value) => {
+            setSubcategoryId(value);
+            setErrors({});
+          }}
+          placeholder="Select a subcategory..."
+          error={errors.subcategoryId}
+          disabled={isSubmitting || availableSubcategories.length === 0}
+          helperText={
+            availableSubcategories.length === 0
+              ? "All expense subcategories already have goals"
+              : undefined
+          }
+        />
+      )}
 
       {/* Amount */}
       <Input
@@ -193,7 +188,7 @@ export function SpendingGoalForm({
       />
 
       {/* Period */}
-      <Select
+      <SimpleSelect
         label="Period"
         value={period}
         onChange={(value) => setPeriod(value as GoalPeriod)}

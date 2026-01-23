@@ -1,6 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "./hooks/useAuth";
 import { ChatPanelProvider } from "./hooks/useChatPanel";
 import LandingPage from "./pages/LandingPage";
@@ -15,23 +14,6 @@ import SettingsPage from "./pages/SettingsPage";
 import AppLayout from "./components/AppLayout";
 
 /**
- * Page transition animation wrapper
- */
-function PageTransition({ children }: { children: ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.2 }}
-      className="flex-1"
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-/**
  * Protected Route wrapper component
  * Redirects to login if user is not authenticated
  */
@@ -40,8 +22,8 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="text-gray-400">Loading...</div>
+      <div className="dark flex min-h-screen items-center justify-center bg-background">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
@@ -50,7 +32,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  return <PageTransition>{children}</PageTransition>;
+  return <>{children}</>;
 }
 
 /**
@@ -63,8 +45,8 @@ function PublicRoute({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="text-gray-400">Loading...</div>
+      <div className="dark flex min-h-screen items-center justify-center bg-background">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
@@ -74,15 +56,13 @@ function PublicRoute({ children }: { children: ReactNode }) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <PageTransition>{children}</PageTransition>;
+  return <>{children}</>;
 }
 
-function AnimatedRoutes() {
-  const location = useLocation();
-
+function Router() {
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <BrowserRouter>
+      <Routes>
         {/* Public routes */}
         <Route
           path="/"
@@ -130,14 +110,6 @@ function AnimatedRoutes() {
         {/* Catch all redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </AnimatePresence>
-  );
-}
-
-function Router() {
-  return (
-    <BrowserRouter>
-      <AnimatedRoutes />
     </BrowserRouter>
   );
 }

@@ -1,7 +1,14 @@
 // MultiTransactionTable component - Tabular input for multiple transactions
 import { useState, useMemo, useCallback } from "react";
 import { Button } from "../ui/Button";
-import type { SelectOption } from "../ui/Select";
+import type { SelectOption } from "../ui/SimpleSelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
 import { categorizeBatchTransactions, getAICorrection } from "../../services/ai";
 import type { Account, Category, Subcategory } from "../../types";
@@ -460,40 +467,50 @@ export function MultiTransactionTable({
 
                   {/* Account */}
                   <td className="px-2 py-1">
-                    <select
-                      value={row.account_id}
-                      onChange={(e) => handleRowChange(row.id, "account_id", e.target.value)}
-                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground ${
-                        rowErrors.account_id ? "border-foreground" : "border-border"
-                      }`}
+                    <Select
+                      value={row.account_id || undefined}
+                      onValueChange={(value) => handleRowChange(row.id, "account_id", value)}
                     >
-                      <option value="">Select...</option>
-                      {accountOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger
+                        className={`w-full h-8 px-2 text-sm ${
+                          rowErrors.account_id ? "border-foreground" : ""
+                        }`}
+                      >
+                        <SelectValue placeholder="Select..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accountOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </td>
 
                   {/* To Account (transfers only) */}
                   {isTransfer && (
                     <td className="px-2 py-1">
-                      <select
-                        value={row.transfer_to_account_id || ""}
-                        onChange={(e) => handleRowChange(row.id, "transfer_to_account_id", e.target.value)}
+                      <Select
+                        value={row.transfer_to_account_id || undefined}
+                        onValueChange={(value) => handleRowChange(row.id, "transfer_to_account_id", value)}
                         disabled={!row.account_id}
-                        className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground disabled:opacity-50 ${
-                          rowErrors.transfer_to_account_id ? "border-foreground" : "border-border"
-                        }`}
                       >
-                        <option value="">Select...</option>
-                        {transferAccountOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
+                        <SelectTrigger
+                          className={`w-full h-8 px-2 text-sm ${
+                            rowErrors.transfer_to_account_id ? "border-foreground" : ""
+                          }`}
+                        >
+                          <SelectValue placeholder="Select..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {transferAccountOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </td>
                   )}
 
@@ -529,18 +546,21 @@ export function MultiTransactionTable({
                   {!isTransfer && (
                     <td className="px-2 py-1">
                       <div className="flex items-center gap-1">
-                        <select
-                          value={row.subcategory_id}
-                          onChange={(e) => handleRowChange(row.id, "subcategory_id", e.target.value)}
-                          className="flex-1 px-2 py-1.5 bg-muted border border-border rounded text-sm text-foreground"
+                        <Select
+                          value={row.subcategory_id || undefined}
+                          onValueChange={(value) => handleRowChange(row.id, "subcategory_id", value)}
                         >
-                          <option value="">Select...</option>
-                          {subcategoryOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger className="flex-1 h-8 px-2 text-sm">
+                            <SelectValue placeholder="Select..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {subcategoryOptions.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         {getCategorizationIndicator(row)}
                       </div>
                     </td>

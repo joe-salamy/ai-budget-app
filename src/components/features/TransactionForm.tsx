@@ -2,8 +2,8 @@
 import { useState, useCallback, useMemo, useRef } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { Select } from "../ui/Select";
-import type { SelectOption } from "../ui/Select";
+import { SimpleSelect } from "../ui/SimpleSelect";
+import type { SelectOption } from "../ui/SimpleSelect";
 import { useAutoSave } from "../../hooks/useAutoSave";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
 import {
@@ -500,7 +500,7 @@ export function TransactionForm({
         />
 
         {/* Account (source for transfers) */}
-        <Select
+        <SimpleSelect
           label={type === "transfer" ? "From Account" : "Account"}
           options={accountOptions}
           value={formData.account_id}
@@ -512,7 +512,7 @@ export function TransactionForm({
 
       {/* Transfer destination account */}
       {type === "transfer" && (
-        <Select
+        <SimpleSelect
           label="To Account"
           options={transferAccountOptions}
           value={formData.transfer_to_account_id || ""}
@@ -555,7 +555,7 @@ export function TransactionForm({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Subcategory */}
         <div>
-          <Select
+          <SimpleSelect
             label={`Subcategory${type === "transfer" ? " (Optional)" : ""}`}
             options={subcategoryOptions}
             value={formData.subcategory_id}

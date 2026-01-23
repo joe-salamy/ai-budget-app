@@ -214,7 +214,7 @@ function SettingsPage() {
   const userSubcategories = subcategories.filter((sub) => !sub.is_system);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 p-6">
+    <div className="space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
@@ -241,7 +241,9 @@ function SettingsPage() {
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">User ID</label>
-            <p className="text-muted-foreground text-sm mt-1 font-mono">{user?.id || "Not available"}</p>
+            <p className="text-muted-foreground text-sm mt-1 font-mono">
+              {user?.id || "Not available"}
+            </p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">Account Created</label>
@@ -840,7 +842,9 @@ function SettingsPage() {
           <div className="flex items-center justify-between p-4 rounded-lg bg-card/50 border border-border">
             <div>
               <h3 className="font-medium text-foreground">Sign Out</h3>
-              <p className="text-sm text-muted-foreground">Sign out of your account on this device</p>
+              <p className="text-sm text-muted-foreground">
+                Sign out of your account on this device
+              </p>
             </div>
             <Button variant="secondary" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
@@ -851,7 +855,9 @@ function SettingsPage() {
           <div className="flex items-center justify-between p-4 rounded-lg bg-foreground/10 border border-foreground/50">
             <div>
               <h3 className="font-medium text-foreground">Delete Account</h3>
-              <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
+              <p className="text-sm text-muted-foreground">
+                Permanently delete your account and all data
+              </p>
             </div>
             {!showDeleteConfirm ? (
               <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>

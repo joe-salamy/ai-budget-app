@@ -136,7 +136,7 @@ function TransactionInputPage() {
   const isDataLoading = accountsLoading || categoriesLoading;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold text-foreground">Add Transactions</h1>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">

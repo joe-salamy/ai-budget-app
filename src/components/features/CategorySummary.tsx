@@ -8,6 +8,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 interface CategorySummaryProps {
   categories: CategorySummaryType[];
   loading: boolean;
+  hasUncategorizedTransactions?: boolean;
 }
 
 // ============== HELPERS ==============
@@ -17,14 +18,6 @@ function formatCurrency(amount: number): string {
     style: "currency",
     currency: "USD",
   }).format(amount);
-}
-
-function getCategoryTypeLabel(type: string): string {
-  return type === "income" ? "Income" : "Expense";
-}
-
-function getCategoryTypeColor(type: string): string {
-  return type === "income" ? "text-foreground" : "text-foreground";
 }
 
 function getDifferenceColor(difference: number | null, categoryType: string): string {
@@ -55,7 +48,11 @@ function getDifferenceLabel(difference: number | null, categoryType: string): st
 
 // ============== MAIN COMPONENT ==============
 
-export function CategorySummary({ categories, loading }: CategorySummaryProps) {
+export function CategorySummary({
+  categories,
+  loading,
+  hasUncategorizedTransactions = false,
+}: CategorySummaryProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const toggleCategory = (categoryId: string) => {
@@ -118,25 +115,43 @@ export function CategorySummary({ categories, loading }: CategorySummaryProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
+        <table className="min-w-full divide-y divide-gray-700" style={{ tableLayout: "fixed" }}>
           <thead className="bg-card/30">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                style={{ width: "4%" }}
+              >
                 {/* Expand icon */}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Type
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                style={{ width: "26%" }}
+              >
                 Category
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th
+                className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                style={{ width: "14%" }}
+              >
+                Subcategories
+              </th>
+              <th
+                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                style={{ width: "19%" }}
+              >
                 Total
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th
+                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                style={{ width: "18%" }}
+              >
                 Goal
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th
+                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                style={{ width: "19%" }}
+              >
                 Difference
               </th>
             </tr>
@@ -146,7 +161,10 @@ export function CategorySummary({ categories, loading }: CategorySummaryProps) {
             {incomeCategories.length > 0 && (
               <>
                 <tr className="bg-card/20">
-                  <td colSpan={6} className="px-4 py-2 text-xs font-medium text-foreground uppercase">
+                  <td
+                    colSpan={6}
+                    className="px-4 py-2 text-xs font-medium text-foreground uppercase"
+                  >
                     Income
                   </td>
                 </tr>
@@ -165,7 +183,10 @@ export function CategorySummary({ categories, loading }: CategorySummaryProps) {
             {expenseCategories.length > 0 && (
               <>
                 <tr className="bg-card/20">
-                  <td colSpan={6} className="px-4 py-2 text-xs font-medium text-foreground uppercase">
+                  <td
+                    colSpan={6}
+                    className="px-4 py-2 text-xs font-medium text-foreground uppercase"
+                  >
                     Expenses
                   </td>
                 </tr>
@@ -184,7 +205,7 @@ export function CategorySummary({ categories, loading }: CategorySummaryProps) {
           {/* Totals Footer */}
           <tfoot className="bg-card/50 border-t-2 border-border">
             <tr>
-              <td colSpan={3} className="px-4 py-3 text-sm font-semibold text-white">
+              <td colSpan={4} className="px-4 py-3 text-sm font-semibold text-white">
                 Summary
               </td>
               <td className="px-4 py-3 text-right">
@@ -203,12 +224,19 @@ export function CategorySummary({ categories, loading }: CategorySummaryProps) {
                   netIncome >= 0 ? "text-foreground" : "text-foreground"
                 }`}
               >
-                Net: {netIncome >= 0 ? "+" : ""}{formatCurrency(netIncome)}
+                Net{hasUncategorizedTransactions ? "*" : ""}: {netIncome >= 0 ? "+" : ""}
+                {formatCurrency(netIncome)}
               </td>
             </tr>
           </tfoot>
         </table>
       </div>
+      {hasUncategorizedTransactions && (
+        <div className="px-4 py-2 text-xs text-muted-foreground border-t border-border/50">
+          * Net amount only includes categorized transactions. The Net Change card includes all
+          transactions.
+        </div>
+      )}
     </div>
   );
 }
@@ -229,36 +257,34 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
     <>
       {/* Main category row */}
       <tr
-        className={`hover:bg-card/50 ${
-          hasSubcategories ? "cursor-pointer" : ""
-        }`}
+        className={`hover:bg-card/50 ${hasSubcategories ? "cursor-pointer" : ""}`}
         onClick={hasSubcategories ? onToggle : undefined}
       >
-        <td className="px-4 py-3 text-muted-foreground">
-          {hasSubcategories && (
-            isExpanded ? (
+        <td className="px-4 py-3 text-muted-foreground" style={{ width: "4%" }}>
+          {hasSubcategories &&
+            (isExpanded ? (
               <ChevronDown className="w-4 h-4" />
             ) : (
               <ChevronRight className="w-4 h-4" />
-            )
-          )}
+            ))}
         </td>
-        <td className={`px-4 py-3 text-sm ${getCategoryTypeColor(category.category_type)}`}>
-          {getCategoryTypeLabel(category.category_type)}
-        </td>
-        <td className="px-4 py-3 text-sm text-gray-200 font-medium">
+        <td className="px-4 py-3 text-sm text-gray-200 font-medium" style={{ width: "26%" }}>
           {category.category_name}
-          {hasSubcategories && (
-            <span className="ml-2 text-xs text-muted-foreground">
-              ({category.subcategories.length} subcategories)
-            </span>
-          )}
         </td>
-        <td className={`px-4 py-3 text-sm text-right font-medium ${totalColor}`}>
+        <td
+          className="px-4 py-3 text-sm text-center text-muted-foreground"
+          style={{ width: "14%" }}
+        >
+          {hasSubcategories ? category.subcategories.length : "-"}
+        </td>
+        <td
+          className={`px-4 py-3 text-sm text-right font-medium ${totalColor}`}
+          style={{ width: "19%" }}
+        >
           {category.category_type === "income" ? "+" : ""}
           {formatCurrency(Math.abs(category.total))}
         </td>
-        <td className="px-4 py-3 text-sm text-right text-muted-foreground">
+        <td className="px-4 py-3 text-sm text-right text-muted-foreground" style={{ width: "18%" }}>
           {category.goal !== null ? formatCurrency(category.goal) : "-"}
         </td>
         <td
@@ -266,6 +292,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
             category.difference,
             category.category_type
           )}`}
+          style={{ width: "19%" }}
         >
           {getDifferenceLabel(category.difference, category.category_type)}
         </td>
@@ -276,25 +303,37 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
         <tr>
           <td colSpan={6} className="px-0 py-0">
             <div className="bg-background/50 border-y border-border/50">
-              <table className="min-w-full">
+              <table className="min-w-full" style={{ tableLayout: "fixed" }}>
                 <thead className="bg-card/20">
                   <tr>
-                    <th className="px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase w-10">
+                    <th
+                      className="px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
+                      style={{ width: "4%" }}
+                    >
                       {/* Spacer */}
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
-                      {/* Type spacer */}
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
+                    <th
+                      className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
+                      style={{ width: "40%" }}
+                    >
                       Subcategory
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
+                    <th
+                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
+                      style={{ width: "19%" }}
+                    >
                       Total
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
+                    <th
+                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
+                      style={{ width: "18%" }}
+                    >
                       Goal
                     </th>
-                    <th className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
+                    <th
+                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
+                      style={{ width: "19%" }}
+                    >
                       Difference
                     </th>
                   </tr>
@@ -306,20 +345,23 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
 
                     return (
                       <tr key={subcategory.subcategory_id} className="hover:bg-card/20">
-                        <td className="px-8 py-2">
+                        <td className="px-8 py-2" style={{ width: "4%" }}>
                           {/* Spacer */}
                         </td>
-                        <td className="px-4 py-2">
-                          {/* Type spacer */}
-                        </td>
-                        <td className="px-4 py-2 text-sm text-foreground">
+                        <td className="px-4 py-2 text-sm text-foreground" style={{ width: "40%" }}>
                           {subcategory.subcategory_name}
                         </td>
-                        <td className={`px-4 py-2 text-sm text-right ${subTotalColor}`}>
+                        <td
+                          className={`px-4 py-2 text-sm text-right ${subTotalColor}`}
+                          style={{ width: "19%" }}
+                        >
                           {category.category_type === "income" ? "+" : ""}
                           {formatCurrency(Math.abs(subcategory.total))}
                         </td>
-                        <td className="px-4 py-2 text-sm text-right text-muted-foreground">
+                        <td
+                          className="px-4 py-2 text-sm text-right text-muted-foreground"
+                          style={{ width: "18%" }}
+                        >
                           {subcategory.goal !== null ? formatCurrency(subcategory.goal) : "-"}
                         </td>
                         <td
@@ -327,6 +369,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
                             subcategory.difference,
                             category.category_type
                           )}`}
+                          style={{ width: "19%" }}
                         >
                           {getDifferenceLabel(subcategory.difference, category.category_type)}
                         </td>

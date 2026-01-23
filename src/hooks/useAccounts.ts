@@ -1,7 +1,8 @@
 // useAccounts hook - Fetch and manage accounts
-import { useState, useEffect, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAccounts, createAccount, updateAccount, deleteAccount } from "../services/accounts";
 import { useAuth } from "./useAuth";
+import { queryKeys } from "../lib/queryKeys";
 import type { Account, AccountType } from "../types";
 
 interface UseAccountsReturn {
@@ -30,100 +31,98 @@ interface UseAccountsReturn {
  * ```
  */
 export function useAccounts(): UseAccountsReturn {
-  const { user, loading: authLoading } = useAuth();
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Fetch accounts
-  const fetchAccounts = useCallback(async () => {
-    // Don't fetch if not authenticated
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const response = await getAccounts();
-
-    if (response.success && response.data) {
-      setAccounts(response.data);
-    } else {
-      setError(response.error || "Failed to fetch accounts");
-    }
-
-    setLoading(false);
-  }, [user]);
-
-  // Load accounts when auth is ready and user is authenticated
-  useEffect(() => {
-    if (!authLoading && user) {
-      fetchAccounts();
-    } else if (!authLoading && !user) {
-      setLoading(false);
-      setAccounts([]);
-    }
-  }, [authLoading, user, fetchAccounts]);
-
-  // Add a new account
-  const addAccount = useCallback(
-    async (name: string, type: AccountType, initialBalance: number) => {
-      const response = await createAccount({
-        name,
-        type,
-        initial_balance: initialBalance,
-      });
-
-      if (response.success && response.data) {
-        // Optimistic update
-        setAccounts((prev) => [...prev, response.data!]);
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
+  // Read query
+  const {
+    data: accounts = [],
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.accounts.list(),
+    queryFn: async () => {
+      const response = await getAccounts();
+      if (!response.success) {
+        throw new Error(response.error || "Failed to fetch accounts");
       }
+      return response.data || [];
     },
-    []
-  );
+    enabled: !!user,
+  });
 
-  // Edit an existing account
-  const editAccount = useCallback(
-    async (
-      id: string,
-      updates: { name?: string; type?: AccountType; initial_balance?: number }
-    ) => {
-      const response = await updateAccount(id, updates);
-
-      if (response.success && response.data) {
-        // Optimistic update
-        setAccounts((prev) => prev.map((acc) => (acc.id === id ? response.data! : acc)));
-        return { success: true, data: response.data };
-      } else {
-        return { success: false, error: response.error };
-      }
+  // Add mutation
+  const addMutation = useMutation({
+    mutationFn: async (data: { name: string; type: AccountType; initial_balance: number }) => {
+      return await createAccount(data);
     },
-    []
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
 
-  // Remove an account (soft delete)
-  const removeAccount = useCallback(async (id: string) => {
-    const response = await deleteAccount(id);
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({
+      id,
+      updates,
+    }: {
+      id: string;
+      updates: { name?: string; type?: AccountType; initial_balance?: number };
+    }) => {
+      return await updateAccount(id, updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
 
-    if (response.success) {
-      // Optimistic update
-      setAccounts((prev) => prev.filter((acc) => acc.id !== id));
-      return { success: true };
-    } else {
-      return { success: false, error: response.error };
-    }
-  }, []);
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await deleteAccount(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+    },
+  });
+
+  // Wrapper functions to maintain interface
+  const addAccount = async (name: string, type: AccountType, initialBalance: number) => {
+    const result = await addMutation.mutateAsync({
+      name,
+      type,
+      initial_balance: initialBalance,
+    });
+    return result;
+  };
+
+  const editAccount = async (
+    id: string,
+    updates: { name?: string; type?: AccountType; initial_balance?: number }
+  ) => {
+    const result = await updateMutation.mutateAsync({ id, updates });
+    return result;
+  };
+
+  const removeAccount = async (id: string) => {
+    const result = await deleteMutation.mutateAsync(id);
+    return result;
+  };
+
+  const refresh = async () => {
+    await refetch();
+  };
 
   return {
     accounts,
     loading,
-    error,
-    refresh: fetchAccounts,
+    error: queryError?.message || null,
+    refresh,
     addAccount,
     editAccount,
     removeAccount,
