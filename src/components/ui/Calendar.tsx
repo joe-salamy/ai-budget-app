@@ -18,32 +18,33 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
+        month_caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-sm font-medium text-foreground",
         nav: "space-x-1 flex items-center",
-        nav_button: cn(
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted"
+        button_previous: cn(
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted absolute left-1"
         ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
+        button_next: cn(
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted absolute right-1"
+        ),
         table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-muted/50 [&:has([aria-selected])]:bg-muted first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: cn(
+        weekdays: "flex w-full",
+        weekday: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center",
+        week: "flex w-full mt-2",
+        day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].range_end)]:rounded-r-md [&:has([aria-selected].outside)]:bg-muted/50 [&:has([aria-selected])]:bg-muted first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        day_button: cn(
           "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-muted rounded-md inline-flex items-center justify-center"
         ),
-        day_range_end: "day-range-end",
-        day_selected:
+        range_end: "range-end",
+        selected:
           "bg-foreground text-background hover:bg-foreground hover:text-background focus:bg-foreground focus:text-background",
-        day_today: "bg-muted text-foreground",
-        day_outside:
-          "day-outside text-muted-foreground opacity-50 aria-selected:bg-muted/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
+        today: "bg-muted text-foreground",
+        outside:
+          "outside text-muted-foreground/40 aria-selected:bg-muted/50 aria-selected:text-muted-foreground/40",
+        disabled: "text-muted-foreground opacity-50",
+        range_middle:
           "aria-selected:bg-muted aria-selected:text-foreground",
-        day_hidden: "invisible",
+        hidden: "invisible",
         ...classNames,
       }}
       components={{

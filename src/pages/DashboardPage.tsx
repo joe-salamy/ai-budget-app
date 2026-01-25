@@ -35,6 +35,13 @@ const DATE_PRESETS = [
     }),
   },
   {
+    label: "Last 365 days",
+    getValue: () => ({
+      startDate: format(subDays(new Date(), 365), "yyyy-MM-dd"),
+      endDate: format(new Date(), "yyyy-MM-dd"),
+    }),
+  },
+  {
     label: "This month",
     getValue: () => ({
       startDate: format(startOfMonth(new Date()), "yyyy-MM-dd"),
@@ -42,21 +49,7 @@ const DATE_PRESETS = [
     }),
   },
   {
-    label: "Last month",
-    getValue: () => ({
-      startDate: format(startOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
-      endDate: format(endOfMonth(subMonths(new Date(), 1)), "yyyy-MM-dd"),
-    }),
-  },
-  {
-    label: "Last 6 months",
-    getValue: () => ({
-      startDate: format(subMonths(new Date(), 6), "yyyy-MM-dd"),
-      endDate: format(new Date(), "yyyy-MM-dd"),
-    }),
-  },
-  {
-    label: "Year to date",
+    label: "This year",
     getValue: () => ({
       startDate: format(new Date(new Date().getFullYear(), 0, 1), "yyyy-MM-dd"),
       endDate: format(new Date(), "yyyy-MM-dd"),
@@ -105,38 +98,43 @@ function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+      <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
 
-        {/* Date Range Picker */}
-        <DateRangePicker
-          startDate={dateRange.startDate}
-          endDate={dateRange.endDate}
-          onDateChange={handleDateRangeChange}
-        />
-      </div>
+      {/* Date Selection Card */}
+      <Card>
+        <CardContent className="pt-3 pb-3 px-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Date Presets */}
+              {DATE_PRESETS.map((preset) => (
+                <button
+                  key={preset.label}
+                  onClick={() => handlePresetClick(preset)}
+                  className="px-3 py-1 text-sm rounded-full border border-border text-foreground hover:bg-muted hover:text-white hover:border-border"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
 
-      {/* Date Presets */}
-      <div className="flex flex-wrap gap-2">
-        {DATE_PRESETS.map((preset) => (
-          <button
-            key={preset.label}
-            onClick={() => handlePresetClick(preset)}
-            className="px-3 py-1 text-xs rounded-full border border-border text-foreground hover:bg-muted hover:text-white hover:border-border"
-          >
-            {preset.label}
-          </button>
-        ))}
-      </div>
+            {/* Date Range Picker */}
+            <DateRangePicker
+              startDate={dateRange.startDate}
+              endDate={dateRange.endDate}
+              onDateChange={handleDateRangeChange}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Key Metrics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Net Worth Card */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-muted-foreground">Net Worth</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium text-muted-foreground">Net Worth</CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-0">
             {accountSummaryLoading ? (
               <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
@@ -150,10 +148,10 @@ function DashboardPage() {
 
         {/* Income Card */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-muted-foreground">Income</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium text-muted-foreground">Income</CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-0">
             {metricsLoading ? (
               <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
@@ -167,10 +165,10 @@ function DashboardPage() {
 
         {/* Expenses Card */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-muted-foreground">Expenses</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium text-muted-foreground">Expenses</CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-0">
             {metricsLoading ? (
               <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (
@@ -184,12 +182,12 @@ function DashboardPage() {
 
         {/* Net Change Card */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-muted-foreground">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg font-medium text-muted-foreground">
               Net Change
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="pt-0">
             {metricsLoading ? (
               <div className="h-8 bg-muted/50 rounded animate-pulse"></div>
             ) : (

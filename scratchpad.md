@@ -4,13 +4,15 @@
 - Test all functionality
 - Go through each page, test for UI; afterwards, do full CC sweep to ensure consistency
 
+The issue was that your project uses react-day-picker v9, which changed the classNames API from
+v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class names:
+
 ### General
 
 - **AI**: Test AI chatbox
 - **Highlighting**: Check that everything highlights
 - **Color**: Maybe add some color back, but make it very intentional
 - **Privacy**: Best method for encryption / privacy for budget app? Want friends to feel more secure that I can’t just see all their transactions. Encrypted db?
-- **Data loading**: Read functions. Change so loads data for ALL pages when get to dashboard.
 - **Keyboard shortcuts**
   - Input transactions: tab next, enter down, control enter submit
   - Shortcut to get to each page
