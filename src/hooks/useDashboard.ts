@@ -3,11 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { format, subDays } from "date-fns";
-import {
-  getAccountSummary,
-  getCategorySummary,
-  getDashboardMetrics,
-} from "../services/dashboard";
+import { getAccountSummary, getCategorySummary, getDashboardMetrics } from "../services/dashboard";
 import { prepareNetWorthData, prepareSankeyData } from "../services/charts";
 import { queryKeys } from "../lib/queryKeys";
 import type { AccountSummary, CategorySummary, NetWorthSummary } from "../services/dashboard";

@@ -302,16 +302,16 @@ export async function getCategorySummary(
     // Period to days conversion
     const periodToDays: Record<string, number> = {
       weekly: 7,
-      monthly: 30.44, // Average days in a month
-      quarterly: 91.31, // Average days in a quarter
-      annual: 365.25,
+      monthly: 365 / 12,
+      quarterly: 365 / 4,
+      annual: 365,
     };
 
     // Create a map of subcategory goals scaled to the date range
     const subcategoryGoals: Record<string, number> = {};
     (spendingGoals || []).forEach((goal) => {
       // Scale goal amount to match the date range
-      const goalPeriodDays = periodToDays[goal.period] || 30.44;
+      const goalPeriodDays = periodToDays[goal.period] || 365 / 12;
       const scaledGoal = (goal.amount / goalPeriodDays) * rangeInDays;
       subcategoryGoals[goal.subcategory_id] = scaledGoal;
     });

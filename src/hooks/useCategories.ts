@@ -195,10 +195,7 @@ export function useCategories(): UseCategoriesReturn {
     return result;
   };
 
-  const editSubcategory = async (
-    id: string,
-    updates: { name?: string; category_id?: string }
-  ) => {
+  const editSubcategory = async (id: string, updates: { name?: string; category_id?: string }) => {
     const result = await updateSubcategoryMutation.mutateAsync({ id, updates });
     return result;
   };

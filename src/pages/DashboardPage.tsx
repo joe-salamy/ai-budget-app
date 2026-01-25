@@ -1,5 +1,6 @@
 // DashboardPage - Main dashboard with summaries and visualizations
 import { useDashboard } from "../hooks/useDashboard";
+import { usePrefetchOtherPages } from "../hooks/usePrefetchOtherPages";
 import { AccountSummary } from "../components/features/AccountSummary";
 import { CategorySummary } from "../components/features/CategorySummary";
 import { NetWorthChart } from "../components/features/NetWorthChart";
@@ -83,6 +84,15 @@ function DashboardPage() {
     sankeyData,
     sankeyLoading,
   } = useDashboard();
+
+  // Prefetch other pages' data in the background after dashboard loads
+  const dashboardLoading =
+    accountSummaryLoading ||
+    categorySummaryLoading ||
+    metricsLoading ||
+    netWorthChartLoading ||
+    sankeyLoading;
+  usePrefetchOtherPages(dashboardLoading);
 
   const handleDateRangeChange = (range: { startDate: string; endDate: string }) => {
     setDateRange(range);
@@ -175,7 +185,9 @@ function DashboardPage() {
         {/* Net Change Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base font-medium text-muted-foreground">Net Change</CardTitle>
+            <CardTitle className="text-base font-medium text-muted-foreground">
+              Net Change
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-2">
             {metricsLoading ? (
@@ -199,8 +211,8 @@ function DashboardPage() {
       />
 
       {/* Category Summary */}
-      <CategorySummary 
-        categories={categorySummary} 
+      <CategorySummary
+        categories={categorySummary}
         loading={categorySummaryLoading}
         hasUncategorizedTransactions={hasUncategorizedTransactions}
       />
