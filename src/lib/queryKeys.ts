@@ -18,8 +18,7 @@ export const queryKeys = {
     all: ["transactions"] as const,
     list: (filters?: TransactionFilters) =>
       [...queryKeys.transactions.all, "list", filters] as const,
-    recentActivity: () =>
-      [...queryKeys.transactions.all, "recent-activity"] as const,
+    recentActivity: () => [...queryKeys.transactions.all, "recent-activity"] as const,
   },
   goals: {
     spending: {
@@ -34,38 +33,16 @@ export const queryKeys = {
   dashboard: {
     all: ["dashboard"] as const,
     accountSummary: (startDate: string, endDate: string) =>
-      [
-        ...queryKeys.dashboard.all,
-        "account-summary",
-        startDate,
-        endDate,
-      ] as const,
+      [...queryKeys.dashboard.all, "account-summary", startDate, endDate] as const,
     categorySummary: (startDate: string, endDate: string) =>
-      [
-        ...queryKeys.dashboard.all,
-        "category-summary",
-        startDate,
-        endDate,
-      ] as const,
+      [...queryKeys.dashboard.all, "category-summary", startDate, endDate] as const,
     metrics: (startDate: string, endDate: string) =>
       [...queryKeys.dashboard.all, "metrics", startDate, endDate] as const,
     charts: {
       netWorth: (startDate: string, endDate: string) =>
-        [
-          ...queryKeys.dashboard.all,
-          "charts",
-          "net-worth",
-          startDate,
-          endDate,
-        ] as const,
+        [...queryKeys.dashboard.all, "charts", "net-worth", startDate, endDate] as const,
       sankey: (startDate: string, endDate: string) =>
-        [
-          ...queryKeys.dashboard.all,
-          "charts",
-          "sankey",
-          startDate,
-          endDate,
-        ] as const,
+        [...queryKeys.dashboard.all, "charts", "sankey", startDate, endDate] as const,
     },
   },
 } as const;

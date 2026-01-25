@@ -208,7 +208,7 @@ function TransactionHistoryPage() {
       )}
 
       {/* Filters */}
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Search */}
           <div className="lg:col-span-2">
@@ -259,7 +259,7 @@ function TransactionHistoryPage() {
 
       {/* Bulk Actions Bar */}
       {selectedIds.size > 0 && (
-        <div className="rounded-lg border border-foreground/30 bg-foreground/10 p-4">
+        <div className="rounded-lg border border-foreground/30 bg-foreground/10 p-4 hover:border-foreground/50 hover:shadow-lg">
           <div className="flex items-center justify-between">
             <p className="text-sm text-foreground">
               {selectedIds.size} transaction{selectedIds.size !== 1 ? "s" : ""} selected

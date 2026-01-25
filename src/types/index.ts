@@ -28,6 +28,7 @@ export interface Category {
   type: CategoryType;
   is_system: boolean;
   created_at: string;
+  updated_at: string;
   deleted_at: string | null;
 }
 
@@ -38,6 +39,7 @@ export interface Subcategory {
   name: string;
   is_system: boolean;
   created_at: string;
+  updated_at: string;
   deleted_at: string | null;
 }
 
@@ -72,6 +74,7 @@ export interface SpendingGoal {
   end_date: string | null;
   created_at: string;
   updated_at: string;
+  deleted_at: string | null;
 }
 
 export interface SavingGoal {
@@ -84,6 +87,7 @@ export interface SavingGoal {
   account_id: string | null;
   created_at: string;
   updated_at: string;
+  deleted_at: string | null;
   completed_at: string | null;
 }
 

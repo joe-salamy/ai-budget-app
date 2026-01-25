@@ -167,7 +167,7 @@ export function TransactionTable({
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
         <div className="animate-pulse">
           <div className="h-12 bg-muted/50"></div>
           {[1, 2, 3, 4, 5].map((i) => (
@@ -180,7 +180,7 @@ export function TransactionTable({
 
   if (transactions.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card p-8 text-center">
+      <div className="rounded-lg border border-border bg-card p-8 text-center hover:border-foreground/30 hover:shadow-lg">
         <p className="text-muted-foreground">No transactions found</p>
         <p className="text-sm text-muted-foreground mt-2">
           Try adjusting your filters or add some transactions
@@ -193,7 +193,7 @@ export function TransactionTable({
   const someSelected = selectedIds.size > 0 && selectedIds.size < sortedTransactions.length;
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
+    <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-card/50">

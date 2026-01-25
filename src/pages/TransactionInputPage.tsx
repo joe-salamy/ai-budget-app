@@ -142,7 +142,7 @@ function TransactionInputPage() {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
         {/* Transaction Table - Takes up 3/4 on large screens */}
         <div className="xl:col-span-3">
-          <div className="rounded-lg border border-border bg-card">
+          <div className="rounded-lg border border-border bg-card hover:border-foreground/30 hover:shadow-lg">
             {/* Tab Navigation */}
             <div className="border-b border-border">
               <div className="flex gap-1 p-1">
@@ -223,7 +223,7 @@ function TransactionInputPage() {
           </div>
 
           {/* Quick Tips */}
-          <div className="mt-4 p-4 rounded-lg border border-border bg-card/50">
+          <div className="mt-4 p-4 rounded-lg border border-border bg-card/50 hover:border-foreground/30 hover:shadow-lg">
             <h3 className="text-sm font-medium text-muted-foreground mb-2">Tips</h3>
             <ul className="text-sm text-muted-foreground space-y-1">
               {activeTab === "import" ? (

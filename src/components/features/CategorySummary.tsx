@@ -20,7 +20,7 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-function getDifferenceColor(difference: number | null, categoryType: string): string {
+function getDifferenceColor(difference: number | null): string {
   if (difference === null) return "text-muted-foreground";
 
   // For expenses: positive difference = under budget (good), negative = over budget (bad)
@@ -65,7 +65,7 @@ export function CategorySummary({
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
         <div className="px-4 py-3 bg-card/50 border-b border-border">
           <h3 className="text-lg font-semibold text-white">Category Summary</h3>
         </div>
@@ -81,7 +81,7 @@ export function CategorySummary({
 
   if (categories.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
         <div className="px-4 py-3 bg-card/50 border-b border-border">
           <h3 className="text-lg font-semibold text-white">Category Summary</h3>
         </div>
@@ -105,7 +105,7 @@ export function CategorySummary({
   const netIncome = totalIncome - totalExpenses;
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
+    <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
       <div className="px-4 py-3 bg-card/50 border-b border-border">
         <h3 className="text-lg font-semibold text-white">Category Summary</h3>
       </div>
@@ -281,8 +281,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
         </td>
         <td
           className={`px-4 py-3 text-sm text-right ${getDifferenceColor(
-            category.difference,
-            category.category_type
+            category.difference
           )}`}
           style={{ width: "19%" }}
         >
@@ -357,8 +356,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
                         </td>
                         <td
                           className={`px-4 py-2 text-sm text-right ${getDifferenceColor(
-                            subcategory.difference,
-                            category.category_type
+                            subcategory.difference
                           )}`}
                           style={{ width: "19%" }}
                         >

@@ -6,7 +6,6 @@ import { format, subDays } from "date-fns";
 import {
   getAccountSummary,
   getCategorySummary,
-  calculateNetWorth,
   getDashboardMetrics,
 } from "../services/dashboard";
 import { prepareNetWorthData, prepareSankeyData } from "../services/charts";

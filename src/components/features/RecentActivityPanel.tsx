@@ -25,7 +25,7 @@ function formatCurrency(amount: number): string {
 export function RecentActivityPanel({ recentActivity, loading, error }: RecentActivityPanelProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
         <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -41,7 +41,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
 
   if (error) {
     return (
-      <div className="rounded-lg border border-foreground/20 bg-foreground/10 p-4">
+      <div className="rounded-lg border border-foreground/20 bg-foreground/10 p-4 hover:border-foreground/30 hover:shadow-lg">
         <h2 className="text-lg font-semibold text-foreground mb-2">Recent Activity</h2>
         <p className="text-foreground text-sm">{error}</p>
       </div>
@@ -50,7 +50,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
 
   if (recentActivity.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card p-4">
+      <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
         <h2 className="text-lg font-semibold text-foreground mb-2">Recent Activity</h2>
         <p className="text-muted-foreground text-sm">
           No accounts yet. Create an account in Settings to get started.
@@ -60,7 +60,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
   }
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
+    <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
       <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
       <div className="space-y-4">
         {recentActivity.map((activity) => (

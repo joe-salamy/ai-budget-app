@@ -6,7 +6,7 @@ import {
   SelectValue,
   SelectGroup,
   SelectLabel,
-} from "./select";
+} from "./Select";
 
 export interface SelectOption {
   value: string;

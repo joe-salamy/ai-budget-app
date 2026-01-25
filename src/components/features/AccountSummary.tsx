@@ -43,7 +43,7 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
 
   if (loading) {
     return (
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
         <div className="px-4 py-3 bg-card/50 border-b border-border">
           <h3 className="text-lg font-semibold text-white">Account Summary</h3>
         </div>
@@ -59,7 +59,7 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
 
   if (accounts.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
         <div className="px-4 py-3 bg-card/50 border-b border-border">
           <h3 className="text-lg font-semibold text-white">Account Summary</h3>
         </div>
@@ -78,7 +78,7 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
   const liabilityAccounts = accounts.filter((a) => a.account_type === "liability");
 
   return (
-    <div className="rounded-lg border border-border bg-card overflow-hidden">
+    <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
       <div className="px-4 py-3 bg-card/50 border-b border-border">
         <h3 className="text-lg font-semibold text-white">Account Summary</h3>
       </div>

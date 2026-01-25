@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../ui/Select";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
 import { categorizeBatchTransactions, getAICorrection } from "../../services/ai";
 import type { Account, Category, Subcategory } from "../../types";

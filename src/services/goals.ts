@@ -201,6 +201,7 @@ export async function getSpendingGoalsWithDetails(): Promise<SpendingGoalsWithDe
       `
       )
       .eq("user_id", user.id)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -224,6 +225,7 @@ export async function getSpendingGoalsWithDetails(): Promise<SpendingGoalsWithDe
         end_date: goal.end_date,
         created_at: goal.created_at,
         updated_at: goal.updated_at,
+        deleted_at: goal.deleted_at,
         subcategory_name: subcategory.name,
         category_name: subcategory.categories.name,
         category_type: subcategory.categories.type,
@@ -310,7 +312,7 @@ export async function updateSpendingGoal(
 }
 
 /**
- * Delete a spending goal
+ * Delete a spending goal (soft delete)
  */
 export async function deleteSpendingGoal(
   id: string
@@ -326,7 +328,7 @@ export async function deleteSpendingGoal(
 
     const { error } = await supabase
       .from("spending_goals")
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq("id", id)
       .eq("user_id", user.id);
 
@@ -563,6 +565,7 @@ export async function getSavingGoalsWithDetails(): Promise<SavingGoalsWithDetail
       `
       )
       .eq("user_id", user.id)
+      .is("deleted_at", null)
       .order("completed_at", { ascending: true, nullsFirst: true })
       .order("created_at", { ascending: false });
 
@@ -583,6 +586,7 @@ export async function getSavingGoalsWithDetails(): Promise<SavingGoalsWithDetail
         account_id: goal.account_id,
         created_at: goal.created_at,
         updated_at: goal.updated_at,
+        deleted_at: goal.deleted_at,
         completed_at: goal.completed_at,
         account_name: account?.name || null,
       };
@@ -668,7 +672,7 @@ export async function updateSavingGoal(
 }
 
 /**
- * Delete a saving goal
+ * Delete a saving goal (soft delete)
  */
 export async function deleteSavingGoal(id: string): Promise<{ success: boolean; error?: string }> {
   try {
@@ -682,7 +686,7 @@ export async function deleteSavingGoal(id: string): Promise<{ success: boolean; 
 
     const { error } = await supabase
       .from("saving_goals")
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq("id", id)
       .eq("user_id", user.id);
 

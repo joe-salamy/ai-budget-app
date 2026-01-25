@@ -8,19 +8,32 @@ import { CategoryForm } from "../components/features/CategoryForm";
 import { SubcategoryForm } from "../components/features/SubcategoryForm";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/Card";
-import { Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../components/ui/dialog";
+import { Trash2, Pencil } from "lucide-react";
+import type { Category, Subcategory } from "../types";
 
 function SetupPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
+  const [editName, setEditName] = useState("");
   const { accounts, loading: accountsLoading, addAccount, removeAccount } = useAccounts();
   const {
     categories,
     subcategories,
     loading: categoriesLoading,
     addCategory,
+    editCategory,
     removeCategory,
     addSubcategory,
+    editSubcategory,
     removeSubcategory,
     getSubcategoriesByCategory,
   } = useCategories();
@@ -75,6 +88,40 @@ function SetupPage() {
     ) {
       await removeSubcategory(id);
     }
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setEditName(category.name);
+  };
+
+  const handleEditSubcategory = (subcategory: Subcategory) => {
+    setEditingSubcategory(subcategory);
+    setEditName(subcategory.name);
+  };
+
+  const handleSaveCategory = async () => {
+    if (!editingCategory || !editName.trim()) return;
+    const result = await editCategory(editingCategory.id, { name: editName.trim() });
+    if (result.success) {
+      setEditingCategory(null);
+      setEditName("");
+    }
+  };
+
+  const handleSaveSubcategory = async () => {
+    if (!editingSubcategory || !editName.trim()) return;
+    const result = await editSubcategory(editingSubcategory.id, { name: editName.trim() });
+    if (result.success) {
+      setEditingSubcategory(null);
+      setEditName("");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCategory(null);
+    setEditingSubcategory(null);
+    setEditName("");
   };
 
   // Filter out system categories/subcategories for display
@@ -244,14 +291,24 @@ function SetupPage() {
                           {category.type === "income" ? "Income" : "Expense"}
                         </p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteCategory(category.id, category.name)}
-                        className="text-foreground hover:text-foreground hover:bg-foreground/20"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditCategory(category)}
+                          className="text-foreground hover:text-foreground hover:bg-foreground/20"
+                        >
+                          <Pencil size={16} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCategory(category.id, category.name)}
+                          className="text-foreground hover:text-foreground hover:bg-foreground/20"
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -328,14 +385,24 @@ function SetupPage() {
                             Category: {category?.name || "Unknown"}
                           </p>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
-                          className="text-foreground hover:text-foreground hover:bg-foreground/20"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditSubcategory(subcategory)}
+                            className="text-foreground hover:text-foreground hover:bg-foreground/20"
+                          >
+                            <Pencil size={16} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
+                            className="text-foreground hover:text-foreground hover:bg-foreground/20"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
                       </div>
                     );
                   })}
@@ -359,6 +426,70 @@ function SetupPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Edit Category Dialog */}
+      <Dialog open={!!editingCategory} onOpenChange={() => handleCancelEdit()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="categoryName" className="block text-sm font-medium text-gray-200 mb-2">
+                Category Name
+              </label>
+              <input
+                id="categoryName"
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-border rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-foreground"
+                placeholder="Enter category name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelEdit}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSaveCategory} disabled={!editName.trim()}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Subcategory Dialog */}
+      <Dialog open={!!editingSubcategory} onOpenChange={() => handleCancelEdit()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Subcategory</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="subcategoryName" className="block text-sm font-medium text-gray-200 mb-2">
+                Subcategory Name
+              </label>
+              <input
+                id="subcategoryName"
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-border rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-foreground"
+                placeholder="Enter subcategory name"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelEdit}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSaveSubcategory} disabled={!editName.trim()}>
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
