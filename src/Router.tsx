@@ -9,7 +9,6 @@ import DashboardPage from "./pages/DashboardPage";
 import SetupPage from "./pages/SetupPage";
 import TransactionInputPage from "./pages/TransactionInputPage";
 import TransactionHistoryPage from "./pages/TransactionHistoryPage";
-import GoalsPage from "./pages/GoalsPage";
 import SettingsPage from "./pages/SettingsPage";
 import AppLayout from "./components/AppLayout";
 
@@ -103,7 +102,6 @@ function Router() {
           <Route path="/setup" element={<SetupPage />} />
           <Route path="/transactions/input" element={<TransactionInputPage />} />
           <Route path="/transactions/history" element={<TransactionHistoryPage />} />
-          <Route path="/goals" element={<GoalsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
 

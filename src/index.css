@@ -107,4 +107,15 @@
   body[data-scroll-locked] {
     margin-right: calc(100vw - 100%);
   }
+
+  /* Remove spinner arrows from number inputs */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }

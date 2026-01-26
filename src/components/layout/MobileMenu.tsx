@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import { LayoutDashboard, Settings, DollarSign, History, Target, Wrench, X } from "lucide-react";
+import { LayoutDashboard, Settings, DollarSign, History, Wrench, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +25,6 @@ const navItems: NavItem[] = [
   { path: "/setup", label: "Setup", icon: Wrench },
   { path: "/transactions/input", label: "Add Transactions", icon: DollarSign },
   { path: "/transactions/history", label: "History", icon: History },
-  { path: "/goals", label: "Goals", icon: Target },
   { path: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -57,7 +56,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   // Focus trap - focus first link when menu opens
   useEffect(() => {
     if (isOpen) {
-      const firstLink = document.querySelector<HTMLAnchorElement>('[data-mobile-menu-link]');
+      const firstLink = document.querySelector<HTMLAnchorElement>("[data-mobile-menu-link]");
       firstLink?.focus();
     }
   }, [isOpen]);
@@ -94,9 +93,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border p-4">
-              <h2 className="text-xl font-bold text-foreground">
-                AI Budget App
-              </h2>
+              <h2 className="text-xl font-bold text-foreground">AI Budget App</h2>
               <button
                 onClick={onClose}
                 className="rounded-md p-2 text-foreground/70 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

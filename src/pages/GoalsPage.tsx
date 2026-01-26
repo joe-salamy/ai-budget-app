@@ -1,4 +1,17 @@
-// GoalsPage - Manage spending and saving goals
+/*
+ * ============================================================================
+ * SHELVED: Savings Goals Feature
+ * ============================================================================
+ * This file contains the Savings Goals functionality that has been temporarily
+ * shelved. We plan to return to this feature later.
+ *
+ * Spending Goals have been moved to the Setup page (Step 4).
+ *
+ * DO NOT DELETE - Code preserved for future implementation.
+ * ============================================================================
+ */
+
+// GoalsPage - SHELVED: Savings Goals code preserved below
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -469,6 +482,7 @@ function AddAmountModal({ goal, onSubmit, onClose }: AddAmountModalProps) {
 
 // ============== MAIN COMPONENT ==============
 
+// @ts-ignore - Function preserved for future use
 function GoalsPage() {
   const {
     spendingGoals,
@@ -719,4 +733,5 @@ function GoalsPage() {
   );
 }
 
-export default GoalsPage;
+// SHELVED: Commenting out export since this page is no longer in use
+// export default GoalsPage;

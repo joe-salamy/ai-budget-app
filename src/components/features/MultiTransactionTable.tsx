@@ -529,17 +529,22 @@ export function MultiTransactionTable({
 
                   {/* Amount */}
                   <td className="px-2 py-1">
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={row.amount}
-                      onChange={(e) => handleRowChange(row.id, "amount", e.target.value)}
-                      placeholder="0.00"
-                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
-                        rowErrors.amount ? "border-foreground" : "border-border"
-                      }`}
-                    />
+                    <div className="relative">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-foreground pointer-events-none">
+                        $
+                      </span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={row.amount}
+                        onChange={(e) => handleRowChange(row.id, "amount", e.target.value)}
+                        placeholder="0.00"
+                        className={`w-full pl-6 pr-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
+                          rowErrors.amount ? "border-foreground" : "border-border"
+                        }`}
+                      />
+                    </div>
                   </td>
 
                   {/* Subcategory (not for transfers) */}

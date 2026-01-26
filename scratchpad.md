@@ -3,9 +3,9 @@
 - Read full repo
 - Test all functionality
 - Go through each page, test for UI; afterwards, do full CC sweep to ensure consistency
-
-The issue was that your project uses react-day-picker v9, which changed the classNames API from
-v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class names:
+- Have Claude create summary of tech stack so I can use again, just want to get used to something
+- Have it make plan to check every package, ensure using correct versioning. Don’t make any substantive changes, only correct package versions, if used incorrectly. If catch error, add comment explicitly stating what version to use.
+  - "The issue was that your project uses react-day-picker v9, which changed the classNames API from v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class names:"
 
 ### General
 
@@ -18,6 +18,7 @@ v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class nam
   - Shortcut to get to each page
   - For every user action, make keyboard shortcut
 - **Build errors**: In @ components
+- Date selectors: modernize
 
 ### Navbar
 
@@ -33,6 +34,7 @@ v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class nam
   - I want the first thing users to do when they sign up is to copy/paste their transaction history into AI chatbot
   - How to ensure it gets them all right, first try, without any user data?
   - Maybe collect data on all user first-tries, see what they change up
+- Account name, button, remove "Dashboard" button,
 
 ### Dashboard
 
@@ -57,7 +59,6 @@ v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class nam
     - Flags that can edit anything anytime
     - What are best practices for setup wizards?
     - Remove accounts/categories from settings, only on the later setup page
-- **Inputs**: put max width, tables too wide
 
 ### Add Transactions
 
@@ -70,6 +71,7 @@ v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class nam
   - Auto expands when you reach bottom, and to get full paste
 - **Import statement**: Remove entirely, want that to be only through the AI
 - **Amount input**: Don't like the tab up/down, just input amounts
+- Make the edit sign match the ones used elsewhere in repo
 
 ### History
 

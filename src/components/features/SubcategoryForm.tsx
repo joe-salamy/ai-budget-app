@@ -90,7 +90,7 @@ export function SubcategoryForm({
   // Create category options
   const categoryOptions: SelectOption[] = categories.map((cat) => ({
     value: cat.id,
-    label: `${cat.name} (${cat.type})`,
+    label: cat.name,
     disabled: cat.is_system, // Can't add subcategories to system categories
   }));
 
@@ -102,7 +102,6 @@ export function SubcategoryForm({
         value={categoryId}
         onChange={(value) => setCategoryId(value)}
         placeholder="Select a category"
-        required
         disabled={isSystemSubcategory}
         helperText={
           isSystemSubcategory

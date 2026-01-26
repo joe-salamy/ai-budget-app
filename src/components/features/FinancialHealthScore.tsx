@@ -71,7 +71,6 @@ function CircularProgress({ score, size = 160 }: { score: number; size?: number 
           strokeDasharray={circumference}
           strokeDashoffset={circumference - progress}
           strokeLinecap="round"
-          className="transition-all duration-1000 ease-out"
         />
       </svg>
       {/* Score text in center */}
@@ -112,7 +111,7 @@ function ScoreFactor({ label, score, maxScore, details, icon }: ScoreFactorProps
       </div>
       <div className="w-full bg-muted rounded-full h-2">
         <div
-          className="h-2 rounded-full transition-all duration-500"
+          className="h-2 rounded-full"
           style={{
             width: `${percentage}%`,
             backgroundColor: barColor,

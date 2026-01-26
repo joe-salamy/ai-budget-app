@@ -3,17 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
-  Settings,
   DollarSign,
   History,
-  Target,
   Wrench,
   Bot,
   Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatPanel } from "@/hooks/useChatPanel";
-import { SearchBar } from "./SearchBar";
 import { UserProfileMenu } from "./UserProfileMenu";
 import { MobileMenu } from "./MobileMenu";
 
@@ -32,8 +29,6 @@ const navItems: NavItem[] = [
   { path: "/setup", label: "Setup", icon: Wrench },
   { path: "/transactions/input", label: "Add Transactions", icon: DollarSign },
   { path: "/transactions/history", label: "History", icon: History },
-  { path: "/goals", label: "Goals", icon: Target },
-  { path: "/settings", label: "Settings", icon: Settings },
 ];
 
 // ============== COMPONENT ==============
@@ -56,7 +51,7 @@ export function Navbar() {
             to="/dashboard"
             className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="whitespace-nowrap text-2xl font-bold text-foreground">
               AI Budget App
             </h1>
           </Link>
@@ -73,7 +68,7 @@ export function Navbar() {
                   to={item.path}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border",
+                    "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border whitespace-nowrap",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     active
                       ? "bg-foreground text-background border-foreground"
@@ -87,18 +82,13 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Right Side: Search, AI Assistant, User Profile */}
+          {/* Right Side: AI Assistant, User Profile */}
           <div className="flex items-center gap-3">
-            {/* Search Bar (Desktop Only) */}
-            <div className="hidden md:block">
-              <SearchBar />
-            </div>
-
             {/* AI Assistant Button */}
             <button
               onClick={togglePanel}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border",
+                "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border whitespace-nowrap",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 chatPanelOpen
                   ? "bg-foreground text-background border-foreground"

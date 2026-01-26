@@ -107,7 +107,7 @@ export function ChatSessionList({
         <MessageSquare className="w-4 h-4 flex-shrink-0" />
         <span className="truncate">{currentSession?.title || "New Chat"}</span>
         <ChevronDown
-          className={`w-4 h-4 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`w-4 h-4 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 

@@ -7,7 +7,7 @@ import { NetWorthChart } from "../components/features/NetWorthChart";
 import { SankeyDiagram } from "../components/features/SankeyDiagram";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { DateRangePicker } from "../components/ui/DateRangePicker";
-import { format, subDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
+import { format, subDays, startOfMonth, endOfMonth } from "date-fns";
 
 // ============== HELPERS ==============
 
@@ -183,9 +183,7 @@ function DashboardPage() {
         {/* Net Change Card */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium text-muted-foreground">
-              Net Change
-            </CardTitle>
+            <CardTitle className="text-lg font-medium text-muted-foreground">Net Change</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             {metricsLoading ? (

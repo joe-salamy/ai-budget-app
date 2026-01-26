@@ -31,9 +31,7 @@ export function AccountForm({
   onCancel,
 }: AccountFormProps) {
   const [name, setName] = useState(initialData?.name || "");
-  const [type, setType] = useState<AccountType>(
-    initialData?.type || "asset"
-  );
+  const [type, setType] = useState<AccountType>(initialData?.type || "asset");
   const [initialBalance, setInitialBalance] = useState<string>(
     initialData?.initial_balance.toString() || "0"
   );
