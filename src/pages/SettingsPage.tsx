@@ -5,49 +5,23 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/Card";
 import { useAuth } from "@/hooks/useAuth";
-import { useAccounts } from "@/hooks/useAccounts";
-import { useCategories } from "@/hooks/useCategories";
-import { AccountForm } from "@/components/features/AccountForm";
-import { CategoryForm } from "@/components/features/CategoryForm";
-import { SubcategoryForm } from "@/components/features/SubcategoryForm";
 import {
   User,
   Lock,
   LogOut,
   AlertTriangle,
-  Trash2,
   Info,
-  Pencil,
   Bot,
   Briefcase,
   Smile,
   Shield,
 } from "lucide-react";
-import type { Account, Category, Subcategory, AIPersonality } from "@/types";
+import type { AIPersonality } from "@/types";
 import * as chatService from "@/services/chat";
 
 function SettingsPage() {
   const navigate = useNavigate();
   const { user, signOut, updatePassword, error, clearError } = useAuth();
-  const {
-    accounts,
-    loading: accountsLoading,
-    addAccount,
-    editAccount,
-    removeAccount,
-  } = useAccounts();
-  const {
-    categories,
-    subcategories,
-    loading: categoriesLoading,
-    addCategory,
-    editCategory,
-    removeCategory,
-    addSubcategory,
-    editSubcategory,
-    removeSubcategory,
-    getSubcategoriesByCategory,
-  } = useCategories();
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -58,15 +32,6 @@ function SettingsPage() {
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [passwordUpdated, setPasswordUpdated] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  const [showAddAccount, setShowAddAccount] = useState(false);
-  const [showAddCategory, setShowAddCategory] = useState(false);
-  const [showAddSubcategory, setShowAddSubcategory] = useState(false);
-
-  // State for editing items
-  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
 
   // AI Personality state
   const [aiPersonality, setAIPersonality] = useState<AIPersonality>("friendly");
@@ -156,69 +121,11 @@ function SettingsPage() {
     setShowDeleteConfirm(false);
   };
 
-  const handleDeleteAccountItem = async (id: string, name: string) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the account "${name}"? This action cannot be undone.`
-      )
-    ) {
-      await removeAccount(id);
-    }
-  };
-
-  const handleDeleteCategory = async (id: string, name: string) => {
-    const subsForCategory = getSubcategoriesByCategory(id);
-    if (subsForCategory.length > 0) {
-      alert(
-        `Cannot delete category "${name}". It has ${subsForCategory.length} subcategories. Delete subcategories first.`
-      );
-      return;
-    }
-
-    if (
-      window.confirm(
-        `Are you sure you want to delete the category "${name}"? This action cannot be undone.`
-      )
-    ) {
-      await removeCategory(id);
-    }
-  };
-
-  const handleDeleteSubcategory = async (id: string, name: string) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the subcategory "${name}"? This action cannot be undone.`
-      )
-    ) {
-      await removeSubcategory(id);
-    }
-  };
-
-  // Edit handlers
-  const handleEditAccount = (account: Account) => {
-    setEditingAccount(account);
-    setShowAddAccount(false); // Close add form if open
-  };
-
-  const handleEditCategory = (category: Category) => {
-    setEditingCategory(category);
-    setShowAddCategory(false); // Close add form if open
-  };
-
-  const handleEditSubcategory = (subcategory: Subcategory) => {
-    setEditingSubcategory(subcategory);
-    setShowAddSubcategory(false); // Close add form if open
-  };
-
-  const userCategories = categories.filter((cat) => !cat.is_system);
-  const userSubcategories = subcategories.filter((sub) => !sub.is_system);
-
   return (
-    <div className="space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-        <p className="text-muted-foreground mt-2">Manage your account preferences</p>
       </div>
 
       {/* User Profile Card */}
@@ -238,12 +145,6 @@ function SettingsPage() {
           <div>
             <label className="text-sm font-medium text-muted-foreground">Email</label>
             <p className="text-foreground mt-1">{user?.email || "Not available"}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">User ID</label>
-            <p className="text-muted-foreground text-sm mt-1 font-mono">
-              {user?.id || "Not available"}
-            </p>
           </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">Account Created</label>
@@ -329,342 +230,6 @@ function SettingsPage() {
               Update Password
             </Button>
           </form>
-        </CardContent>
-      </Card>
-
-      {/* Accounts Management */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Accounts</CardTitle>
-              <CardDescription>Manage your financial accounts</CardDescription>
-            </div>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setShowAddAccount(!showAddAccount);
-                setEditingAccount(null); // Close edit form if open
-              }}
-            >
-              {showAddAccount ? "Cancel" : "Add Account"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {showAddAccount && (
-            <div className="p-4 bg-muted rounded-lg border border-border">
-              <AccountForm
-                onSubmit={async (data) => {
-                  const result = await addAccount(data.name, data.type, data.initialBalance);
-                  if (result.success) {
-                    setShowAddAccount(false);
-                  }
-                  return result;
-                }}
-                submitLabel="Add Account"
-                showCancel
-                onCancel={() => setShowAddAccount(false)}
-              />
-            </div>
-          )}
-
-          {editingAccount && (
-            <div className="p-4 bg-muted rounded-lg border border-foreground">
-              <h4 className="text-sm font-medium text-foreground mb-3">Edit Account</h4>
-              <AccountForm
-                initialData={editingAccount}
-                onSubmit={async (data) => {
-                  const result = await editAccount(editingAccount.id, {
-                    name: data.name,
-                    type: data.type,
-                    initial_balance: data.initialBalance,
-                  });
-                  if (result.success) {
-                    setEditingAccount(null);
-                  }
-                  return result;
-                }}
-                submitLabel="Save Changes"
-                showCancel
-                onCancel={() => setEditingAccount(null)}
-              />
-            </div>
-          )}
-
-          {accountsLoading ? (
-            <p className="text-muted-foreground">Loading accounts...</p>
-          ) : accounts.length > 0 ? (
-            <div className="space-y-2">
-              {accounts.map((account) => (
-                <div
-                  key={account.id}
-                  className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
-                >
-                  <div>
-                    <p className="font-medium text-foreground">{account.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {account.type === "asset" ? "Asset" : "Liability"} • Initial Balance: $
-                      {account.initial_balance.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEditAccount(account)}
-                      className="text-foreground hover:text-foreground hover:bg-muted"
-                    >
-                      <Pencil size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteAccountItem(account.id, account.name)}
-                      className="text-foreground hover:text-foreground hover:bg-muted"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-4">No accounts yet.</p>
-          )}
-
-          <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg">
-            <Info size={16} className="text-muted-foreground mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-muted-foreground">
-              Renaming accounts will automatically update all related transactions via foreign key
-              relationships.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Categories Management */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Categories</CardTitle>
-              <CardDescription>Organize your income and expenses</CardDescription>
-            </div>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setShowAddCategory(!showAddCategory);
-                setEditingCategory(null); // Close edit form if open
-              }}
-            >
-              {showAddCategory ? "Cancel" : "Add Category"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {showAddCategory && (
-            <div className="p-4 bg-muted rounded-lg border border-border">
-              <CategoryForm
-                onSubmit={async (data) => {
-                  const result = await addCategory(data.name, data.type);
-                  if (result.success) {
-                    setShowAddCategory(false);
-                  }
-                  return result;
-                }}
-                submitLabel="Add Category"
-                showCancel
-                onCancel={() => setShowAddCategory(false)}
-              />
-            </div>
-          )}
-
-          {editingCategory && (
-            <div className="p-4 bg-card rounded-lg border border-foreground">
-              <h4 className="text-sm font-medium text-foreground mb-3">Edit Category</h4>
-              <CategoryForm
-                initialData={editingCategory}
-                onSubmit={async (data) => {
-                  const result = await editCategory(editingCategory.id, {
-                    name: data.name,
-                  });
-                  if (result.success) {
-                    setEditingCategory(null);
-                  }
-                  return result;
-                }}
-                submitLabel="Save Changes"
-                showCancel
-                onCancel={() => setEditingCategory(null)}
-                disableTypeChange
-              />
-            </div>
-          )}
-
-          {categoriesLoading ? (
-            <p className="text-muted-foreground">Loading categories...</p>
-          ) : userCategories.length > 0 ? (
-            <div className="space-y-2">
-              {userCategories.map((category) => (
-                <div
-                  key={category.id}
-                  className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
-                >
-                  <div>
-                    <p className="font-medium text-foreground">{category.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {category.type === "income" ? "Income" : "Expense"}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEditCategory(category)}
-                      className="text-foreground hover:text-foreground hover:bg-muted"
-                    >
-                      <Pencil size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteCategory(category.id, category.name)}
-                      className="text-foreground hover:text-foreground hover:bg-muted"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-4">No categories yet.</p>
-          )}
-
-          <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg">
-            <Info size={16} className="text-foreground mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-foreground">
-              Cannot delete categories with subcategories. Delete subcategories first.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Subcategories Management */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Subcategories</CardTitle>
-              <CardDescription>Further organize your transactions</CardDescription>
-            </div>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setShowAddSubcategory(!showAddSubcategory);
-                setEditingSubcategory(null); // Close edit form if open
-              }}
-              disabled={categories.length === 0}
-            >
-              {showAddSubcategory ? "Cancel" : "Add Subcategory"}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {showAddSubcategory && (
-            <div className="p-4 bg-muted rounded-lg border border-border">
-              <SubcategoryForm
-                categories={categories}
-                onSubmit={async (data) => {
-                  const result = await addSubcategory(data.name, data.categoryId);
-                  if (result.success) {
-                    setShowAddSubcategory(false);
-                  }
-                  return result;
-                }}
-                submitLabel="Add Subcategory"
-                showCancel
-                onCancel={() => setShowAddSubcategory(false)}
-              />
-            </div>
-          )}
-
-          {editingSubcategory && (
-            <div className="p-4 bg-card rounded-lg border border-foreground">
-              <h4 className="text-sm font-medium text-foreground mb-3">Edit Subcategory</h4>
-              <SubcategoryForm
-                categories={categories}
-                initialData={editingSubcategory}
-                onSubmit={async (data) => {
-                  const result = await editSubcategory(editingSubcategory.id, {
-                    name: data.name,
-                    category_id: data.categoryId,
-                  });
-                  if (result.success) {
-                    setEditingSubcategory(null);
-                  }
-                  return result;
-                }}
-                submitLabel="Save Changes"
-                showCancel
-                onCancel={() => setEditingSubcategory(null)}
-              />
-            </div>
-          )}
-
-          {categoriesLoading ? (
-            <p className="text-muted-foreground">Loading subcategories...</p>
-          ) : userSubcategories.length > 0 ? (
-            <div className="space-y-2">
-              {userSubcategories.map((subcategory) => {
-                const category = categories.find((cat) => cat.id === subcategory.category_id);
-                return (
-                  <div
-                    key={subcategory.id}
-                    className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border"
-                  >
-                    <div>
-                      <p className="font-medium text-foreground">{subcategory.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Category: {category?.name || "Unknown"}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditSubcategory(subcategory)}
-                        className="text-foreground hover:text-foreground hover:bg-muted"
-                      >
-                        <Pencil size={16} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteSubcategory(subcategory.id, subcategory.name)}
-                        className="text-foreground hover:text-foreground hover:bg-muted"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-4">No subcategories yet.</p>
-          )}
-
-          <div className="flex items-start gap-2 p-3 bg-muted border border-border rounded-lg">
-            <Info size={16} className="text-foreground mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-foreground">
-              Names must be unique across all accounts, categories, and subcategories.
-            </p>
-          </div>
         </CardContent>
       </Card>
 
@@ -833,10 +398,9 @@ function SettingsPage() {
       </Card>
 
       {/* Sign Out & Delete Account */}
-      <Card className="border-2 border-foreground/50">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-foreground">Danger Zone</CardTitle>
-          <CardDescription>Irreversible actions</CardDescription>
+          <CardTitle className="text-foreground">Account Actions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between p-4 rounded-lg bg-card/50 border border-border">
@@ -852,7 +416,7 @@ function SettingsPage() {
             </Button>
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-lg bg-foreground/10 border border-foreground/50">
+          <div className="flex items-center justify-between p-4 rounded-lg bg-card/50 border border-border">
             <div>
               <h3 className="font-medium text-foreground">Delete Account</h3>
               <p className="text-sm text-muted-foreground">

@@ -10,7 +10,6 @@
 ### General
 
 - **AI**: Test AI chatbox
-- **Highlighting**: Check that everything highlights
 - **Color**: Maybe add some color back, but make it very intentional
 - **Privacy**: Best method for encryption / privacy for budget app? Want friends to feel more secure that I can’t just see all their transactions. Encrypted db?
 - **Keyboard shortcuts**
@@ -18,11 +17,12 @@
   - Shortcut to get to each page
   - For every user action, make keyboard shortcut
 - **Build errors**: In @ components
+- Date range: can input dates, just as numbers
 - Date selectors: modernize
+- Make ALL inputs and mini-cards highlightable, like Setup --> Accounts, the account name inputs, each account down below.
 
 ### Navbar
 
-- **Text**: Don't like how text spills to 2 lines - change font size, or just icon, or something
 - **Search bar**: Change search bar to be the AI assistant, want it clickable + very visible from navbar
   - Make it take up more space on navbar
   - Give it suggested message placeholders that rotate every few seconds
@@ -34,7 +34,10 @@
   - I want the first thing users to do when they sign up is to copy/paste their transaction history into AI chatbot
   - How to ensure it gets them all right, first try, without any user data?
   - Maybe collect data on all user first-tries, see what they change up
-- Account name, button, remove "Dashboard" button,
+- Account name, button, remove "Dashboard" button
+- In settings, make selectable what fun icon you want your account to be
+
+### Settings
 
 ### Dashboard
 
