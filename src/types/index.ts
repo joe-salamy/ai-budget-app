@@ -37,6 +37,7 @@ export interface Subcategory {
   user_id: string;
   category_id: string;
   name: string;
+  monthly_goal: number | null;
   is_system: boolean;
   created_at: string;
   updated_at: string;

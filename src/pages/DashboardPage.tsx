@@ -217,7 +217,7 @@ function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Net Worth Over Time</CardTitle>
+            <CardTitle className="text-lg">Account Values Over Time</CardTitle>
           </CardHeader>
           <CardContent>
             <NetWorthChart
@@ -230,7 +230,7 @@ function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Cash Flow (Sankey Diagram)</CardTitle>
+            <CardTitle className="text-lg">Cash Flow</CardTitle>
           </CardHeader>
           <CardContent>
             <SankeyDiagram data={sankeyData || { nodes: [], links: [] }} loading={sankeyLoading} />

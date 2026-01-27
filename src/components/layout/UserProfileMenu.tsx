@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,20 +41,12 @@ export function UserProfileMenu() {
         <DropdownMenuLabel className="text-foreground">{user?.email}</DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
-          onClick={() => navigate("/dashboard")}
-          className="gap-2 cursor-pointer text-foreground/80 focus:bg-muted focus:text-foreground"
-        >
-          <LayoutDashboard className="h-4 w-4" />
-          Dashboard
-        </DropdownMenuItem>
-        <DropdownMenuItem
           onClick={() => navigate("/settings")}
           className="gap-2 cursor-pointer text-foreground/80 focus:bg-muted focus:text-foreground"
         >
           <Settings className="h-4 w-4" />
           Settings
         </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem
           onClick={handleSignOut}
           className="gap-2 cursor-pointer text-foreground focus:bg-muted focus:text-foreground"

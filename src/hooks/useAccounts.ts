@@ -1,12 +1,18 @@
 // useAccounts hook - Fetch and manage accounts
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAccounts, createAccount, updateAccount, deleteAccount } from "../services/accounts";
+import {
+  getAccountsWithBalances,
+  createAccount,
+  updateAccount,
+  deleteAccount,
+} from "../services/accounts";
 import { useAuth } from "./useAuth";
 import { queryKeys } from "../lib/queryKeys";
-import type { Account, AccountType } from "../types";
+import type { AccountType } from "../types";
+import type { AccountWithBalance } from "../services/accounts";
 
 interface UseAccountsReturn {
-  accounts: Account[];
+  accounts: AccountWithBalance[];
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
@@ -14,11 +20,11 @@ interface UseAccountsReturn {
     name: string,
     type: AccountType,
     initialBalance: number
-  ) => Promise<{ success: boolean; error?: string; data?: Account }>;
+  ) => Promise<{ success: boolean; error?: string; data?: AccountWithBalance }>;
   editAccount: (
     id: string,
     updates: { name?: string; type?: AccountType; initial_balance?: number }
-  ) => Promise<{ success: boolean; error?: string; data?: Account }>;
+  ) => Promise<{ success: boolean; error?: string; data?: AccountWithBalance }>;
   removeAccount: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -43,7 +49,7 @@ export function useAccounts(): UseAccountsReturn {
   } = useQuery({
     queryKey: queryKeys.accounts.list(),
     queryFn: async () => {
-      const response = await getAccounts();
+      const response = await getAccountsWithBalances();
       if (!response.success) {
         throw new Error(response.error || "Failed to fetch accounts");
       }

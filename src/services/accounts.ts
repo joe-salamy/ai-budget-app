@@ -129,6 +129,73 @@ export async function getAccounts(): Promise<AccountsResponse> {
   }
 }
 
+export interface AccountWithBalance extends Account {
+  current_balance: number;
+}
+
+export interface AccountsWithBalanceResponse {
+  success: boolean;
+  data?: AccountWithBalance[];
+  error?: string;
+}
+
+/**
+ * Get all accounts with their current balances (initial_balance + transaction sum)
+ */
+export async function getAccountsWithBalances(): Promise<AccountsWithBalanceResponse> {
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "User not authenticated" };
+    }
+
+    const { data: accounts, error } = await supabase
+      .from("accounts")
+      .select("*")
+      .eq("user_id", user.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    if (!accounts || accounts.length === 0) {
+      return { success: true, data: [] };
+    }
+
+    // Calculate current balance for each account
+    const accountsWithBalances = await Promise.all(
+      accounts.map(async (account) => {
+        const { data: transactions } = await supabase
+          .from("transactions")
+          .select("amount")
+          .eq("user_id", user.id)
+          .eq("account_id", account.id)
+          .is("deleted_at", null);
+
+        const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
+        const currentBalance = account.initial_balance + transactionSum;
+
+        return {
+          ...account,
+          current_balance: currentBalance,
+        };
+      })
+    );
+
+    return { success: true, data: accountsWithBalances };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
+
 /**
  * Get a single account by ID
  */

@@ -34,8 +34,7 @@
   - I want the first thing users to do when they sign up is to copy/paste their transaction history into AI chatbot
   - How to ensure it gets them all right, first try, without any user data?
   - Maybe collect data on all user first-tries, see what they change up
-- Account name, button, remove "Dashboard" button
-- In settings, make selectable what fun icon you want your account to be
+- In settings, make selectable what fun icon you want your account to be. Give like 10,000 options
 
 ### Settings
 
@@ -46,6 +45,7 @@
 - **Sankey**: Fix colors, text overlaps, don't like the savings bar - just eliminate
   - Ensure that it only shows from start date to end date
 - **Diagrams**: Move both to top? They're cooler than the summaries
+  - Just a button to expand to full screen? Detailed view?
 - **Date range selector**: days of week messed up, should default to last 30 days
   - Date range selector buttons: this month, this year, last 30 days, last 365 days, date range selector
   - Add last 3 months? Last 6 months? Input for "last x months"?
@@ -62,6 +62,12 @@
     - Flags that can edit anything anytime
     - What are best practices for setup wizards?
     - Remove accounts/categories from settings, only on the later setup page
+- Throughout app, only show categories, subcategories, accounts sorted alphabetically
+- Move Goals to Subcategories + rename to bugdet, show tree of categories
+- Add budget for each subcategory (including income), at bottom show the remaining balance
+  - Input budget as %?
+  - Eliminate the start and end dates from budget goals
+- Account value goals? By certain date? Can count start and end date, calculate progress
 
 ### Add Transactions
 
@@ -86,3 +92,5 @@
 - **Testing**: Delete page, move to Setup + test goals features, how they work
 
 ### Settings
+
+- Make Profile card narrower (1 row?)

@@ -322,11 +322,13 @@ export async function deleteCategory(id: string): Promise<CategoryResponse> {
 export interface CreateSubcategoryData {
   name: string;
   category_id: string;
+  monthly_goal?: number | null;
 }
 
 export interface UpdateSubcategoryData {
   name?: string;
   category_id?: string;
+  monthly_goal?: number | null;
 }
 
 export interface SubcategoryResponse {
@@ -395,6 +397,7 @@ export async function createSubcategory(
         user_id: user.id,
         name: subcategoryData.name,
         category_id: subcategoryData.category_id,
+        monthly_goal: subcategoryData.monthly_goal,
         is_system: false,
       })
       .select()

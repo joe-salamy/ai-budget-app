@@ -11,6 +11,7 @@ interface SubcategoryFormProps {
   onSubmit: (data: {
     name: string;
     categoryId: string;
+    monthlyGoal?: number | null;
   }) => Promise<{ success: boolean; error?: string }>;
   initialData?: Subcategory;
   submitLabel?: string;
@@ -30,6 +31,9 @@ export function SubcategoryForm({
   const [categoryId, setCategoryId] = useState<string>(
     initialData?.category_id || ""
   );
+  const [monthlyGoal, setMonthlyGoal] = useState<string>(
+    initialData?.monthly_goal?.toString() || ""
+  );
   const [error, setError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -38,6 +42,7 @@ export function SubcategoryForm({
     if (initialData) {
       setName(initialData.name);
       setCategoryId(initialData.category_id);
+      setMonthlyGoal(initialData.monthly_goal?.toString() || "");
     }
   }, [initialData]);
 
@@ -70,6 +75,7 @@ export function SubcategoryForm({
     const result = await onSubmit({
       name: name.trim(),
       categoryId,
+      monthlyGoal: monthlyGoal ? parseFloat(monthlyGoal) : null,
     });
 
     setSubmitting(false);
@@ -78,6 +84,7 @@ export function SubcategoryForm({
       // Clear form if creating new subcategory (not editing)
       if (!initialData) {
         setName("");
+        setMonthlyGoal("");
         // Keep the same category selected for convenience
       }
     } else {
@@ -117,6 +124,17 @@ export function SubcategoryForm({
         onChange={(e) => setName(e.target.value)}
         placeholder="e.g., Rent, Gas, Freelance"
         required
+        disabled={isSystemSubcategory}
+      />
+
+      <Input
+        label="Monthly Goal (Optional)"
+        type="number"
+        step="0.01"
+        min="0"
+        value={monthlyGoal}
+        onChange={(e) => setMonthlyGoal(e.target.value)}
+        placeholder="0.00"
         disabled={isSystemSubcategory}
       />
 

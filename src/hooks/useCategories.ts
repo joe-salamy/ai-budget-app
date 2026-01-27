@@ -32,11 +32,12 @@ interface UseCategoriesReturn {
   removeCategory: (id: string) => Promise<{ success: boolean; error?: string }>;
   addSubcategory: (
     name: string,
-    categoryId: string
+    categoryId: string,
+    monthlyGoal?: number | null
   ) => Promise<{ success: boolean; error?: string; data?: Subcategory }>;
   editSubcategory: (
     id: string,
-    updates: { name?: string; category_id?: string }
+    updates: { name?: string; category_id?: string; monthly_goal?: number | null }
   ) => Promise<{ success: boolean; error?: string; data?: Subcategory }>;
   removeSubcategory: (id: string) => Promise<{ success: boolean; error?: string }>;
   getSubcategoriesByCategory: (categoryId: string) => Subcategory[];
@@ -136,7 +137,7 @@ export function useCategories(): UseCategoriesReturn {
 
   // Subcategory mutations
   const addSubcategoryMutation = useMutation({
-    mutationFn: async (data: { name: string; category_id: string }) => {
+    mutationFn: async (data: { name: string; category_id: string; monthly_goal?: number | null }) => {
       return await createSubcategory(data);
     },
     onSuccess: () => {
@@ -151,7 +152,7 @@ export function useCategories(): UseCategoriesReturn {
       updates,
     }: {
       id: string;
-      updates: { name?: string; category_id?: string };
+      updates: { name?: string; category_id?: string; monthly_goal?: number | null };
     }) => {
       return await updateSubcategory(id, updates);
     },
@@ -187,15 +188,16 @@ export function useCategories(): UseCategoriesReturn {
     return result;
   };
 
-  const addSubcategory = async (name: string, categoryId: string) => {
+  const addSubcategory = async (name: string, categoryId: string, monthlyGoal?: number | null) => {
     const result = await addSubcategoryMutation.mutateAsync({
       name,
       category_id: categoryId,
+      monthly_goal: monthlyGoal,
     });
     return result;
   };
 
-  const editSubcategory = async (id: string, updates: { name?: string; category_id?: string }) => {
+  const editSubcategory = async (id: string, updates: { name?: string; category_id?: string; monthly_goal?: number | null }) => {
     const result = await updateSubcategoryMutation.mutateAsync({ id, updates });
     return result;
   };
