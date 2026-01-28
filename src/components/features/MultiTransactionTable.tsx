@@ -1,14 +1,8 @@
 // MultiTransactionTable component - Tabular input for multiple transactions
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { Button } from "../ui/Button";
 import type { SelectOption } from "../ui/SimpleSelect";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/Select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
 import { categorizeBatchTransactions, getAICorrection } from "../../services/ai";
 import type { Account, Category, Subcategory } from "../../types";
@@ -87,6 +81,12 @@ export function MultiTransactionTable({
   const [isCategorizingAll, setIsCategorizingAll] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Refs for input navigation
+  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+
+  // Determine if this is a transfer table
+  const isTransfer = type === "transfer";
+
   // Filter subcategories based on transaction type
   const filteredSubcategories = useMemo(() => {
     const categoryType = type === "income" ? "income" : "expense";
@@ -99,7 +99,7 @@ export function MultiTransactionTable({
   const accountOptions: SelectOption[] = useMemo(() => {
     return accounts.map((acc) => ({
       value: acc.id,
-      label: `${acc.name} (${acc.type === "asset" ? "Asset" : "Liability"})`,
+      label: acc.name,
     }));
   }, [accounts]);
 
@@ -172,13 +172,82 @@ export function MultiTransactionTable({
     []
   );
 
-  // Add a new row
-  const addRow = useCallback(() => {
-    // Use the account from the last row as default
-    const lastRow = rows[rows.length - 1];
-    const defaultAccountId = lastRow?.account_id || "";
-    setRows((prev) => [...prev, createEmptyRow(defaultAccountId)]);
-  }, [rows]);
+  // Handle Enter key press to add new row
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent, rowId: string) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+
+        // Find if this is the last row
+        const rowIndex = rows.findIndex((r) => r.id === rowId);
+        const isLastRow = rowIndex === rows.length - 1;
+
+        if (isLastRow) {
+          // Add a new row
+          const lastRow = rows[rows.length - 1];
+          const defaultAccountId = lastRow?.account_id || "";
+          setRows((prev) => [...prev, createEmptyRow(defaultAccountId)]);
+        }
+      }
+    },
+    [rows]
+  );
+
+  // Handle arrow key navigation for empty inputs
+  const handleArrowNavigation = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>, rowId: string, field: string) => {
+      const target = e.target as HTMLInputElement;
+
+      // Only navigate if input is empty
+      if (target.value !== "") return;
+
+      const arrow = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+      if (!arrow.includes(e.key)) return;
+
+      e.preventDefault();
+
+      const rowIndex = rows.findIndex((r) => r.id === rowId);
+      if (rowIndex === -1) return;
+
+      // Define field order (navigable fields only)
+      const fieldOrder = isTransfer
+        ? ["date", "name", "amount", "comment"]
+        : ["date", "name", "amount", "comment"];
+
+      const currentFieldIndex = fieldOrder.indexOf(field);
+      if (currentFieldIndex === -1) return;
+
+      let targetRowIndex = rowIndex;
+      let targetFieldIndex = currentFieldIndex;
+
+      // Calculate target position
+      switch (e.key) {
+        case "ArrowUp":
+          targetRowIndex = Math.max(0, rowIndex - 1);
+          break;
+        case "ArrowDown":
+          targetRowIndex = Math.min(rows.length - 1, rowIndex + 1);
+          break;
+        case "ArrowLeft":
+          targetFieldIndex = Math.max(0, currentFieldIndex - 1);
+          break;
+        case "ArrowRight":
+          targetFieldIndex = Math.min(fieldOrder.length - 1, currentFieldIndex + 1);
+          break;
+      }
+
+      // Focus target input
+      const targetRow = rows[targetRowIndex];
+      const targetField = fieldOrder[targetFieldIndex];
+      const refKey = `${targetRow.id}-${targetField}`;
+      const targetInput = inputRefs.current.get(refKey);
+
+      if (targetInput) {
+        targetInput.focus();
+      }
+    },
+    [rows, isTransfer]
+  );
 
   // Remove a row
   const removeRow = useCallback((rowId: string) => {
@@ -223,10 +292,7 @@ export function MultiTransactionTable({
         }
 
         // Check for previous transaction
-        const lookupResponse = await getRecentTransactionByNameAndAccount(
-          row.name,
-          row.account_id
-        );
+        const lookupResponse = await getRecentTransactionByNameAndAccount(row.name, row.account_id);
         if (lookupResponse.success && lookupResponse.data?.subcategory_id) {
           updatedRows[i] = {
             ...row,
@@ -251,9 +317,10 @@ export function MultiTransactionTable({
           const transactionsForAI = batch.map(({ row }) => ({
             name: row.name,
             account_name: getAccountName(row.account_id),
-            amount: type === "expense"
-              ? -Math.abs(parseFloat(row.amount))
-              : Math.abs(parseFloat(row.amount)),
+            amount:
+              type === "expense"
+                ? -Math.abs(parseFloat(row.amount))
+                : Math.abs(parseFloat(row.amount)),
           }));
 
           const aiResponse = await categorizeBatchTransactions(transactionsForAI);
@@ -295,9 +362,7 @@ export function MultiTransactionTable({
     let hasErrors = false;
 
     // Find rows with any data entered
-    const rowsWithData = rows.filter(
-      (row) => row.name.trim() || row.amount || row.account_id
-    );
+    const rowsWithData = rows.filter((row) => row.name.trim() || row.amount || row.account_id);
 
     if (rowsWithData.length === 0) {
       setSubmitError("Please enter at least one transaction");
@@ -349,9 +414,7 @@ export function MultiTransactionTable({
     if (!validate()) return;
 
     // Only submit rows that have data
-    const rowsToSubmit = rows.filter(
-      (row) => row.name.trim() && row.amount && row.account_id
-    );
+    const rowsToSubmit = rows.filter((row) => row.name.trim() && row.amount && row.account_id);
 
     const result = await onSubmit(rowsToSubmit);
 
@@ -374,24 +437,21 @@ export function MultiTransactionTable({
       case "correction":
         return <span className="text-xs text-foreground">Preferred</span>;
       case "ai":
-        return row.user_corrected
-          ? <span className="text-xs text-orange-400">Corrected</span>
-          : <span className="text-xs text-foreground">AI</span>;
+        return row.user_corrected ? (
+          <span className="text-xs text-orange-400">Corrected</span>
+        ) : (
+          <span className="text-xs text-foreground">AI</span>
+        );
       default:
         return null;
     }
   };
-
-  const isTransfer = type === "transfer";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Action Buttons */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" onClick={addRow}>
-            + Add Row
-          </Button>
           {uncategorizedCount > 0 && (
             <Button
               type="button"
@@ -400,15 +460,10 @@ export function MultiTransactionTable({
               disabled={isCategorizingAll}
               isLoading={isCategorizingAll}
             >
-              {isCategorizingAll
-                ? "Categorizing..."
-                : `Auto-Categorize (${uncategorizedCount})`}
+              {isCategorizingAll ? "Categorizing..." : `Auto-Categorize (${uncategorizedCount})`}
             </Button>
           )}
         </div>
-        <span className="text-sm text-muted-foreground">
-          {rows.filter((r) => r.name.trim() && r.amount).length} transaction(s) entered
-        </span>
       </div>
 
       {/* Error message */}
@@ -424,16 +479,18 @@ export function MultiTransactionTable({
           <thead className="bg-card">
             <tr>
               <th className="px-3 py-2 text-left font-medium text-foreground w-32">Date</th>
-              <th className="px-3 py-2 text-left font-medium text-foreground w-40">
+              <th className="px-3 py-2 text-left font-medium text-foreground w-52">
                 {isTransfer ? "From Account" : "Account"}
               </th>
               {isTransfer && (
-                <th className="px-3 py-2 text-left font-medium text-foreground w-40">To Account</th>
+                <th className="px-3 py-2 text-left font-medium text-foreground w-52">To Account</th>
               )}
               <th className="px-3 py-2 text-left font-medium text-foreground">Description</th>
               <th className="px-3 py-2 text-left font-medium text-foreground w-28">Amount</th>
               {!isTransfer && (
-                <th className="px-3 py-2 text-left font-medium text-foreground w-48">Subcategory</th>
+                <th className="px-3 py-2 text-left font-medium text-foreground w-52">
+                  Subcategory
+                </th>
               )}
               <th className="px-3 py-2 text-left font-medium text-foreground w-32">Comment</th>
               <th className="px-3 py-2 w-12"></th>
@@ -448,7 +505,7 @@ export function MultiTransactionTable({
                 .filter((acc) => acc.id !== row.account_id)
                 .map((acc) => ({
                   value: acc.id,
-                  label: `${acc.name} (${acc.type === "asset" ? "Asset" : "Liability"})`,
+                  label: acc.name,
                 }));
 
               return (
@@ -456,9 +513,17 @@ export function MultiTransactionTable({
                   {/* Date */}
                   <td className="px-2 py-1">
                     <input
+                      ref={(el) => {
+                        if (el) inputRefs.current.set(`${row.id}-date`, el);
+                        else inputRefs.current.delete(`${row.id}-date`);
+                      }}
                       type="date"
                       value={row.date}
                       onChange={(e) => handleRowChange(row.id, "date", e.target.value)}
+                      onKeyDown={(e) => {
+                        handleKeyDown(e, row.id);
+                        handleArrowNavigation(e, row.id, "date");
+                      }}
                       className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground ${
                         rowErrors.date ? "border-foreground" : "border-border"
                       }`}
@@ -493,7 +558,9 @@ export function MultiTransactionTable({
                     <td className="px-2 py-1">
                       <Select
                         value={row.transfer_to_account_id || undefined}
-                        onValueChange={(value) => handleRowChange(row.id, "transfer_to_account_id", value)}
+                        onValueChange={(value) =>
+                          handleRowChange(row.id, "transfer_to_account_id", value)
+                        }
                         disabled={!row.account_id}
                       >
                         <SelectTrigger
@@ -517,9 +584,17 @@ export function MultiTransactionTable({
                   {/* Description */}
                   <td className="px-2 py-1">
                     <input
+                      ref={(el) => {
+                        if (el) inputRefs.current.set(`${row.id}-name`, el);
+                        else inputRefs.current.delete(`${row.id}-name`);
+                      }}
                       type="text"
                       value={row.name}
                       onChange={(e) => handleRowChange(row.id, "name", e.target.value)}
+                      onKeyDown={(e) => {
+                        handleKeyDown(e, row.id);
+                        handleArrowNavigation(e, row.id, "name");
+                      }}
                       placeholder="e.g., Grocery shopping"
                       className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
                         rowErrors.name ? "border-foreground" : "border-border"
@@ -534,11 +609,19 @@ export function MultiTransactionTable({
                         $
                       </span>
                       <input
+                        ref={(el) => {
+                          if (el) inputRefs.current.set(`${row.id}-amount`, el);
+                          else inputRefs.current.delete(`${row.id}-amount`);
+                        }}
                         type="number"
                         step="0.01"
                         min="0"
                         value={row.amount}
                         onChange={(e) => handleRowChange(row.id, "amount", e.target.value)}
+                        onKeyDown={(e) => {
+                          handleKeyDown(e, row.id);
+                          handleArrowNavigation(e, row.id, "amount");
+                        }}
                         placeholder="0.00"
                         className={`w-full pl-6 pr-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
                           rowErrors.amount ? "border-foreground" : "border-border"
@@ -553,7 +636,9 @@ export function MultiTransactionTable({
                       <div className="flex items-center gap-1">
                         <Select
                           value={row.subcategory_id || undefined}
-                          onValueChange={(value) => handleRowChange(row.id, "subcategory_id", value)}
+                          onValueChange={(value) =>
+                            handleRowChange(row.id, "subcategory_id", value)
+                          }
                         >
                           <SelectTrigger className="flex-1 h-8 px-2 text-sm">
                             <SelectValue placeholder="Select..." />
@@ -574,9 +659,17 @@ export function MultiTransactionTable({
                   {/* Comment */}
                   <td className="px-2 py-1">
                     <input
+                      ref={(el) => {
+                        if (el) inputRefs.current.set(`${row.id}-comment`, el);
+                        else inputRefs.current.delete(`${row.id}-comment`);
+                      }}
                       type="text"
                       value={row.comment}
                       onChange={(e) => handleRowChange(row.id, "comment", e.target.value)}
+                      onKeyDown={(e) => {
+                        handleKeyDown(e, row.id);
+                        handleArrowNavigation(e, row.id, "comment");
+                      }}
                       placeholder="Note..."
                       className="w-full px-2 py-1.5 bg-muted border border-border rounded text-sm text-foreground placeholder:text-muted-foreground"
                     />
@@ -591,31 +684,102 @@ export function MultiTransactionTable({
                       className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
                       title="Remove row"
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </td>
                 </tr>
               );
             })}
+
+            {/* Ghost row - visual indicator for adding new rows */}
+            <tr className="bg-card/20 pointer-events-none opacity-50">
+              {/* Date */}
+              <td className="px-2 py-1">
+                <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm">
+                  <span className="invisible">2024-01-01</span>
+                </div>
+              </td>
+
+              {/* Account */}
+              <td className="px-2 py-1">
+                <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
+                  Select...
+                </div>
+              </td>
+
+              {/* To Account (transfers only) */}
+              {isTransfer && (
+                <td className="px-2 py-1">
+                  <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
+                    Select...
+                  </div>
+                </td>
+              )}
+
+              {/* Description */}
+              <td className="px-2 py-1">
+                <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70 italic">
+                  Press Enter to add row...
+                </div>
+              </td>
+
+              {/* Amount */}
+              <td className="px-2 py-1">
+                <div className="relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground/70">
+                    $
+                  </span>
+                  <div className="w-full pl-6 pr-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
+                    0.00
+                  </div>
+                </div>
+              </td>
+
+              {/* Subcategory (not for transfers) */}
+              {!isTransfer && (
+                <td className="px-2 py-1">
+                  <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
+                    Select...
+                  </div>
+                </td>
+              )}
+
+              {/* Comment */}
+              <td className="px-2 py-1">
+                <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm">
+                  <span className="invisible">Note...</span>
+                </div>
+              </td>
+
+              {/* Remove button placeholder */}
+              <td className="px-2 py-1">
+                <div className="w-4 h-4"></div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
       {/* Submit button */}
       <div className="flex justify-end pt-2">
-        <Button
-          type="submit"
-          variant="primary"
-          isLoading={isLoading}
-          disabled={isLoading}
-        >
+        <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
           {type === "income"
             ? "Add All Income"
             : type === "expense"
-            ? "Add All Expenses"
-            : "Add All Transfers"}
+              ? "Add All Expenses"
+              : "Add All Transfers"}
         </Button>
       </div>
     </form>

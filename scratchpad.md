@@ -1,15 +1,12 @@
 ### To do
 
-- Read full repo
-- Test all functionality
-- Go through each page, test for UI; afterwards, do full CC sweep to ensure consistency
-- Have Claude create summary of tech stack so I can use again, just want to get used to something
-- Have it make plan to check every package, ensure using correct versioning. Don’t make any substantive changes, only correct package versions, if used incorrectly. If catch error, add comment explicitly stating what version to use.
+- Sweep full frontend for consistency
+- Create summary of tech stack so I can use again, just want to get used to something
+- Check every package, ensure correct versioning. If catch error, add comment explicitly stating what version to use.
   - "The issue was that your project uses react-day-picker v9, which changed the classNames API from v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class names:"
 
 ### General
 
-- **AI**: Test AI chatbox
 - **Color**: Maybe add some color back, but make it very intentional
 - **Privacy**: Best method for encryption / privacy for budget app? Want friends to feel more secure that I can’t just see all their transactions. Encrypted db?
 - **Keyboard shortcuts**
@@ -17,7 +14,7 @@
   - Shortcut to get to each page
   - For every user action, make keyboard shortcut
 - **Build errors**: In @ components
-- Date range: can input dates, just as numbers
+- Date range: can input dates, switch to numbers
 - Date selectors: modernize
 - Make ALL inputs and mini-cards highlightable, like Setup --> Accounts, the account name inputs, each account down below.
 
@@ -51,6 +48,7 @@
   - Add last 3 months? Last 6 months? Input for "last x months"?
   - Could just see when users access the calendar, add that as input if enough ppl do it
   - Include an all-time button? Could be fun
+  - Fix loading, how come the others load first
 
 ### Setup
 
@@ -62,11 +60,6 @@
     - Flags that can edit anything anytime
     - What are best practices for setup wizards?
     - Remove accounts/categories from settings, only on the later setup page
-- Throughout app, only show categories, subcategories, accounts sorted alphabetically
-- Move Goals to Subcategories + rename to bugdet, show tree of categories
-- Add budget for each subcategory (including income), at bottom show the remaining balance
-  - Input budget as %?
-  - Eliminate the start and end dates from budget goals
 - Account value goals? By certain date? Can count start and end date, calculate progress
 
 ### Add Transactions

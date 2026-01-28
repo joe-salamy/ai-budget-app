@@ -318,6 +318,29 @@ function SetupPage() {
     });
   }, [userSubcategories, subcategoriesSortColumn, subcategoriesSortDirection, categories]);
 
+  // Calculate budget summary
+  const budgetSummary = useMemo(() => {
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    userSubcategories.forEach((sub) => {
+      const category = categories.find((cat) => cat.id === sub.category_id);
+      if (category && sub.monthly_goal) {
+        if (category.type === "income") {
+          totalIncome += sub.monthly_goal;
+        } else if (category.type === "expense") {
+          totalExpenses += sub.monthly_goal;
+        }
+      }
+    });
+
+    return {
+      totalIncome,
+      totalExpenses,
+      remaining: totalIncome - totalExpenses,
+    };
+  }, [userSubcategories, categories]);
+
   // Helper for rendering sort icons
   const renderSortIcon = (
     column: string,
@@ -635,13 +658,54 @@ function SetupPage() {
               <p className="text-muted-foreground">Please create at least one category first.</p>
             )}
 
+            {/* Budget Summary */}
+            {userSubcategories.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-200 mb-3">Budget Summary</h3>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-border">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                          Total Income
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                          Total Expenses
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                          Remaining Budget
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      <tr className="hover:bg-muted">
+                        <td className="px-4 py-4 text-sm text-foreground font-bold text-green-500">
+                          {formatCurrency(budgetSummary.totalIncome)}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-foreground font-bold text-red-500">
+                          {formatCurrency(budgetSummary.totalExpenses)}
+                        </td>
+                        <td
+                          className={`px-4 py-4 text-sm text-foreground font-bold ${
+                            budgetSummary.remaining >= 0 ? "text-green-500" : "text-red-500"
+                          }`}
+                        >
+                          {formatCurrency(budgetSummary.remaining)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {/* Subcategories List */}
             {categoriesLoading ? (
               <p className="text-muted-foreground">Loading subcategories...</p>
             ) : userSubcategories.length > 0 ? (
               <div>
                 <h3 className="text-lg font-semibold text-gray-200 mb-3">
-                  Your Subcategories ({userSubcategories.length}) + Budget
+                  Your Subcategories ({userSubcategories.length})
                 </h3>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-border">

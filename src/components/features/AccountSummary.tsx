@@ -73,9 +73,13 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
     );
   }
 
-  // Group accounts by type
-  const assetAccounts = accounts.filter((a) => a.account_type === "asset");
-  const liabilityAccounts = accounts.filter((a) => a.account_type === "liability");
+  // Group accounts by type and sort alphabetically
+  const assetAccounts = accounts
+    .filter((a) => a.account_type === "asset")
+    .sort((a, b) => a.account_name.localeCompare(b.account_name));
+  const liabilityAccounts = accounts
+    .filter((a) => a.account_type === "liability")
+    .sort((a, b) => a.account_name.localeCompare(b.account_name));
 
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">

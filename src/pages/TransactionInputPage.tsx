@@ -1,8 +1,7 @@
-// TransactionInputPage - Page for adding multiple transactions with Income, Expense, Transfer, and Import tabs
+// TransactionInputPage - Page for adding multiple transactions with Income, Expense, and Transfer tabs
 import { useState, useCallback } from "react";
 import { MultiTransactionTable } from "../components/features/MultiTransactionTable";
 import { RecentActivityPanel } from "../components/features/RecentActivityPanel";
-import { StatementParser } from "../components/features/StatementParser";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions, useRecentActivity } from "../hooks/useTransactions";
@@ -12,7 +11,7 @@ import type {
   TransactionRowData,
 } from "../components/features/MultiTransactionTable";
 
-type TabType = "income" | "expense" | "transfer" | "import";
+type TabType = "income" | "expense" | "transfer";
 
 function TransactionInputPage() {
   const [activeTab, setActiveTab] = useState<TabType>("expense");
@@ -130,7 +129,6 @@ function TransactionInputPage() {
     { key: "income", label: "Income", type: "income" },
     { key: "expense", label: "Expense", type: "expense" },
     { key: "transfer", label: "Transfer", type: "transfer" },
-    { key: "import", label: "Import Statement" },
   ];
 
   const isDataLoading = accountsLoading || categoriesLoading;
@@ -139,9 +137,15 @@ function TransactionInputPage() {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-foreground">Add Transactions</h1>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        {/* Transaction Table - Takes up 3/4 on large screens */}
-        <div className="xl:col-span-3">
+      {/* Recent Activity Table */}
+      <RecentActivityPanel
+        recentActivity={recentActivity}
+        loading={activityLoading}
+        error={activityError}
+      />
+
+      {/* Transaction Input Section */}
+      <div>
           <div className="rounded-lg border border-border bg-card hover:border-foreground/30 hover:shadow-lg">
             {/* Tab Navigation */}
             <div className="border-b border-border">
@@ -199,13 +203,6 @@ function TransactionInputPage() {
                         Go to Setup
                       </a>
                     </div>
-                  ) : activeTab === "import" ? (
-                    <StatementParser
-                      accounts={accounts}
-                      categories={categories}
-                      subcategories={subcategories}
-                      onSuccess={refreshActivity}
-                    />
                   ) : (
                     <MultiTransactionTable
                       key={activeTab} // Reset table when switching tabs
@@ -221,70 +218,6 @@ function TransactionInputPage() {
               )}
             </div>
           </div>
-
-          {/* Quick Tips */}
-          <div className="mt-4 p-4 rounded-lg border border-border bg-card/50 hover:border-foreground/30 hover:shadow-lg">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">Tips</h3>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              {activeTab === "import" ? (
-                <>
-                  <li>
-                    <strong>Copy statements:</strong> Copy transaction data directly from your bank
-                    or credit card website
-                  </li>
-                  <li>
-                    <strong>Supported formats:</strong> Most common statement formats are supported
-                    (CSV, tab-separated, text)
-                  </li>
-                  <li>
-                    <strong>Duplicate detection:</strong> Transactions that already exist will be
-                    marked as duplicates
-                  </li>
-                  <li>
-                    <strong>Smart categorization:</strong> Transactions are auto-categorized based
-                    on history and AI
-                  </li>
-                  <li>
-                    <strong>Review before saving:</strong> You can edit categories and remove
-                    transactions before adding them
-                  </li>
-                </>
-              ) : (
-                <>
-                  <li>
-                    <strong>Income:</strong> Money coming into your accounts (salary, dividends,
-                    refunds)
-                  </li>
-                  <li>
-                    <strong>Expense:</strong> Money going out of your accounts (purchases, bills,
-                    subscriptions)
-                  </li>
-                  <li>
-                    <strong>Transfer:</strong> Moving money between your own accounts (paying credit
-                    card, moving to savings)
-                  </li>
-                  <li>
-                    <strong>Batch entry:</strong> Enter multiple transactions at once, then click
-                    "Add All" to save them
-                  </li>
-                  <li>
-                    <strong>Auto-Categorize:</strong> Click the "Auto-Categorize" button to have AI
-                    suggest categories for uncategorized transactions
-                  </li>
-                </>
-              )}
-            </ul>
-          </div>
-        </div>
-
-        {/* Recent Activity Panel - Takes up 1/4 on large screens */}
-        <div className="xl:col-span-1">
-          <RecentActivityPanel
-            recentActivity={recentActivity}
-            loading={activityLoading}
-            error={activityError}
-          />
-        </div>
       </div>
     </div>
   );

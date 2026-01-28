@@ -95,9 +95,13 @@ export function CategorySummary({
     );
   }
 
-  // Group categories by type
-  const incomeCategories = categories.filter((c) => c.category_type === "income");
-  const expenseCategories = categories.filter((c) => c.category_type === "expense");
+  // Group categories by type and sort alphabetically
+  const incomeCategories = categories
+    .filter((c) => c.category_type === "income")
+    .sort((a, b) => a.category_name.localeCompare(b.category_name));
+  const expenseCategories = categories
+    .filter((c) => c.category_type === "expense")
+    .sort((a, b) => a.category_name.localeCompare(b.category_name));
 
   // Calculate totals
   const totalIncome = incomeCategories.reduce((sum, c) => sum + c.total, 0);
@@ -330,7 +334,10 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800/50">
-                  {category.subcategories.map((subcategory) => {
+                  {category.subcategories
+                    .slice()
+                    .sort((a, b) => a.subcategory_name.localeCompare(b.subcategory_name))
+                    .map((subcategory) => {
                     const subTotalColor = "text-foreground";
 
                     return (
