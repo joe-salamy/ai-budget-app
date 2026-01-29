@@ -1,3 +1,25 @@
+### Prompt queue
+
+Continue last, have it fix the date selectors
+
+---
+
+Change all of the number inputs so that they automatically display commas for every thousand/million/etc
+
+There are number inputs on the following pages:
+
+- Setup: Account initial balance, Subcategory budget (and their associated popups, for editing)
+- Add Transactions: amount
+- History: edit transaction amount
+
+---
+
+Make the following changes to History page:
+
+- Move the Clear Filters button to sit on top of the card, so that it doesn't shift everything down when it appears
+- Change the Transaction History filter card to be more compact. Everythign should fit on 1 screen, on a standard laptop viewing width.
+- Change the formatting of the Transaction History table to match the formatting of the Accounts table on the Setup page. (Header row should be gray, actions icons should match, etc)
+
 ### To do
 
 - Sweep full frontend for consistency
@@ -7,7 +29,7 @@
 
 ### General
 
-- **Color**: Maybe add some color back, but make it very intentional
+- **Color**: Add color back, intentionally
 - **Privacy**: Best method for encryption / privacy for budget app? Want friends to feel more secure that I can’t just see all their transactions. Encrypted db?
 - **Keyboard shortcuts**
   - Input transactions: tab next, enter down, control enter submit
@@ -68,17 +90,23 @@
   - Also, use stictch for the whole income expense transfer setup. What's optimal?
 - **Recent activity**: Ensure add transactions page has visible flag on what accounts need adding
 - **Bulk transaction logic**: How should bulk transaction parse transactions? No regex, all LLM call? LLM call returns regex parsing? All regex
+  - Analyze regex. LLM should only do categorize.
+  - Do cc statements show sign? Or just color?
+  - Does Fidelity show transaction history? Only issue is transfer to Roth or brokerage, would need to add transaction
+
 - **Transactions table**
   - Allow for table copy/paste (like when copying rows)
   - Auto expands when you reach bottom, and to get full paste
 - **Import statement**: Remove entirely, want that to be only through the AI
 - **Amount input**: Don't like the tab up/down, just input amounts
 - Make the edit sign match the ones used elsewhere in repo
+- Remove Category name from Subcategory dropdown
 
 ### History
 
 - **Data export**: Download as csv
 - **Sort/filter**: Easy sort and filter for transaction history
+- Have table match before
 
 ### Goals
 
@@ -87,3 +115,21 @@
 ### Settings
 
 - Make Profile card narrower (1 row?)
+
+### Checklist
+
+Checklist:
+◽️Privacy Policy
+◽️Terms of Service
+◽️Delete Account
+◽️Restore Purchase
+◽️App screenshots
+◽️Marketing copy
+◽️Support pages & FAQ
+◽️Figuring out the deployment pipeline
+◽️Testflight setup
+◽️In-App Purchase documentation
+◽️App Privacy declarations
+◽️8 iterations on imprecise wording
+◽️Age rating
+◽️Regulations and Permits

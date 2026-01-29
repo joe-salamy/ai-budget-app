@@ -101,7 +101,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
   if (loading) {
     return (
       <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-muted rounded"></div>
           <div className="h-10 bg-muted rounded"></div>
@@ -114,7 +114,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
   if (error) {
     return (
       <div className="rounded-lg border border-foreground/20 bg-foreground/10 p-4 hover:border-foreground/30 hover:shadow-lg">
-        <h2 className="text-lg font-semibold text-foreground mb-2">Recent Activity</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-2">Recent Activity</h2>
         <p className="text-foreground text-sm">{error}</p>
       </div>
     );
@@ -123,7 +123,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
   if (recentActivity.length === 0) {
     return (
       <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
-        <h2 className="text-lg font-semibold text-foreground mb-2">Recent Activity</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-2">Recent Activity</h2>
         <p className="text-muted-foreground text-sm">
           No accounts yet. Create an account in Settings to get started.
         </p>
@@ -134,7 +134,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
   return (
     <div className="rounded-lg border border-border bg-card hover:border-foreground/30 hover:shadow-lg">
       <div className="p-4">
-        <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-border">
             <thead className="bg-muted">

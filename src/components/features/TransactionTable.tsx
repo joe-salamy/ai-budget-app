@@ -125,9 +125,15 @@ export function TransactionTable({
     });
   }, []);
 
-  // Handle individual row selection
-  const handleRowSelect = useCallback(
-    (id: string, index: number, event: React.MouseEvent<HTMLInputElement>) => {
+  // Handle row click for selection
+  const handleRowClick = useCallback(
+    (id: string, index: number, event: React.MouseEvent<HTMLTableRowElement>) => {
+      // Don't select if clicking on action buttons
+      const target = event.target as HTMLElement;
+      if (target.closest('button')) {
+        return;
+      }
+
       const newSelected = new Set(selectedIds);
       const isShiftClick = event.shiftKey && lastSelectedIndex !== null;
 
@@ -154,17 +160,6 @@ export function TransactionTable({
     [selectedIds, lastSelectedIndex, sortedTransactions, onSelectionChange]
   );
 
-  // Handle select all
-  const handleSelectAll = useCallback(() => {
-    if (selectedIds.size === sortedTransactions.length) {
-      // Deselect all
-      onSelectionChange(new Set());
-    } else {
-      // Select all
-      onSelectionChange(new Set(sortedTransactions.map((t) => t.id)));
-    }
-  }, [selectedIds.size, sortedTransactions, onSelectionChange]);
-
   if (loading) {
     return (
       <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
@@ -189,27 +184,12 @@ export function TransactionTable({
     );
   }
 
-  const allSelected = selectedIds.size === sortedTransactions.length && sortedTransactions.length > 0;
-  const someSelected = selectedIds.size > 0 && selectedIds.size < sortedTransactions.length;
-
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
           <thead className="bg-card/50">
             <tr>
-              {/* Checkbox column */}
-              <th className="px-4 py-3 w-10">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  ref={(el) => {
-                    if (el) el.indeterminate = someSelected;
-                  }}
-                  onChange={handleSelectAll}
-                  className="rounded border-border bg-muted text-foreground focus:ring-foreground focus:ring-offset-gray-900"
-                />
-              </th>
               <ColumnHeader
                 field="date"
                 label="Date"
@@ -272,20 +252,11 @@ export function TransactionTable({
               return (
                 <tr
                   key={txn.id}
-                  className={`hover:bg-card/50 ${
+                  onClick={(e) => handleRowClick(txn.id, index, e)}
+                  className={`hover:bg-card/50 cursor-pointer ${
                     isSelected ? "bg-foreground/10" : ""
                   }`}
                 >
-                  {/* Checkbox */}
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onClick={(e) => handleRowSelect(txn.id, index, e)}
-                      onChange={() => {}} // Controlled by onClick
-                      className="rounded border-border bg-muted text-foreground focus:ring-foreground focus:ring-offset-gray-900"
-                    />
-                  </td>
 
                   {/* Date */}
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-foreground">

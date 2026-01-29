@@ -5,11 +5,11 @@ import { queryKeys } from "../lib/queryKeys";
 import { getAccounts } from "../services/accounts";
 import { getCategories, getSubcategories } from "../services/categories";
 import { getSpendingGoalsWithDetails, getSavingGoalsWithDetails } from "../services/goals";
-import { getTransactionsWithDetails } from "../services/transactions";
+import { getTransactionsWithDetails, getRecentActivityByAccount } from "../services/transactions";
 import { useAuth } from "./useAuth";
 
 /**
- * Custom hook that prefetches data for other pages (Goals, TransactionHistory) in the background
+ * Custom hook that prefetches data for other pages (Goals, TransactionHistory, Add Transactions) in the background
  * after dashboard data is loaded. This makes navigating to those pages instant.
  *
  * Usage:
@@ -97,6 +97,19 @@ export function usePrefetchOtherPages(dashboardLoading: boolean) {
         const response = await getTransactionsWithDetails({});
         if (!response.success) {
           throw new Error(response.error || "Failed to fetch transactions");
+        }
+        return response.data || [];
+      },
+      staleTime: 5 * 60 * 1000,
+    });
+
+    // Prefetch recent activity (used by Add Transactions page)
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.transactions.recentActivity(),
+      queryFn: async () => {
+        const response = await getRecentActivityByAccount();
+        if (!response.success) {
+          throw new Error(response.error || "Failed to fetch recent activity");
         }
         return response.data || [];
       },

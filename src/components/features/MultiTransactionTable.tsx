@@ -1,6 +1,8 @@
-// MultiTransactionTable component - Tabular input for multiple transactions
+// MultiTransactionTable component - Tabular input for multiple transactions with per-row type selection
 import { useState, useMemo, useCallback, useRef } from "react";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "../ui/Button";
+import { DatePicker } from "../ui/DatePicker";
 import type { SelectOption } from "../ui/SimpleSelect";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
@@ -9,18 +11,17 @@ import type { Account, Category, Subcategory } from "../../types";
 
 // ============== TYPES ==============
 
-export type TransactionType = "income" | "expense" | "transfer";
+export type RowTransactionType = "income" | "expense";
 
 export interface TransactionRowData {
   id: string; // Unique ID for React key
   date: string;
   account_id: string;
+  type: RowTransactionType; // Per-row income/expense selection
   name: string;
   amount: string;
   subcategory_id: string;
   comment: string;
-  // Transfer-specific
-  transfer_to_account_id?: string;
   // AI-related tracking
   ai_suggested?: boolean;
   user_corrected?: boolean;
@@ -30,12 +31,12 @@ export interface TransactionRowData {
 }
 
 interface MultiTransactionTableProps {
-  type: TransactionType;
   accounts: Account[];
   categories: Category[];
   subcategories: Subcategory[];
   onSubmit: (transactions: TransactionRowData[]) => Promise<{ success: boolean; error?: string }>;
   isLoading?: boolean;
+  onTransferClick?: () => void;
 }
 
 // Generate unique ID for rows
@@ -51,11 +52,11 @@ function createEmptyRow(defaultAccountId: string = ""): TransactionRowData {
     id: generateRowId(),
     date: today,
     account_id: defaultAccountId,
+    type: "expense", // Default to expense
     name: "",
     amount: "",
     subcategory_id: "",
     comment: "",
-    transfer_to_account_id: "",
     categorizationSource: "none",
   };
 }
@@ -63,12 +64,12 @@ function createEmptyRow(defaultAccountId: string = ""): TransactionRowData {
 // ============== COMPONENT ==============
 
 export function MultiTransactionTable({
-  type,
   accounts,
   categories,
   subcategories,
   onSubmit,
   isLoading = false,
+  onTransferClick,
 }: MultiTransactionTableProps) {
   // Initialize with 3 empty rows
   const [rows, setRows] = useState<TransactionRowData[]>(() => [
@@ -80,20 +81,16 @@ export function MultiTransactionTable({
   const [errors, setErrors] = useState<Record<string, Record<string, string>>>({});
   const [isCategorizingAll, setIsCategorizingAll] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<
+    "date" | "account" | "type" | "name" | "amount" | "subcategory" | null
+  >(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   // Refs for input navigation
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
-
-  // Determine if this is a transfer table
-  const isTransfer = type === "transfer";
-
-  // Filter subcategories based on transaction type
-  const filteredSubcategories = useMemo(() => {
-    const categoryType = type === "income" ? "income" : "expense";
-    const relevantCategories = categories.filter((cat) => cat.type === categoryType);
-    const relevantCategoryIds = new Set(relevantCategories.map((cat) => cat.id));
-    return subcategories.filter((sub) => relevantCategoryIds.has(sub.category_id));
-  }, [categories, subcategories, type]);
 
   // Build account options
   const accountOptions: SelectOption[] = useMemo(() => {
@@ -103,30 +100,40 @@ export function MultiTransactionTable({
     }));
   }, [accounts]);
 
-  // Build subcategory options (grouped by category)
-  const subcategoryOptions: SelectOption[] = useMemo(() => {
-    const options: SelectOption[] = [];
-    const grouped = new Map<string, Subcategory[]>();
+  // Get subcategory options for a specific type (income or expense)
+  const getSubcategoryOptionsForType = useCallback(
+    (type: RowTransactionType): SelectOption[] => {
+      const categoryType = type === "income" ? "income" : "expense";
+      const relevantCategories = categories.filter((cat) => cat.type === categoryType);
+      const relevantCategoryIds = new Set(relevantCategories.map((cat) => cat.id));
+      const filteredSubcategories = subcategories.filter((sub) =>
+        relevantCategoryIds.has(sub.category_id)
+      );
 
-    filteredSubcategories.forEach((sub) => {
-      const existing = grouped.get(sub.category_id) || [];
-      grouped.set(sub.category_id, [...existing, sub]);
-    });
+      const options: SelectOption[] = [];
+      const grouped = new Map<string, Subcategory[]>();
 
-    grouped.forEach((subs, categoryId) => {
-      const category = categories.find((c) => c.id === categoryId);
-      if (!category) return;
+      filteredSubcategories.forEach((sub) => {
+        const existing = grouped.get(sub.category_id) || [];
+        grouped.set(sub.category_id, [...existing, sub]);
+      });
 
-      subs.forEach((sub) => {
-        options.push({
-          value: sub.id,
-          label: `${category.name} > ${sub.name}`,
+      grouped.forEach((subs, categoryId) => {
+        const category = categories.find((c) => c.id === categoryId);
+        if (!category) return;
+
+        subs.forEach((sub) => {
+          options.push({
+            value: sub.id,
+            label: `${category.name} > ${sub.name}`,
+          });
         });
       });
-    });
 
-    return options;
-  }, [filteredSubcategories, categories]);
+      return options;
+    },
+    [categories, subcategories]
+  );
 
   // Get account name from account ID
   const getAccountName = useCallback(
@@ -137,6 +144,64 @@ export function MultiTransactionTable({
     [accounts]
   );
 
+  // Sorting handler
+  const handleSort = (column: "date" | "account" | "type" | "name" | "amount" | "subcategory") => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+  };
+
+  // Helper for rendering sort icons
+  const renderSortIcon = (column: string) => {
+    if (sortColumn !== column) {
+      return <ArrowUpDown size={14} className="inline ml-1 opacity-50" />;
+    }
+    return sortDirection === "asc" ? (
+      <ArrowUp size={14} className="inline ml-1" />
+    ) : (
+      <ArrowDown size={14} className="inline ml-1" />
+    );
+  };
+
+  // Sorted rows
+  const sortedRows = useMemo(() => {
+    if (!sortColumn) return rows;
+
+    return [...rows].sort((a, b) => {
+      let aValue: string | number = "";
+      let bValue: string | number = "";
+
+      if (sortColumn === "date") {
+        aValue = a.date;
+        bValue = b.date;
+      } else if (sortColumn === "account") {
+        aValue = getAccountName(a.account_id).toLowerCase();
+        bValue = getAccountName(b.account_id).toLowerCase();
+      } else if (sortColumn === "type") {
+        aValue = a.type;
+        bValue = b.type;
+      } else if (sortColumn === "name") {
+        aValue = a.name.toLowerCase();
+        bValue = b.name.toLowerCase();
+      } else if (sortColumn === "amount") {
+        aValue = parseFloat(a.amount) || 0;
+        bValue = parseFloat(b.amount) || 0;
+      } else if (sortColumn === "subcategory") {
+        const aSub = subcategories.find((sub) => sub.id === a.subcategory_id);
+        const bSub = subcategories.find((sub) => sub.id === b.subcategory_id);
+        aValue = aSub?.name.toLowerCase() || "";
+        bValue = bSub?.name.toLowerCase() || "";
+      }
+
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [rows, sortColumn, sortDirection, getAccountName, subcategories]);
+
   // Handle field changes for a specific row
   const handleRowChange = useCallback(
     (rowId: string, field: keyof TransactionRowData, value: string) => {
@@ -145,6 +210,14 @@ export function MultiTransactionTable({
           if (row.id !== rowId) return row;
 
           const updated = { ...row, [field]: value };
+
+          // Reset subcategory and categorization when type changes
+          if (field === "type") {
+            updated.subcategory_id = "";
+            updated.categorizationSource = "none";
+            updated.ai_suggested = false;
+            updated.user_corrected = false;
+          }
 
           // Reset categorization if name, account, or amount changes
           if (field === "name" || field === "account_id" || field === "amount") {
@@ -210,9 +283,7 @@ export function MultiTransactionTable({
       if (rowIndex === -1) return;
 
       // Define field order (navigable fields only)
-      const fieldOrder = isTransfer
-        ? ["date", "name", "amount", "comment"]
-        : ["date", "name", "amount", "comment"];
+      const fieldOrder = ["date", "name", "amount", "comment"];
 
       const currentFieldIndex = fieldOrder.indexOf(field);
       if (currentFieldIndex === -1) return;
@@ -246,7 +317,120 @@ export function MultiTransactionTable({
         targetInput.focus();
       }
     },
-    [rows, isTransfer]
+    [rows]
+  );
+
+  // Handle paste event for spreadsheet-style data input
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLInputElement>, rowId: string, field: string) => {
+      // Get clipboard data
+      const pastedData = e.clipboardData.getData("text");
+
+      // Check if this is multi-cell data (contains tabs or newlines)
+      const hasMultipleCells = pastedData.includes("\t") || pastedData.includes("\n");
+
+      if (!hasMultipleCells) {
+        // Single cell paste - let default behavior handle it
+        return;
+      }
+
+      // Prevent default paste behavior for multi-cell data
+      e.preventDefault();
+
+      // Parse the pasted data into a 2D array
+      const lines = pastedData.split("\n").filter(line => line.trim() !== "");
+      const pastedGrid = lines.map(line => line.split("\t"));
+
+      // Find current row index
+      const currentRowIndex = rows.findIndex((r) => r.id === rowId);
+      if (currentRowIndex === -1) return;
+
+      // Define field order for pasting (only pasteable text/number fields)
+      const fieldOrder = ["date", "name", "amount", "comment"];
+      const currentFieldIndex = fieldOrder.indexOf(field);
+      if (currentFieldIndex === -1) return;
+
+      // Calculate how many new rows we need
+      const rowsNeeded = currentRowIndex + pastedGrid.length;
+      const newRowsToAdd = Math.max(0, rowsNeeded - rows.length);
+
+      // Create new rows if needed
+      const updatedRows = [...rows];
+      const lastRow = updatedRows[updatedRows.length - 1];
+      const defaultAccountId = lastRow?.account_id || "";
+
+      for (let i = 0; i < newRowsToAdd; i++) {
+        updatedRows.push(createEmptyRow(defaultAccountId));
+      }
+
+      // Fill in the pasted data
+      pastedGrid.forEach((rowData, rowOffset) => {
+        const targetRowIndex = currentRowIndex + rowOffset;
+        if (targetRowIndex >= updatedRows.length) return;
+
+        const targetRow = updatedRows[targetRowIndex];
+
+        rowData.forEach((cellValue, colOffset) => {
+          const targetFieldIndex = currentFieldIndex + colOffset;
+          if (targetFieldIndex >= fieldOrder.length) return;
+
+          const targetField = fieldOrder[targetFieldIndex];
+          const trimmedValue = cellValue.trim();
+
+          // Update the row with the pasted value
+          if (targetField === "amount") {
+            // Remove any currency symbols and parse as number
+            const cleanedValue = trimmedValue.replace(/[$,]/g, "");
+            const numericValue = parseFloat(cleanedValue);
+            if (!isNaN(numericValue)) {
+              updatedRows[targetRowIndex] = {
+                ...targetRow,
+                [targetField]: Math.abs(numericValue).toString(),
+              };
+            }
+          } else if (targetField === "date") {
+            // Try to parse and format date
+            try {
+              // Handle various date formats
+              const dateValue = new Date(trimmedValue);
+              if (!isNaN(dateValue.getTime())) {
+                const formattedDate = dateValue.toISOString().split("T")[0];
+                updatedRows[targetRowIndex] = {
+                  ...targetRow,
+                  [targetField]: formattedDate,
+                };
+              } else {
+                // If it's already in YYYY-MM-DD format, use as is
+                if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+                  updatedRows[targetRowIndex] = {
+                    ...targetRow,
+                    [targetField]: trimmedValue,
+                  };
+                }
+              }
+            } catch {
+              // If date parsing fails, try to use as-is if it matches the format
+              if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+                updatedRows[targetRowIndex] = {
+                  ...targetRow,
+                  [targetField]: trimmedValue,
+                };
+              }
+            }
+          } else {
+            // Text field
+            updatedRows[targetRowIndex] = {
+              ...targetRow,
+              [targetField]: trimmedValue,
+            };
+          }
+        });
+      });
+
+      // Update state with the new rows
+      setRows(updatedRows);
+    },
+    [rows]
   );
 
   // Remove a row
@@ -260,6 +444,14 @@ export function MultiTransactionTable({
       delete newErrors[rowId];
       return newErrors;
     });
+  }, []);
+
+  // Clear all rows
+  const handleClearAll = useCallback(() => {
+    setRows([createEmptyRow(), createEmptyRow(), createEmptyRow()]);
+    setErrors({});
+    setSubmitError(null);
+    setShowClearConfirm(false);
   }, []);
 
   // Categorize all uncategorized transactions
@@ -318,7 +510,7 @@ export function MultiTransactionTable({
             name: row.name,
             account_name: getAccountName(row.account_id),
             amount:
-              type === "expense"
+              row.type === "expense"
                 ? -Math.abs(parseFloat(row.amount))
                 : Math.abs(parseFloat(row.amount)),
           }));
@@ -347,7 +539,7 @@ export function MultiTransactionTable({
     } finally {
       setIsCategorizingAll(false);
     }
-  }, [rows, getAccountName, type]);
+  }, [rows, getAccountName]);
 
   // Count uncategorized rows (rows with data but no subcategory)
   const uncategorizedCount = useMemo(() => {
@@ -388,14 +580,6 @@ export function MultiTransactionTable({
         rowErrors.amount = "Must be > 0";
         hasErrors = true;
       }
-      if (type === "transfer" && !row.transfer_to_account_id) {
-        rowErrors.transfer_to_account_id = "Required";
-        hasErrors = true;
-      }
-      if (type === "transfer" && row.account_id === row.transfer_to_account_id) {
-        rowErrors.transfer_to_account_id = "Same account";
-        hasErrors = true;
-      }
 
       if (Object.keys(rowErrors).length > 0) {
         newErrors[row.id] = rowErrors;
@@ -404,7 +588,7 @@ export function MultiTransactionTable({
 
     setErrors(newErrors);
     return !hasErrors;
-  }, [rows, type]);
+  }, [rows]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -474,64 +658,76 @@ export function MultiTransactionTable({
       )}
 
       {/* Transaction Table */}
-      <div className="overflow-x-auto border border-border rounded-lg">
-        <table className="w-full text-sm">
-          <thead className="bg-card">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
-              <th className="px-3 py-2 text-left font-medium text-foreground w-32">Date</th>
-              <th className="px-3 py-2 text-left font-medium text-foreground w-52">
-                {isTransfer ? "From Account" : "Account"}
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground w-32"
+                onClick={() => handleSort("date")}
+              >
+                Date
+                {renderSortIcon("date")}
               </th>
-              {isTransfer && (
-                <th className="px-3 py-2 text-left font-medium text-foreground w-52">To Account</th>
-              )}
-              <th className="px-3 py-2 text-left font-medium text-foreground">Description</th>
-              <th className="px-3 py-2 text-left font-medium text-foreground w-28">Amount</th>
-              {!isTransfer && (
-                <th className="px-3 py-2 text-left font-medium text-foreground w-52">
-                  Subcategory
-                </th>
-              )}
-              <th className="px-3 py-2 text-left font-medium text-foreground w-32">Comment</th>
-              <th className="px-3 py-2 w-12"></th>
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground w-44"
+                onClick={() => handleSort("account")}
+              >
+                Account
+                {renderSortIcon("account")}
+              </th>
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground w-28"
+                onClick={() => handleSort("type")}
+              >
+                Type
+                {renderSortIcon("type")}
+              </th>
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
+                onClick={() => handleSort("name")}
+              >
+                Description
+                {renderSortIcon("name")}
+              </th>
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground w-28"
+                onClick={() => handleSort("amount")}
+              >
+                Amount
+                {renderSortIcon("amount")}
+              </th>
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground w-52"
+                onClick={() => handleSort("subcategory")}
+              >
+                Subcategory
+                {renderSortIcon("subcategory")}
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase w-32">
+                Comment
+              </th>
+              <th className="px-4 py-3 w-12"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {rows.map((row) => {
+            {sortedRows.map((row) => {
               const rowErrors = errors[row.id] || {};
-
-              // Build transfer destination options (exclude source account)
-              const transferAccountOptions: SelectOption[] = accounts
-                .filter((acc) => acc.id !== row.account_id)
-                .map((acc) => ({
-                  value: acc.id,
-                  label: acc.name,
-                }));
+              const subcategoryOptions = getSubcategoryOptionsForType(row.type);
 
               return (
-                <tr key={row.id} className="bg-card hover:bg-card/50">
+                <tr key={row.id} className="hover:bg-muted">
                   {/* Date */}
-                  <td className="px-2 py-1">
-                    <input
-                      ref={(el) => {
-                        if (el) inputRefs.current.set(`${row.id}-date`, el);
-                        else inputRefs.current.delete(`${row.id}-date`);
-                      }}
-                      type="date"
-                      value={row.date}
-                      onChange={(e) => handleRowChange(row.id, "date", e.target.value)}
-                      onKeyDown={(e) => {
-                        handleKeyDown(e, row.id);
-                        handleArrowNavigation(e, row.id, "date");
-                      }}
-                      className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground ${
-                        rowErrors.date ? "border-foreground" : "border-border"
-                      }`}
+                  <td className="px-4 py-4">
+                    <DatePicker
+                      date={row.date}
+                      onDateChange={(newDate) => handleRowChange(row.id, "date", newDate)}
+                      className={rowErrors.date ? "border-foreground" : ""}
                     />
                   </td>
 
                   {/* Account */}
-                  <td className="px-2 py-1">
+                  <td className="px-4 py-4">
                     <Select
                       value={row.account_id || undefined}
                       onValueChange={(value) => handleRowChange(row.id, "account_id", value)}
@@ -553,36 +749,26 @@ export function MultiTransactionTable({
                     </Select>
                   </td>
 
-                  {/* To Account (transfers only) */}
-                  {isTransfer && (
-                    <td className="px-2 py-1">
-                      <Select
-                        value={row.transfer_to_account_id || undefined}
-                        onValueChange={(value) =>
-                          handleRowChange(row.id, "transfer_to_account_id", value)
-                        }
-                        disabled={!row.account_id}
-                      >
-                        <SelectTrigger
-                          className={`w-full h-8 px-2 text-sm ${
-                            rowErrors.transfer_to_account_id ? "border-foreground" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {transferAccountOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </td>
-                  )}
+                  {/* Type */}
+                  <td className="px-4 py-4">
+                    <Select
+                      value={row.type}
+                      onValueChange={(value) =>
+                        handleRowChange(row.id, "type", value as RowTransactionType)
+                      }
+                    >
+                      <SelectTrigger className="w-full h-8 px-2 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="expense">Expense</SelectItem>
+                        <SelectItem value="income">Income</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
 
                   {/* Description */}
-                  <td className="px-2 py-1">
+                  <td className="px-4 py-4">
                     <input
                       ref={(el) => {
                         if (el) inputRefs.current.set(`${row.id}-name`, el);
@@ -595,6 +781,7 @@ export function MultiTransactionTable({
                         handleKeyDown(e, row.id);
                         handleArrowNavigation(e, row.id, "name");
                       }}
+                      onPaste={(e) => handlePaste(e, row.id, "name")}
                       placeholder="e.g., Grocery shopping"
                       className={`w-full px-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
                         rowErrors.name ? "border-foreground" : "border-border"
@@ -603,7 +790,7 @@ export function MultiTransactionTable({
                   </td>
 
                   {/* Amount */}
-                  <td className="px-2 py-1">
+                  <td className="px-4 py-4">
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-foreground pointer-events-none">
                         $
@@ -622,6 +809,7 @@ export function MultiTransactionTable({
                           handleKeyDown(e, row.id);
                           handleArrowNavigation(e, row.id, "amount");
                         }}
+                        onPaste={(e) => handlePaste(e, row.id, "amount")}
                         placeholder="0.00"
                         className={`w-full pl-6 pr-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
                           rowErrors.amount ? "border-foreground" : "border-border"
@@ -630,34 +818,30 @@ export function MultiTransactionTable({
                     </div>
                   </td>
 
-                  {/* Subcategory (not for transfers) */}
-                  {!isTransfer && (
-                    <td className="px-2 py-1">
-                      <div className="flex items-center gap-1">
-                        <Select
-                          value={row.subcategory_id || undefined}
-                          onValueChange={(value) =>
-                            handleRowChange(row.id, "subcategory_id", value)
-                          }
-                        >
-                          <SelectTrigger className="flex-1 h-8 px-2 text-sm">
-                            <SelectValue placeholder="Select..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {subcategoryOptions.map((opt) => (
-                              <SelectItem key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {getCategorizationIndicator(row)}
-                      </div>
-                    </td>
-                  )}
+                  {/* Subcategory */}
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-1">
+                      <Select
+                        value={row.subcategory_id || undefined}
+                        onValueChange={(value) => handleRowChange(row.id, "subcategory_id", value)}
+                      >
+                        <SelectTrigger className="flex-1 h-8 px-2 text-sm">
+                          <SelectValue placeholder="Select..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {subcategoryOptions.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {getCategorizationIndicator(row)}
+                    </div>
+                  </td>
 
                   {/* Comment */}
-                  <td className="px-2 py-1">
+                  <td className="px-4 py-4">
                     <input
                       ref={(el) => {
                         if (el) inputRefs.current.set(`${row.id}-comment`, el);
@@ -670,13 +854,14 @@ export function MultiTransactionTable({
                         handleKeyDown(e, row.id);
                         handleArrowNavigation(e, row.id, "comment");
                       }}
+                      onPaste={(e) => handlePaste(e, row.id, "comment")}
                       placeholder="Note..."
                       className="w-full px-2 py-1.5 bg-muted border border-border rounded text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </td>
 
                   {/* Remove button */}
-                  <td className="px-2 py-1">
+                  <td className="px-4 py-4">
                     <button
                       type="button"
                       onClick={() => removeRow(row.id)}
@@ -704,39 +889,37 @@ export function MultiTransactionTable({
             })}
 
             {/* Ghost row - visual indicator for adding new rows */}
-            <tr className="bg-card/20 pointer-events-none opacity-50">
+            <tr className="pointer-events-none opacity-50">
               {/* Date */}
-              <td className="px-2 py-1">
+              <td className="px-4 py-4">
                 <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm">
                   <span className="invisible">2024-01-01</span>
                 </div>
               </td>
 
               {/* Account */}
-              <td className="px-2 py-1">
+              <td className="px-4 py-4">
                 <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
                   Select...
                 </div>
               </td>
 
-              {/* To Account (transfers only) */}
-              {isTransfer && (
-                <td className="px-2 py-1">
-                  <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
-                    Select...
-                  </div>
-                </td>
-              )}
+              {/* Type */}
+              <td className="px-4 py-4">
+                <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
+                  Expense
+                </div>
+              </td>
 
               {/* Description */}
-              <td className="px-2 py-1">
+              <td className="px-4 py-4">
                 <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70 italic">
                   Press Enter to add row...
                 </div>
               </td>
 
               {/* Amount */}
-              <td className="px-2 py-1">
+              <td className="px-4 py-4">
                 <div className="relative">
                   <span className="absolute left-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground/70">
                     $
@@ -747,24 +930,22 @@ export function MultiTransactionTable({
                 </div>
               </td>
 
-              {/* Subcategory (not for transfers) */}
-              {!isTransfer && (
-                <td className="px-2 py-1">
-                  <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
-                    Select...
-                  </div>
-                </td>
-              )}
+              {/* Subcategory */}
+              <td className="px-4 py-4">
+                <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm text-muted-foreground/70">
+                  Select...
+                </div>
+              </td>
 
               {/* Comment */}
-              <td className="px-2 py-1">
+              <td className="px-4 py-4">
                 <div className="w-full px-2 py-1.5 bg-muted/50 border border-border/50 rounded text-sm">
                   <span className="invisible">Note...</span>
                 </div>
               </td>
 
               {/* Remove button placeholder */}
-              <td className="px-2 py-1">
+              <td className="px-4 py-4">
                 <div className="w-4 h-4"></div>
               </td>
             </tr>
@@ -772,16 +953,50 @@ export function MultiTransactionTable({
         </table>
       </div>
 
-      {/* Submit button */}
-      <div className="flex justify-end pt-2">
+      {/* Action buttons row */}
+      <div className="flex items-center justify-between pt-2">
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setShowClearConfirm(true)}
+          >
+            Clear All
+          </Button>
+          {onTransferClick && (
+            <Button type="button" variant="secondary" onClick={onTransferClick}>
+              Add Transfer
+            </Button>
+          )}
+        </div>
         <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
-          {type === "income"
-            ? "Add All Income"
-            : type === "expense"
-              ? "Add All Expenses"
-              : "Add All Transfers"}
+          Add All Transactions
         </Button>
       </div>
+
+      {/* Clear confirmation dialog */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card border border-border rounded-lg p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Clear All Transactions?</h3>
+            <p className="text-muted-foreground mb-6">
+              This will remove all rows from the table. This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowClearConfirm(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="button" variant="primary" onClick={handleClearAll}>
+                Clear All
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

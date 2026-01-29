@@ -6,7 +6,8 @@ import { ConfirmDeleteModal } from "../components/features/ConfirmDeleteModal";
 import { Modal } from "../components/ui/Modal";
 import { TransactionForm } from "../components/features/TransactionForm";
 import { Input } from "../components/ui/Input";
-import { SimpleSelect } from "../components/ui/SimpleSelect";
+import { MultiSelect } from "../components/ui/MultiSelect";
+import { DateRangePicker } from "../components/ui/DateRangePicker";
 import { Button } from "../components/ui/Button";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
@@ -26,9 +27,10 @@ function TransactionHistoryPage() {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
-  const [accountFilter, setAccountFilter] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [accountFilter, setAccountFilter] = useState<Set<string>>(new Set());
+  const [categoryFilter, setCategoryFilter] = useState<Set<string>>(new Set());
+  const [subcategoryFilter, setSubcategoryFilter] = useState<Set<string>>(new Set());
+  const [dateRange, setDateRange] = useState({ startDate: "", endDate: "" });
 
   // Success/error messages
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -65,14 +67,28 @@ function TransactionHistoryPage() {
     }
 
     // Account filter
-    if (accountFilter) {
-      result = result.filter((txn) => txn.account_id === accountFilter);
+    if (accountFilter.size > 0) {
+      result = result.filter((txn) => accountFilter.has(txn.account_id));
+    }
+
+    // Category filter
+    if (categoryFilter.size > 0) {
+      result = result.filter((txn) =>
+        txn.category_id ? categoryFilter.has(txn.category_id) : false
+      );
+    }
+
+    // Subcategory filter
+    if (subcategoryFilter.size > 0) {
+      result = result.filter((txn) =>
+        txn.subcategory_id ? subcategoryFilter.has(txn.subcategory_id) : false
+      );
     }
 
     return result;
-  }, [transactions, searchQuery, accountFilter]);
+  }, [transactions, searchQuery, accountFilter, categoryFilter, subcategoryFilter]);
 
-  // Build account options for filter dropdown
+  // Build options for filter dropdowns
   const accountOptions = useMemo(() => {
     return accounts.map((acc) => ({
       value: acc.id,
@@ -80,16 +96,29 @@ function TransactionHistoryPage() {
     }));
   }, [accounts]);
 
+  const categoryOptions = useMemo(() => {
+    return categories.map((cat) => ({
+      value: cat.id,
+      label: cat.name,
+    }));
+  }, [categories]);
+
+  const subcategoryOptions = useMemo(() => {
+    return subcategories.map((sub) => ({
+      value: sub.id,
+      label: sub.name,
+    }));
+  }, [subcategories]);
+
   // Handle date filter changes
-  const handleDateFilterChange = useCallback(
-    (field: "startDate" | "endDate", value: string) => {
-      if (field === "startDate") {
-        setDateFrom(value);
-        setFilters({ ...filters, startDate: value || undefined });
-      } else {
-        setDateTo(value);
-        setFilters({ ...filters, endDate: value || undefined });
-      }
+  const handleDateRangeChange = useCallback(
+    (range: { startDate: string; endDate: string }) => {
+      setDateRange(range);
+      setFilters({
+        ...filters,
+        startDate: range.startDate || undefined,
+        endDate: range.endDate || undefined,
+      });
     },
     [filters, setFilters]
   );
@@ -178,26 +207,21 @@ function TransactionHistoryPage() {
   // Clear all filters
   const clearFilters = useCallback(() => {
     setSearchQuery("");
-    setAccountFilter("");
-    setDateFrom("");
-    setDateTo("");
+    setAccountFilter(new Set());
+    setCategoryFilter(new Set());
+    setSubcategoryFilter(new Set());
+    setDateRange({ startDate: "", endDate: "" });
     setFilters({});
   }, [setFilters]);
 
-  const hasFilters = searchQuery || accountFilter || dateFrom || dateTo;
+  const hasFilters = searchQuery || accountFilter.size > 0 || categoryFilter.size > 0 || subcategoryFilter.size > 0 || dateRange.startDate || dateRange.endDate;
   const isLoading = accountsLoading || categoriesLoading || transactionsLoading;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
         <h1 className="text-3xl font-bold text-foreground">Transaction History</h1>
-
-        {/* Quick stats */}
-        <div className="text-sm text-muted-foreground">
-          {filteredTransactions.length} transaction{filteredTransactions.length !== 1 ? "s" : ""}
-          {hasFilters && " (filtered)"}
-        </div>
       </div>
 
       {/* Success Message */}
@@ -209,9 +233,18 @@ function TransactionHistoryPage() {
 
       {/* Filters */}
       <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Clear filters button - top right */}
+        {hasFilters && (
+          <div className="flex justify-end mb-3">
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          </div>
+        )}
+
+        <div className="space-y-4">
           {/* Search */}
-          <div className="lg:col-span-2">
+          <div>
             <Input
               placeholder="Search transactions..."
               value={searchQuery}
@@ -220,41 +253,42 @@ function TransactionHistoryPage() {
             />
           </div>
 
-          {/* Account filter */}
-          <SimpleSelect
-            options={accountOptions}
-            value={accountFilter}
-            onChange={setAccountFilter}
-            placeholder="All Accounts"
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Account filter */}
+            <MultiSelect
+              options={accountOptions}
+              value={accountFilter}
+              onChange={setAccountFilter}
+              placeholder="All Accounts"
+            />
 
-          {/* Date from */}
-          <Input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => handleDateFilterChange("startDate", e.target.value)}
-            placeholder="From date"
-            fullWidth
-          />
+            {/* Category filter */}
+            <MultiSelect
+              options={categoryOptions}
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              placeholder="All Categories"
+            />
 
-          {/* Date to */}
-          <Input
-            type="date"
-            value={dateTo}
-            onChange={(e) => handleDateFilterChange("endDate", e.target.value)}
-            placeholder="To date"
-            fullWidth
-          />
-        </div>
-
-        {/* Clear filters button */}
-        {hasFilters && (
-          <div className="mt-3 flex justify-end">
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear filters
-            </Button>
+            {/* Subcategory filter */}
+            <MultiSelect
+              options={subcategoryOptions}
+              value={subcategoryFilter}
+              onChange={setSubcategoryFilter}
+              placeholder="All Subcategories"
+            />
           </div>
-        )}
+
+          {/* Date Range Picker */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">Date Range:</span>
+            <DateRangePicker
+              startDate={dateRange.startDate}
+              endDate={dateRange.endDate}
+              onDateChange={handleDateRangeChange}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Bulk Actions Bar */}
