@@ -214,7 +214,13 @@ function TransactionHistoryPage() {
     setFilters({});
   }, [setFilters]);
 
-  const hasFilters = searchQuery || accountFilter.size > 0 || categoryFilter.size > 0 || subcategoryFilter.size > 0 || dateRange.startDate || dateRange.endDate;
+  const hasFilters =
+    searchQuery ||
+    accountFilter.size > 0 ||
+    categoryFilter.size > 0 ||
+    subcategoryFilter.size > 0 ||
+    dateRange.startDate ||
+    dateRange.endDate;
   const isLoading = accountsLoading || categoriesLoading || transactionsLoading;
 
   return (
@@ -232,17 +238,21 @@ function TransactionHistoryPage() {
       )}
 
       {/* Filters */}
-      <div className="rounded-lg border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-lg">
-        {/* Clear filters button - top right */}
-        {hasFilters && (
-          <div className="flex justify-end mb-3">
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear filters
-            </Button>
-          </div>
-        )}
+      <div className="rounded-lg border border-border bg-card hover:border-foreground/30 hover:shadow-lg">
+        {/* Clear filters button - fixed position at top right */}
+        <div
+          className="flex justify-end px-4 pt-3"
+          style={{
+            minHeight: hasFilters ? "40px" : "0",
+            visibility: hasFilters ? "visible" : "hidden",
+          }}
+        >
+          <Button variant="ghost" size="sm" onClick={clearFilters}>
+            Clear filters
+          </Button>
+        </div>
 
-        <div className="space-y-4">
+        <div className="px-4 pb-4 space-y-3">
           {/* Search */}
           <div>
             <Input
@@ -253,7 +263,8 @@ function TransactionHistoryPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Filters in one row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Account filter */}
             <MultiSelect
               options={accountOptions}
@@ -277,11 +288,8 @@ function TransactionHistoryPage() {
               onChange={setSubcategoryFilter}
               placeholder="All Subcategories"
             />
-          </div>
 
-          {/* Date Range Picker */}
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Date Range:</span>
+            {/* Date Range Picker */}
             <DateRangePicker
               startDate={dateRange.startDate}
               endDate={dateRange.endDate}
@@ -299,25 +307,13 @@ function TransactionHistoryPage() {
               {selectedIds.size} transaction{selectedIds.size !== 1 ? "s" : ""} selected
             </p>
             <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowBulkEdit(true)}
-              >
+              <Button variant="secondary" size="sm" onClick={() => setShowBulkEdit(true)}>
                 Edit Subcategory
               </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={() => setShowBulkDelete(true)}
-              >
+              <Button variant="danger" size="sm" onClick={() => setShowBulkDelete(true)}>
                 Delete Selected
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedIds(new Set())}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
                 Clear Selection
               </Button>
             </div>

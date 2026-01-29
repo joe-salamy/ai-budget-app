@@ -1,6 +1,8 @@
 // TransactionTable component - Table with sorting, filtering, and bulk selection
 import { useState, useCallback, useMemo } from "react";
 import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "../ui/Button";
 import type { TransactionWithDetails } from "../../services/transactions";
 
 // ============== TYPES ==============
@@ -130,7 +132,7 @@ export function TransactionTable({
     (id: string, index: number, event: React.MouseEvent<HTMLTableRowElement>) => {
       // Don't select if clicking on action buttons
       const target = event.target as HTMLElement;
-      if (target.closest('button')) {
+      if (target.closest("button")) {
         return;
       }
 
@@ -187,8 +189,8 @@ export function TransactionTable({
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden hover:border-foreground/30 hover:shadow-lg">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
-          <thead className="bg-card/50">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-muted">
             <tr>
               <ColumnHeader
                 field="date"
@@ -242,7 +244,7 @@ export function TransactionTable({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700/50">
+          <tbody className="divide-y divide-border">
             {sortedTransactions.map((txn, index) => {
               const isSelected = selectedIds.has(txn.id);
               // Display amount from account perspective: flip sign for liability accounts
@@ -253,14 +255,13 @@ export function TransactionTable({
                 <tr
                   key={txn.id}
                   onClick={(e) => handleRowClick(txn.id, index, e)}
-                  className={`hover:bg-card/50 cursor-pointer ${
+                  className={`hover:bg-muted cursor-pointer ${
                     isSelected ? "bg-foreground/10" : ""
                   }`}
                 >
-
                   {/* Date */}
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-foreground">
-                    {format(new Date(txn.date), "MMM d, yyyy")}
+                    {format(new Date(txn.date), "MM/dd/yyyy")}
                   </td>
 
                   {/* Account */}
@@ -274,12 +275,12 @@ export function TransactionTable({
                   </td>
 
                   {/* Description */}
-                  <td className="px-4 py-3 text-sm text-gray-200 max-w-xs truncate">
-                    {txn.name}
-                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-200 max-w-xs truncate">{txn.name}</td>
 
                   {/* Amount */}
-                  <td className={`px-4 py-3 whitespace-nowrap text-sm text-right font-medium ${amountColor}`}>
+                  <td
+                    className={`px-4 py-3 whitespace-nowrap text-sm text-right font-medium ${amountColor}`}
+                  >
                     {displayAmount >= 0 ? "+" : ""}
                     {formatCurrency(displayAmount)}
                   </td>
@@ -303,44 +304,24 @@ export function TransactionTable({
 
                   {/* Actions */}
                   <td className="px-4 py-3 whitespace-nowrap text-right">
-                    <button
-                      onClick={() => onEditTransaction(txn)}
-                      className="text-muted-foreground hover:text-foreground mr-2"
-                      title="Edit"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEditTransaction(txn)}
+                        className="text-foreground hover:text-foreground hover:bg-muted"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => onDeleteTransaction(txn.id)}
-                      className="text-muted-foreground hover:text-foreground"
-                      title="Delete"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                        <Pencil size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onDeleteTransaction(txn.id)}
+                        className="text-foreground hover:text-foreground hover:bg-muted"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               );

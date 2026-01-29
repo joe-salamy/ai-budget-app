@@ -85,10 +85,10 @@ interface UseDashboardReturn {
 export function useDashboard(): UseDashboardReturn {
   const { user } = useAuth();
 
-  // Default to last 90 days
+  // Default to last 30 days
   const [dateRange, setDateRange] = useState<DateRange>(() => {
     const endDate = new Date();
-    const startDate = subDays(endDate, 90);
+    const startDate = subDays(endDate, 30);
     return {
       startDate: format(startDate, "yyyy-MM-dd"),
       endDate: format(endDate, "yyyy-MM-dd"),

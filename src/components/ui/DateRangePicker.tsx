@@ -1,12 +1,12 @@
 import { useMemo, useState, useRef } from "react";
-import type { KeyboardEvent, FocusEvent } from "react";
+import type { KeyboardEvent, FocusEvent, ChangeEvent } from "react";
 import { Button } from "./Button";
 import { Calendar } from "./Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./Popover";
 import { format, parse, isValid } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import type { DateRange } from "react-day-picker";
-import { cn } from "../../lib/utils";
+import { cn, formatDateInput } from "../../lib/utils";
 
 interface DateRangePickerProps {
   startDate: string; // yyyy-MM-dd format
@@ -24,7 +24,9 @@ export function DateRangePicker({
   const [isOpen, setIsOpen] = useState(false);
   const [startInputValue, setStartInputValue] = useState("");
   const [endInputValue, setEndInputValue] = useState("");
-  const preventCloseRef = useRef(false);
+  const [startFocused, setStartFocused] = useState(false);
+  const [endFocused, setEndFocused] = useState(false);
+  const selectionCountRef = useRef(0);
   const endInputRef = useRef<HTMLInputElement>(null);
 
   // Convert string dates to Date objects for the calendar
@@ -41,56 +43,59 @@ export function DateRangePicker({
 
   // Format display values for inputs
   const displayStartDate = useMemo(() => {
-    if (startInputValue) return startInputValue;
+    if (startFocused) return startInputValue;
     try {
       const date = parse(startDate, "yyyy-MM-dd", new Date());
-      return isValid(date) ? format(date, "M/d/yyyy") : "";
+      return isValid(date) ? format(date, "MM/dd/yyyy") : "";
     } catch {
       return "";
     }
-  }, [startDate, startInputValue]);
+  }, [startDate, startInputValue, startFocused]);
 
   const displayEndDate = useMemo(() => {
-    if (endInputValue) return endInputValue;
+    if (endFocused) return endInputValue;
     try {
       const date = parse(endDate, "yyyy-MM-dd", new Date());
-      return isValid(date) ? format(date, "M/d/yyyy") : "";
+      return isValid(date) ? format(date, "MM/dd/yyyy") : "";
     } catch {
       return "";
     }
-  }, [endDate, endInputValue]);
+  }, [endDate, endInputValue, endFocused]);
 
   const handleSelect = (range: DateRange | undefined) => {
     if (!range) return;
 
-    // If both dates are selected and they're different, update and close
-    if (range.from && range.to && range.from.getTime() !== range.to.getTime()) {
-      preventCloseRef.current = false;
+    // Increment selection count
+    selectionCountRef.current += 1;
+
+    // Update the dates
+    if (range.from && range.to) {
+      // Both dates selected
       onDateChange({
         startDate: format(range.from, "yyyy-MM-dd"),
         endDate: format(range.to, "yyyy-MM-dd"),
       });
       setStartInputValue("");
       setEndInputValue("");
-      setIsOpen(false);
+
+      // Only close if we've had 2 selections (user clicked twice)
+      if (selectionCountRef.current >= 2) {
+        setIsOpen(false);
+      }
     } else if (range.from) {
-      // If only start date is selected (or both dates are the same), keep open
-      preventCloseRef.current = true;
+      // Only start date selected
       onDateChange({
         startDate: format(range.from, "yyyy-MM-dd"),
-        endDate: "", // Clear end date to indicate incomplete range
+        endDate: "",
       });
       setStartInputValue("");
     }
   };
 
   const handleOpenChange = (open: boolean) => {
-    // Prevent closing if we're in the middle of selecting a range
-    if (!open && preventCloseRef.current) {
-      return;
-    }
-    if (!open) {
-      preventCloseRef.current = false;
+    if (open) {
+      // Reset selection count when opening
+      selectionCountRef.current = 0;
     }
     setIsOpen(open);
   };
@@ -100,12 +105,12 @@ export function DateRangePicker({
     if (!input.trim()) return;
 
     try {
-      // Try parsing M/d/yyyy format
-      let parsedDate = parse(input, "M/d/yyyy", new Date());
+      // Try parsing MM/dd/yyyy format
+      let parsedDate = parse(input, "MM/dd/yyyy", new Date());
 
       // If that fails, try other common formats
       if (!isValid(parsedDate)) {
-        parsedDate = parse(input, "MM/dd/yyyy", new Date());
+        parsedDate = parse(input, "M/d/yyyy", new Date());
       }
       if (!isValid(parsedDate)) {
         parsedDate = parse(input, "yyyy-MM-dd", new Date());
@@ -131,11 +136,47 @@ export function DateRangePicker({
     }
   };
 
+  const handleStartInputFocus = () => {
+    setStartFocused(true);
+    // Initialize with current formatted value
+    if (startDate) {
+      try {
+        const date = parse(startDate, "yyyy-MM-dd", new Date());
+        if (isValid(date)) {
+          setStartInputValue(format(date, "MM/dd/yyyy"));
+        }
+      } catch {
+        setStartInputValue("");
+      }
+    } else {
+      setStartInputValue("");
+    }
+  };
+
   const handleStartInputBlur = (e: FocusEvent<HTMLInputElement>) => {
+    setStartFocused(false);
     parseAndUpdateDate(e.target.value, true);
   };
 
+  const handleEndInputFocus = () => {
+    setEndFocused(true);
+    // Initialize with current formatted value
+    if (endDate) {
+      try {
+        const date = parse(endDate, "yyyy-MM-dd", new Date());
+        if (isValid(date)) {
+          setEndInputValue(format(date, "MM/dd/yyyy"));
+        }
+      } catch {
+        setEndInputValue("");
+      }
+    } else {
+      setEndInputValue("");
+    }
+  };
+
   const handleEndInputBlur = (e: FocusEvent<HTMLInputElement>) => {
+    setEndFocused(false);
     parseAndUpdateDate(e.target.value, false);
   };
 
@@ -155,27 +196,26 @@ export function DateRangePicker({
     }
   };
 
+  // Handle input change with auto-formatting
+  const handleStartInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatDateInput(e.target.value);
+    setStartInputValue(formatted);
+  };
+
+  const handleEndInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatDateInput(e.target.value);
+    setEndInputValue(formatted);
+  };
+
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <Popover open={isOpen} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-9 px-3"
-            type="button"
-          >
+          <Button variant="outline" className="h-9 px-3" type="button">
             <CalendarIcon className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className="w-auto p-0"
-          align="start"
-          onInteractOutside={(e) => {
-            if (preventCloseRef.current) {
-              e.preventDefault();
-            }
-          }}
-        >
+        <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="range"
             defaultMonth={dateRange?.from}
@@ -187,28 +227,50 @@ export function DateRangePicker({
         </PopoverContent>
       </Popover>
 
-      <input
-        type="text"
-        value={displayStartDate}
-        onChange={(e) => setStartInputValue(e.target.value)}
-        onBlur={handleStartInputBlur}
-        onKeyDown={handleStartInputKeyDown}
-        placeholder="1/28/2026"
-        className="h-9 w-28 px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
-      />
+      <div className="relative">
+        <input
+          type="text"
+          value={displayStartDate}
+          onChange={handleStartInputChange}
+          onFocus={handleStartInputFocus}
+          onBlur={handleStartInputBlur}
+          onKeyDown={handleStartInputKeyDown}
+          placeholder="mm/dd/yyyy"
+          className="h-9 w-28 px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+        />
+        <div className="absolute inset-0 flex items-center px-3 pointer-events-none text-sm z-10">
+          {startFocused && displayStartDate.length > 0 && displayStartDate.length < 10 && (
+            <>
+              <span className="opacity-0">{displayStartDate}</span>
+              <span className="text-muted-foreground opacity-60">{"mm/dd/yyyy".slice(displayStartDate.length)}</span>
+            </>
+          )}
+        </div>
+      </div>
 
       <span className="text-muted-foreground">-</span>
 
-      <input
-        ref={endInputRef}
-        type="text"
-        value={displayEndDate}
-        onChange={(e) => setEndInputValue(e.target.value)}
-        onBlur={handleEndInputBlur}
-        onKeyDown={handleEndInputKeyDown}
-        placeholder="1/28/2026"
-        className="h-9 w-28 px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
-      />
+      <div className="relative">
+        <input
+          ref={endInputRef}
+          type="text"
+          value={displayEndDate}
+          onChange={handleEndInputChange}
+          onFocus={handleEndInputFocus}
+          onBlur={handleEndInputBlur}
+          onKeyDown={handleEndInputKeyDown}
+          placeholder="mm/dd/yyyy"
+          className="h-9 w-28 px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+        />
+        <div className="absolute inset-0 flex items-center px-3 pointer-events-none text-sm z-10">
+          {endFocused && displayEndDate.length > 0 && displayEndDate.length < 10 && (
+            <>
+              <span className="opacity-0">{displayEndDate}</span>
+              <span className="text-muted-foreground opacity-60">{"mm/dd/yyyy".slice(displayEndDate.length)}</span>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

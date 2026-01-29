@@ -218,7 +218,7 @@ export function RecentActivityPanel({ recentActivity, loading, error }: RecentAc
                     </td>
                     <td className="px-4 py-4 text-sm text-muted-foreground">
                       {activity.recent_transaction
-                        ? format(new Date(activity.recent_transaction.date), "M/d/yyyy")
+                        ? format(new Date(activity.recent_transaction.date), "MM/dd/yyyy")
                         : "—"}
                     </td>
                   </tr>

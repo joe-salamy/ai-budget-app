@@ -18,14 +18,14 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        month_caption: "flex justify-center pt-1 relative items-center",
+        month_caption: "flex justify-center pt-1 pb-1 relative items-center",
         caption_label: "text-sm font-medium text-foreground",
-        nav: "space-x-1 flex items-center",
+        nav: "absolute inset-x-0 flex items-center justify-between px-1 pointer-events-none",
         button_previous: cn(
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted absolute left-1"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted pointer-events-auto"
         ),
         button_next: cn(
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted absolute right-1"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 inline-flex items-center justify-center rounded-md border border-border hover:bg-muted pointer-events-auto"
         ),
         table: "w-full border-collapse space-y-1",
         weekdays: "flex w-full",

@@ -1,16 +1,10 @@
 ### Prompt queue
 
-Continue last, have it fix the date selectors
+Continue last one
 
----
-
-Change all of the number inputs so that they automatically display commas for every thousand/million/etc
-
-There are number inputs on the following pages:
-
-- Setup: Account initial balance, Subcategory budget (and their associated popups, for editing)
-- Add Transactions: amount
-- History: edit transaction amount
+Modify date selector/date range selector buttons to have larger clickable area for switch month
+Change date selector/date range selector buttons to have gray
+Make the bubble look better (shifted to left, make it smaller + centered)
 
 ---
 
