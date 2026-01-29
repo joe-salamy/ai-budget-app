@@ -146,12 +146,14 @@ export async function getAccountSummary(
           .order("date", { ascending: true })
           .order("created_at", { ascending: true });
 
-        // Calculate total change and running balances
-        let runningBalance = startingBalance;
+        // Calculate total change and running balances forward chronologically
         const totalChange = (rangeTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
+        let runningBalance = startingBalance;
 
         const transactions: AccountTransaction[] = (rangeTransactions || []).map((txn) => {
+          // Add this transaction to the running balance
           runningBalance += txn.amount;
+
           // Supabase returns nested relations - handle type casting
           const subcategoryData = txn.subcategory as unknown;
           let subcategoryName: string | null = null;
@@ -492,30 +494,14 @@ export async function getDashboardMetrics(
     let totalIncome = 0;
     let totalExpenses = 0;
 
+    // Use transaction amount sign to determine income vs expense
     (transactions || []).forEach((txn) => {
-      // Supabase returns nested relations - handle type casting
-      const subcategoryData = txn.subcategory as unknown;
-      let categoryType: string | null = null;
-
-      if (subcategoryData && typeof subcategoryData === "object") {
-        const sub = subcategoryData as { category?: { type?: string } | null };
-        if (sub.category && typeof sub.category === "object") {
-          categoryType = sub.category.type || null;
-        }
-      }
-
-      if (categoryType === "income") {
+      if (txn.amount > 0) {
         totalIncome += txn.amount;
-      } else if (categoryType === "expense") {
+      } else if (txn.amount < 0) {
         totalExpenses += Math.abs(txn.amount);
-      } else {
-        // Uncategorized - use amount sign to determine
-        if (txn.amount > 0) {
-          totalIncome += txn.amount;
-        } else {
-          totalExpenses += Math.abs(txn.amount);
-        }
       }
+      // Zero amounts are ignored
     });
 
     return {

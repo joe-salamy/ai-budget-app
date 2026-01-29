@@ -160,7 +160,7 @@ function buildCategorizationPrompt(
     transactionsSection += `${i + 1}. Name: "${t.name}", Account: "${t.account_name}", Amount: $${Math.abs(t.amount).toFixed(2)} (${amountType})\n`;
   });
 
-  const prompt = `You are a financial transaction categorization assistant. Your task is to categorize transactions into the most appropriate subcategory based on the transaction name, account, and amount.
+  const prompt = `You are a financial transaction categorization assistant. Your task is to categorize transactions into the most appropriate subcategory based on the transaction name, account, and amount sign.
 
 ${categoriesSection}
 ${pastSection}
@@ -170,7 +170,9 @@ ${transactionsSection}
 ## INSTRUCTIONS
 
 1. For each transaction, select the BEST matching subcategory from the available options
-2. Consider the transaction name, account, and amount type (income vs expense)
+2. The transaction amount's SIGN indicates the direction:
+   - Positive amounts (+) are income/deposits → suggest income category subcategories
+   - Negative amounts (-) are expenses/withdrawals → suggest expense category subcategories
 3. If a similar transaction appears in the past examples, use the same categorization
 4. If the user has corrected a similar transaction, ALWAYS follow that correction
 5. If no good match exists, use "Unassigned" subcategory for the appropriate type (income or expense)

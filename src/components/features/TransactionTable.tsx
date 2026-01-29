@@ -1,8 +1,9 @@
 // TransactionTable component - Table with sorting, filtering, and bulk selection
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { format } from "date-fns";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "../ui/Button";
+import { supabase } from "../../lib/supabaseClient";
 import type { TransactionWithDetails } from "../../services/transactions";
 
 // ============== TYPES ==============
@@ -14,6 +15,11 @@ interface TransactionTableProps {
   onSelectionChange: (ids: Set<string>) => void;
   onEditTransaction: (transaction: TransactionWithDetails) => void;
   onDeleteTransaction: (id: string) => void;
+}
+
+interface AccountBalance {
+  initial_balance: number;
+  prior_transactions_sum: number;
 }
 
 type SortField = "date" | "name" | "amount" | "account_name" | "category_name" | "subcategory_name";
@@ -73,10 +79,103 @@ export function TransactionTable({
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+  const [accountBalances, setAccountBalances] = useState<Map<string, AccountBalance>>(new Map());
 
-  // Sort transactions
-  const sortedTransactions = useMemo(() => {
-    return [...transactions].sort((a, b) => {
+  // Fetch account initial balances when transactions change
+  useEffect(() => {
+    async function fetchAccountBalances() {
+      if (transactions.length === 0) return;
+
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Get unique account IDs from transactions
+        const accountIds = Array.from(new Set(transactions.map((t) => t.account_id)));
+
+        // Fetch account details
+        const { data: accounts } = await supabase
+          .from("accounts")
+          .select("id, initial_balance")
+          .in("id", accountIds)
+          .is("deleted_at", null);
+
+        if (!accounts) return;
+
+        // Get the earliest transaction date to calculate prior transactions
+        const earliestDate = transactions.reduce((min, t) => {
+          return t.date < min ? t.date : min;
+        }, transactions[0].date);
+
+        // For each account, get sum of transactions before the earliest date in view
+        const balanceMap = new Map<string, AccountBalance>();
+        await Promise.all(
+          accounts.map(async (account) => {
+            const { data: priorTransactions } = await supabase
+              .from("transactions")
+              .select("amount")
+              .eq("user_id", user.id)
+              .eq("account_id", account.id)
+              .lt("date", earliestDate)
+              .is("deleted_at", null);
+
+            const priorSum = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
+
+            balanceMap.set(account.id, {
+              initial_balance: account.initial_balance,
+              prior_transactions_sum: priorSum,
+            });
+          })
+        );
+
+        setAccountBalances(balanceMap);
+      } catch (error) {
+        console.error("Error fetching account balances:", error);
+      }
+    }
+
+    fetchAccountBalances();
+  }, [transactions]);
+
+  // Sort transactions and calculate running balances
+  const sortedTransactionsWithBalance = useMemo(() => {
+    // First, sort transactions by date and created_at to ensure consistent ordering
+    const sorted = [...transactions].sort((a, b) => {
+      // First sort by date
+      if (a.date !== b.date) {
+        return a.date.localeCompare(b.date);
+      }
+      // Then by created_at for same-day transactions
+      if (a.created_at && b.created_at) {
+        return a.created_at.localeCompare(b.created_at);
+      }
+      return 0;
+    });
+
+    // Calculate running balances per account
+    const accountRunningBalances = new Map<string, number>();
+
+    // Initialize starting balances for each account
+    accountBalances.forEach((balance, accountId) => {
+      accountRunningBalances.set(accountId, balance.initial_balance + balance.prior_transactions_sum);
+    });
+
+    // Add running balance to each transaction
+    const withBalances = sorted.map((txn) => {
+      const currentBalance = accountRunningBalances.get(txn.account_id) || 0;
+      const newBalance = currentBalance + txn.amount;
+      accountRunningBalances.set(txn.account_id, newBalance);
+
+      return {
+        ...txn,
+        running_balance: newBalance,
+      };
+    });
+
+    // Now apply user-selected sorting
+    return withBalances.sort((a, b) => {
       let aValue: string | number;
       let bValue: string | number;
 
@@ -113,7 +212,7 @@ export function TransactionTable({
       if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
-  }, [transactions, sortField, sortDirection]);
+  }, [transactions, sortField, sortDirection, accountBalances]);
 
   // Handle column header click for sorting
   const handleSort = useCallback((field: SortField) => {
@@ -145,7 +244,7 @@ export function TransactionTable({
         const end = Math.max(lastSelectedIndex, index);
 
         for (let i = start; i <= end; i++) {
-          newSelected.add(sortedTransactions[i].id);
+          newSelected.add(sortedTransactionsWithBalance[i].id);
         }
       } else {
         // Single selection toggle
@@ -159,7 +258,7 @@ export function TransactionTable({
 
       onSelectionChange(newSelected);
     },
-    [selectedIds, lastSelectedIndex, sortedTransactions, onSelectionChange]
+    [selectedIds, lastSelectedIndex, sortedTransactionsWithBalance, onSelectionChange]
   );
 
   if (loading) {
@@ -222,6 +321,9 @@ export function TransactionTable({
                 sortDirection={sortDirection}
                 onSort={handleSort}
               />
+              <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Balance
+              </th>
               <ColumnHeader
                 field="subcategory_name"
                 label="Subcategory"
@@ -245,10 +347,11 @@ export function TransactionTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {sortedTransactions.map((txn, index) => {
+            {sortedTransactionsWithBalance.map((txn, index) => {
               const isSelected = selectedIds.has(txn.id);
-              // Display amount from account perspective: flip sign for liability accounts
-              const displayAmount = txn.account_type === "liability" ? -txn.amount : txn.amount;
+              // Use actual transaction signs without flipping
+              const displayAmount = txn.amount;
+              const displayBalance = txn.running_balance ?? 0;
               const amountColor = "text-foreground";
 
               return (
@@ -283,6 +386,11 @@ export function TransactionTable({
                   >
                     {displayAmount >= 0 ? "+" : ""}
                     {formatCurrency(displayAmount)}
+                  </td>
+
+                  {/* Balance */}
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-right text-foreground">
+                    {formatCurrency(displayBalance)}
                   </td>
 
                   {/* Subcategory */}

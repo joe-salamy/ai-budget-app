@@ -16,13 +16,15 @@ import type { Account, Category, Subcategory } from "../../types";
 
 // ============== TYPES ==============
 
-export type TransactionType = "income" | "expense" | "transfer";
+// Removed income/expense distinction - transactions use signed amounts
+// Only keep transfer type for special transfer handling
+export type TransactionType = "transfer";
 
 export interface TransactionFormData {
   date: string;
   account_id: string;
   name: string;
-  amount: string;
+  amount: string; // Signed value: positive for income, negative for expense
   subcategory_id: string;
   comment: string;
   // Transfer-specific
@@ -43,7 +45,7 @@ interface AICategorizationState {
 }
 
 interface TransactionFormProps {
-  type: TransactionType;
+  type?: TransactionType; // Optional: only needed for transfer transactions
   accounts: Account[];
   categories: Category[];
   subcategories: Subcategory[];
@@ -94,13 +96,11 @@ export function TransactionForm({
   // Track the original AI suggestion for correction saving
   const originalAISuggestionRef = useRef<CategorizationResult | null>(null);
 
-  // Filter subcategories based on transaction type
+  // Show all subcategories (no longer filtering by income/expense type)
+  // Users can now assign any category to any transaction
   const filteredSubcategories = useMemo(() => {
-    const categoryType = type === "income" ? "income" : "expense";
-    const relevantCategories = categories.filter((cat) => cat.type === categoryType);
-    const relevantCategoryIds = new Set(relevantCategories.map((cat) => cat.id));
-    return subcategories.filter((sub) => relevantCategoryIds.has(sub.category_id));
-  }, [categories, subcategories, type]);
+    return subcategories;
+  }, [subcategories]);
 
   // Get category for a subcategory
   const getCategoryForSubcategory = useCallback(
@@ -284,12 +284,11 @@ export function TransactionForm({
       }
 
       const amount = parseFloat(formData.amount);
-      const adjustedAmount = type === "expense" ? -Math.abs(amount) : Math.abs(amount);
 
       const aiResponse = await categorizeSingleTransaction({
         name: formData.name,
         account_name: getAccountName(formData.account_id),
-        amount: adjustedAmount,
+        amount: amount, // Use signed amount directly
       });
 
       if (aiResponse.success && aiResponse.data) {
@@ -391,8 +390,8 @@ export function TransactionForm({
       newErrors.name = "Name is required";
     }
 
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
-      newErrors.amount = "Amount must be greater than 0";
+    if (!formData.amount || parseFloat(formData.amount) === 0) {
+      newErrors.amount = "Amount cannot be zero";
     }
 
     if (type === "transfer" && !formData.transfer_to_account_id) {
@@ -539,14 +538,13 @@ export function TransactionForm({
 
         {/* Amount */}
         <Input
-          label="Amount"
+          label="Amount (+ for income, - for expense)"
           type="number"
           step="0.01"
-          min="0"
           value={formData.amount}
           onChange={(e) => handleChange("amount", e.target.value)}
           onBlur={handleAmountBlur}
-          placeholder="0.00"
+          placeholder="100.00 or -50.00"
           error={errors.amount}
           fullWidth
         />

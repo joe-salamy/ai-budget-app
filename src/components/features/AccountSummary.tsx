@@ -190,9 +190,8 @@ interface AccountRowProps {
 }
 
 function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
-  // Display change from account perspective: flip sign for liability accounts
-  const displayChange =
-    account.account_type === "liability" ? -account.total_change : account.total_change;
+  // Use actual transaction signs without flipping
+  const displayChange = account.total_change;
   const changeColor =
     displayChange > 0
       ? "text-foreground"
@@ -264,10 +263,10 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-800/50">
-                  {account.transactions.map((txn) => {
-                    // Display amount from account perspective: flip sign for liability accounts
-                    const displayAmount =
-                      account.account_type === "liability" ? -txn.amount : txn.amount;
+                  {/* Display transactions newest-to-oldest */}
+                  {[...account.transactions].reverse().map((txn) => {
+                    // Use actual transaction signs without flipping
+                    const displayAmount = txn.amount;
                     const amountColor = "text-foreground";
 
                     return (

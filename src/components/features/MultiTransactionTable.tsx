@@ -11,15 +11,13 @@ import type { Account, Category, Subcategory } from "../../types";
 
 // ============== TYPES ==============
 
-export type RowTransactionType = "income" | "expense";
-
+// Removed income/expense type - using signed amounts instead
 export interface TransactionRowData {
   id: string; // Unique ID for React key
   date: string;
   account_id: string;
-  type: RowTransactionType; // Per-row income/expense selection
   name: string;
-  amount: string;
+  amount: string; // Signed value: positive for income, negative for expense
   subcategory_id: string;
   comment: string;
   // AI-related tracking
@@ -52,7 +50,6 @@ function createEmptyRow(defaultAccountId: string = ""): TransactionRowData {
     id: generateRowId(),
     date: today,
     account_id: defaultAccountId,
-    type: "expense", // Default to expense
     name: "",
     amount: "",
     subcategory_id: "",
@@ -100,40 +97,30 @@ export function MultiTransactionTable({
     }));
   }, [accounts]);
 
-  // Get subcategory options for a specific type (income or expense)
-  const getSubcategoryOptionsForType = useCallback(
-    (type: RowTransactionType): SelectOption[] => {
-      const categoryType = type === "income" ? "income" : "expense";
-      const relevantCategories = categories.filter((cat) => cat.type === categoryType);
-      const relevantCategoryIds = new Set(relevantCategories.map((cat) => cat.id));
-      const filteredSubcategories = subcategories.filter((sub) =>
-        relevantCategoryIds.has(sub.category_id)
-      );
+  // Get all subcategory options (no longer filtering by income/expense type)
+  const subcategoryOptions = useMemo((): SelectOption[] => {
+    const options: SelectOption[] = [];
+    const grouped = new Map<string, Subcategory[]>();
 
-      const options: SelectOption[] = [];
-      const grouped = new Map<string, Subcategory[]>();
+    subcategories.forEach((sub) => {
+      const existing = grouped.get(sub.category_id) || [];
+      grouped.set(sub.category_id, [...existing, sub]);
+    });
 
-      filteredSubcategories.forEach((sub) => {
-        const existing = grouped.get(sub.category_id) || [];
-        grouped.set(sub.category_id, [...existing, sub]);
-      });
+    grouped.forEach((subs, categoryId) => {
+      const category = categories.find((c) => c.id === categoryId);
+      if (!category) return;
 
-      grouped.forEach((subs, categoryId) => {
-        const category = categories.find((c) => c.id === categoryId);
-        if (!category) return;
-
-        subs.forEach((sub) => {
-          options.push({
-            value: sub.id,
-            label: `${category.name} > ${sub.name}`,
-          });
+      subs.forEach((sub) => {
+        options.push({
+          value: sub.id,
+          label: `${category.name} > ${sub.name}`,
         });
       });
+    });
 
-      return options;
-    },
-    [categories, subcategories]
-  );
+    return options;
+  }, [categories, subcategories]);
 
   // Get account name from account ID
   const getAccountName = useCallback(
@@ -145,7 +132,7 @@ export function MultiTransactionTable({
   );
 
   // Sorting handler
-  const handleSort = (column: "date" | "account" | "type" | "name" | "amount" | "subcategory") => {
+  const handleSort = (column: "date" | "account" | "name" | "amount" | "subcategory") => {
     if (sortColumn === column) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
@@ -180,9 +167,6 @@ export function MultiTransactionTable({
       } else if (sortColumn === "account") {
         aValue = getAccountName(a.account_id).toLowerCase();
         bValue = getAccountName(b.account_id).toLowerCase();
-      } else if (sortColumn === "type") {
-        aValue = a.type;
-        bValue = b.type;
       } else if (sortColumn === "name") {
         aValue = a.name.toLowerCase();
         bValue = b.name.toLowerCase();
@@ -210,14 +194,6 @@ export function MultiTransactionTable({
           if (row.id !== rowId) return row;
 
           const updated = { ...row, [field]: value };
-
-          // Reset subcategory and categorization when type changes
-          if (field === "type") {
-            updated.subcategory_id = "";
-            updated.categorizationSource = "none";
-            updated.ai_suggested = false;
-            updated.user_corrected = false;
-          }
 
           // Reset categorization if name, account, or amount changes
           if (field === "name" || field === "account_id" || field === "amount") {
@@ -509,10 +485,7 @@ export function MultiTransactionTable({
           const transactionsForAI = batch.map(({ row }) => ({
             name: row.name,
             account_name: getAccountName(row.account_id),
-            amount:
-              row.type === "expense"
-                ? -Math.abs(parseFloat(row.amount))
-                : Math.abs(parseFloat(row.amount)),
+            amount: parseFloat(row.amount), // Use signed amount directly
           }));
 
           const aiResponse = await categorizeBatchTransactions(transactionsForAI);
@@ -677,13 +650,6 @@ export function MultiTransactionTable({
                 {renderSortIcon("account")}
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground w-28"
-                onClick={() => handleSort("type")}
-              >
-                Type
-                {renderSortIcon("type")}
-              </th>
-              <th
                 className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase cursor-pointer hover:text-foreground"
                 onClick={() => handleSort("name")}
               >
@@ -713,7 +679,6 @@ export function MultiTransactionTable({
           <tbody className="divide-y divide-border">
             {sortedRows.map((row) => {
               const rowErrors = errors[row.id] || {};
-              const subcategoryOptions = getSubcategoryOptionsForType(row.type);
 
               return (
                 <tr key={row.id} className="hover:bg-muted">
@@ -745,24 +710,6 @@ export function MultiTransactionTable({
                             {opt.label}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </td>
-
-                  {/* Type */}
-                  <td className="px-4 py-4">
-                    <Select
-                      value={row.type}
-                      onValueChange={(value) =>
-                        handleRowChange(row.id, "type", value as RowTransactionType)
-                      }
-                    >
-                      <SelectTrigger className="w-full h-8 px-2 text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="expense">Expense</SelectItem>
-                        <SelectItem value="income">Income</SelectItem>
                       </SelectContent>
                     </Select>
                   </td>
@@ -802,7 +749,6 @@ export function MultiTransactionTable({
                         }}
                         type="number"
                         step="0.01"
-                        min="0"
                         value={row.amount}
                         onChange={(e) => handleRowChange(row.id, "amount", e.target.value)}
                         onKeyDown={(e) => {
@@ -810,7 +756,7 @@ export function MultiTransactionTable({
                           handleArrowNavigation(e, row.id, "amount");
                         }}
                         onPaste={(e) => handlePaste(e, row.id, "amount")}
-                        placeholder="0.00"
+                        placeholder="100 or -50"
                         className={`w-full pl-6 pr-2 py-1.5 bg-muted border rounded text-sm text-foreground placeholder:text-muted-foreground ${
                           rowErrors.amount ? "border-foreground" : "border-border"
                         }`}

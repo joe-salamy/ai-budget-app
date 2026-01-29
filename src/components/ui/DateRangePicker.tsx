@@ -236,13 +236,15 @@ export function DateRangePicker({
           onBlur={handleStartInputBlur}
           onKeyDown={handleStartInputKeyDown}
           placeholder="mm/dd/yyyy"
-          className="h-9 w-28 px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+          className="h-9 w-28 px-2 py-1.5 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
         />
-        <div className="absolute inset-0 flex items-center px-3 pointer-events-none text-sm z-10">
+        <div className="absolute inset-0 flex items-center px-2 pointer-events-none text-sm z-10">
           {startFocused && displayStartDate.length > 0 && displayStartDate.length < 10 && (
             <>
               <span className="opacity-0">{displayStartDate}</span>
-              <span className="text-muted-foreground opacity-60">{"mm/dd/yyyy".slice(displayStartDate.length)}</span>
+              <span className="text-muted-foreground opacity-60">
+                {"mm/dd/yyyy".slice(displayStartDate.length)}
+              </span>
             </>
           )}
         </div>
@@ -260,13 +262,15 @@ export function DateRangePicker({
           onBlur={handleEndInputBlur}
           onKeyDown={handleEndInputKeyDown}
           placeholder="mm/dd/yyyy"
-          className="h-9 w-28 px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+          className="h-9 w-28 px-2 py-1.5 text-sm bg-muted border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
         />
-        <div className="absolute inset-0 flex items-center px-3 pointer-events-none text-sm z-10">
+        <div className="absolute inset-0 flex items-center px-2 pointer-events-none text-sm z-10">
           {endFocused && displayEndDate.length > 0 && displayEndDate.length < 10 && (
             <>
               <span className="opacity-0">{displayEndDate}</span>
-              <span className="text-muted-foreground opacity-60">{"mm/dd/yyyy".slice(displayEndDate.length)}</span>
+              <span className="text-muted-foreground opacity-60">
+                {"mm/dd/yyyy".slice(displayEndDate.length)}
+              </span>
             </>
           )}
         </div>

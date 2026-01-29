@@ -376,7 +376,6 @@ function TransactionHistoryPage() {
         {editingTransaction && (
           <TransactionForm
             key={editingTransaction.id}
-            type={editingTransaction.amount >= 0 ? "income" : "expense"}
             accounts={accounts}
             categories={categories}
             subcategories={subcategories}
@@ -384,7 +383,7 @@ function TransactionHistoryPage() {
               date: editingTransaction.date,
               account_id: editingTransaction.account_id,
               name: editingTransaction.name,
-              amount: Math.abs(editingTransaction.amount).toString(),
+              amount: editingTransaction.amount.toString(), // Use signed amount directly
               subcategory_id: editingTransaction.subcategory_id || "",
               comment: editingTransaction.comment || "",
             }}

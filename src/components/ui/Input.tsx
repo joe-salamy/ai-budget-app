@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect } from "react";
+import { forwardRef, useState } from "react";
 import type { InputHTMLAttributes } from "react";
 
 import { cn, formatNumberWithCommas, parseNumberWithCommas, formatDateInput } from "@/lib/utils";
@@ -73,7 +73,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     // Handle date input focus
-    const handleDateFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleDateFocus = (_e: React.FocusEvent<HTMLInputElement>) => {
       if (isDateInput) {
         setIsDateFocused(true);
         // Initialize display value from current value

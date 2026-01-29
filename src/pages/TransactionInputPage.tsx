@@ -39,15 +39,14 @@ function TransactionInputPage() {
 
         for (const txn of transactions) {
           try {
-            // Read type from each row and apply sign
+            // Use signed amount directly (no conversion needed)
             const amount = parseFloat(txn.amount);
-            const signedAmount = txn.type === "income" ? Math.abs(amount) : -Math.abs(amount);
 
             const result = await addTransaction({
               account_id: txn.account_id,
               date: txn.date,
               name: txn.name,
-              amount: signedAmount,
+              amount: amount,
               subcategory_id: txn.subcategory_id || null,
               comment: txn.comment || null,
               is_transfer: false,
