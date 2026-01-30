@@ -28,9 +28,7 @@ export function SubcategoryForm({
   onCancel,
 }: SubcategoryFormProps) {
   const [name, setName] = useState(initialData?.name || "");
-  const [categoryId, setCategoryId] = useState<string>(
-    initialData?.category_id || ""
-  );
+  const [categoryId, setCategoryId] = useState<string>(initialData?.category_id || "");
   const [monthlyGoal, setMonthlyGoal] = useState<string>(
     initialData?.monthly_goal?.toString() || ""
   );

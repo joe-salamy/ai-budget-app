@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
-import {
-  LayoutDashboard,
-  DollarSign,
-  History,
-  Wrench,
-  Bot,
-  Menu,
-} from "lucide-react";
+import { LayoutDashboard, DollarSign, History, Wrench, Bot, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useChatPanel } from "@/hooks/useChatPanel";
 import { UserProfileMenu } from "./UserProfileMenu";
@@ -51,9 +44,7 @@ export function Navbar() {
             to="/dashboard"
             className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <h1 className="whitespace-nowrap text-2xl font-bold text-foreground">
-              AI Budget App
-            </h1>
+            <h1 className="whitespace-nowrap text-2xl font-bold text-foreground">AI Budget App</h1>
           </Link>
 
           {/* Desktop Navigation Links */}

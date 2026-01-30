@@ -260,7 +260,9 @@ export function ChatSidePanel() {
                 I can help you manage your budget, track spending, add transactions, and more.
               </p>
               <div className="space-y-2 w-full max-w-xs">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">Try asking:</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                  Try asking:
+                </p>
                 {[
                   "What's my spending this month?",
                   "Add a $50 grocery expense",
@@ -293,9 +295,7 @@ export function ChatSidePanel() {
 
                   <div
                     className={`group relative max-w-[85%] rounded-lg px-4 py-2.5 ${
-                      message.role === "user"
-                        ? "bg-foreground text-white"
-                        : "bg-card text-gray-100"
+                      message.role === "user" ? "bg-foreground text-white" : "bg-card text-gray-100"
                     }`}
                   >
                     {message.role === "assistant" ? (

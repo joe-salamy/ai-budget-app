@@ -234,7 +234,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               {isDateFocused && dateDisplayValue.length > 0 && dateDisplayValue.length < 10 && (
                 <>
                   <span className="opacity-0">{dateDisplayValue}</span>
-                  <span className="text-muted-foreground opacity-60">{"mm/dd/yyyy".slice(dateDisplayValue.length)}</span>
+                  <span className="text-muted-foreground opacity-60">
+                    {"mm/dd/yyyy".slice(dateDisplayValue.length)}
+                  </span>
                 </>
               )}
             </div>

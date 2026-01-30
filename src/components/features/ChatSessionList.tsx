@@ -106,9 +106,7 @@ export function ChatSessionList({
       >
         <MessageSquare className="w-4 h-4 flex-shrink-0" />
         <span className="truncate">{currentSession?.title || "New Chat"}</span>
-        <ChevronDown
-          className={`w-4 h-4 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`w-4 h-4 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown menu */}
@@ -130,9 +128,13 @@ export function ChatSessionList({
           {/* Sessions list */}
           <div className="max-h-64 overflow-y-auto">
             {loading ? (
-              <div className="p-4 text-center text-muted-foreground text-sm">Loading sessions...</div>
+              <div className="p-4 text-center text-muted-foreground text-sm">
+                Loading sessions...
+              </div>
             ) : sessions.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground text-sm">No chat sessions yet</div>
+              <div className="p-4 text-center text-muted-foreground text-sm">
+                No chat sessions yet
+              </div>
             ) : (
               sessions.map((session) => (
                 <div

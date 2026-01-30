@@ -1,6 +1,10 @@
 ### To do
 
-- Read all code
+- Delete unused code
+  - Go through each folder, correct all build errors + delete unused code
+  - Go through each table in DB, fix
+- Keep frontend around, so can test functionality + the AI chatbot
+
 - Create AI chatbot functionality
 - Refactor entire frontend using Stitch
 
@@ -54,6 +58,7 @@
 
 - **Data export**: Download as csv
 - **Running balance**: Doesn't calculate properly, annoying
+- **Initial balance**: Treat just like any other transaction, this is retarded+
 
 ### Checklist
 
@@ -71,4 +76,6 @@
 
 # What I learned
 
+- Designing UI/UX yourself is useless - just design around functionality, and have Stich/AI design UI
+- Read the logic, AI is retarded
 - Ton of UI/UX fixes are just the z-value. AI is fucking retarded.

@@ -274,7 +274,9 @@ export function FinancialHealthScore({ startDate, endDate }: FinancialHealthScor
                 <span className="text-3xl font-bold text-muted-foreground">--</span>
               </div>
               <p className="text-foreground">{error || "Unable to calculate score"}</p>
-              <p className="text-sm text-muted-foreground mt-1">Try adding more transactions and goals</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Try adding more transactions and goals
+              </p>
             </div>
           </div>
         </CardContent>

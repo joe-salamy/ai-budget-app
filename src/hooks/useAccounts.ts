@@ -8,7 +8,7 @@ import {
 } from "../services/accounts";
 import { useAuth } from "./useAuth";
 import { queryKeys } from "../lib/queryKeys";
-import type { AccountType } from "../types";
+import type { AccountType, Account } from "../types";
 import type { AccountWithBalance } from "../services/accounts";
 
 interface UseAccountsReturn {
@@ -20,11 +20,11 @@ interface UseAccountsReturn {
     name: string,
     type: AccountType,
     initialBalance: number
-  ) => Promise<{ success: boolean; error?: string; data?: AccountWithBalance }>;
+  ) => Promise<{ success: boolean; error?: string; data?: Account }>;
   editAccount: (
     id: string,
     updates: { name?: string; type?: AccountType; initial_balance?: number }
-  ) => Promise<{ success: boolean; error?: string; data?: AccountWithBalance }>;
+  ) => Promise<{ success: boolean; error?: string; data?: Account }>;
   removeAccount: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
 

@@ -53,11 +53,7 @@ export function ConfirmDeleteModal({
           <Button variant="ghost" onClick={handleClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button
-            variant="danger"
-            onClick={handleConfirm}
-            isLoading={isLoading}
-          >
+          <Button variant="danger" onClick={handleConfirm} isLoading={isLoading}>
             Delete
           </Button>
         </>
@@ -89,13 +85,9 @@ export function ConfirmDeleteModal({
           ?
         </p>
 
-        <p className="text-center text-sm text-muted-foreground">
-          This action cannot be undone.
-        </p>
+        <p className="text-center text-sm text-muted-foreground">This action cannot be undone.</p>
 
-        {error && (
-          <p className="text-sm text-foreground text-center">{error}</p>
-        )}
+        {error && <p className="text-sm text-foreground text-center">{error}</p>}
       </div>
     </Modal>
   );

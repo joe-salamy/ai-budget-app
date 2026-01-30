@@ -64,38 +64,26 @@ export function SimpleSelect({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          {hasGroups ? (
-            groups.map((group) => (
-              <SelectGroup key={group.label}>
-                <SelectLabel>{group.label}</SelectLabel>
-                {group.options.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    disabled={option.disabled}
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            ))
-          ) : (
-            options.map((option) => (
-              <SelectItem
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </SelectItem>
-            ))
-          )}
+          {hasGroups
+            ? groups.map((group) => (
+                <SelectGroup key={group.label}>
+                  <SelectLabel>{group.label}</SelectLabel>
+                  {group.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))
+            : options.map((option) => (
+                <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+                  {option.label}
+                </SelectItem>
+              ))}
         </SelectContent>
       </Select>
       {error && <p className="mt-1.5 text-sm text-destructive">{error}</p>}
-      {helperText && !error && (
-        <p className="mt-1.5 text-sm text-muted-foreground">{helperText}</p>
-      )}
+      {helperText && !error && <p className="mt-1.5 text-sm text-muted-foreground">{helperText}</p>}
     </div>
   );
 }

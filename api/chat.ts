@@ -222,7 +222,8 @@ const AVAILABLE_FUNCTIONS = [
         },
         target_date: {
           type: "string",
-          description: "Target date to reach the goal in YYYY-MM-DD format (optional if target_amount provided)",
+          description:
+            "Target date to reach the goal in YYYY-MM-DD format (optional if target_amount provided)",
         },
         current_amount: {
           type: "number",
@@ -809,7 +810,12 @@ async function executeFunctionCall(
       }
 
       case "create_saving_goal": {
-        const { name: goalName, target_amount, target_date, current_amount } = args as {
+        const {
+          name: goalName,
+          target_amount,
+          target_date,
+          current_amount,
+        } = args as {
           name: string;
           target_amount?: number;
           target_date?: string;

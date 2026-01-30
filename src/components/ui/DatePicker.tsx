@@ -118,21 +118,12 @@ export function DatePicker({
     <div className={cn("flex items-center gap-1", className)}>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            type="button"
-          >
+          <Button variant="outline" className="h-8 w-8 p-0" type="button">
             <CalendarIcon className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleSelect}
-            initialFocus
-          />
+          <Calendar mode="single" selected={selectedDate} onSelect={handleSelect} initialFocus />
         </PopoverContent>
       </Popover>
 
@@ -151,7 +142,9 @@ export function DatePicker({
           {isFocused && displayDate.length > 0 && displayDate.length < 10 && (
             <>
               <span className="opacity-0">{displayDate}</span>
-              <span className="text-muted-foreground opacity-60">{placeholder.slice(displayDate.length)}</span>
+              <span className="text-muted-foreground opacity-60">
+                {placeholder.slice(displayDate.length)}
+              </span>
             </>
           )}
         </div>

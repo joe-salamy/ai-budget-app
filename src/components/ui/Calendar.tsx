@@ -5,12 +5,7 @@ import { cn } from "../../lib/utils";
 
 export type CalendarProps = DayPickerProps;
 
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}: CalendarProps) {
+function Calendar({ className, classNames, showOutsideDays = true, ...props }: CalendarProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -42,8 +37,7 @@ function Calendar({
         outside:
           "outside text-muted-foreground/40 aria-selected:bg-muted/50 aria-selected:text-muted-foreground/40",
         disabled: "text-muted-foreground opacity-50",
-        range_middle:
-          "aria-selected:bg-muted aria-selected:text-foreground",
+        range_middle: "aria-selected:bg-muted aria-selected:text-foreground",
         hidden: "invisible",
         ...classNames,
       }}

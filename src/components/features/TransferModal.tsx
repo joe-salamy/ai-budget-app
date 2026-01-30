@@ -159,9 +159,7 @@ export function TransferModal({ isOpen, onClose, accounts, onSubmit }: TransferM
         <div className="space-y-1">
           <label className="text-sm font-medium text-foreground">From Account</label>
           <Select value={fromAccountId || undefined} onValueChange={handleFromAccountChange}>
-            <SelectTrigger
-              className={`w-full ${errors.fromAccountId ? "border-destructive" : ""}`}
-            >
+            <SelectTrigger className={`w-full ${errors.fromAccountId ? "border-destructive" : ""}`}>
               <SelectValue placeholder="Select account..." />
             </SelectTrigger>
             <SelectContent>
@@ -172,7 +170,9 @@ export function TransferModal({ isOpen, onClose, accounts, onSubmit }: TransferM
               ))}
             </SelectContent>
           </Select>
-          {errors.fromAccountId && <p className="text-xs text-destructive">{errors.fromAccountId}</p>}
+          {errors.fromAccountId && (
+            <p className="text-xs text-destructive">{errors.fromAccountId}</p>
+          )}
         </div>
 
         {/* To Account */}
@@ -190,7 +190,9 @@ export function TransferModal({ isOpen, onClose, accounts, onSubmit }: TransferM
             disabled={!fromAccountId}
           >
             <SelectTrigger className={`w-full ${errors.toAccountId ? "border-destructive" : ""}`}>
-              <SelectValue placeholder={fromAccountId ? "Select account..." : "Select from account first"} />
+              <SelectValue
+                placeholder={fromAccountId ? "Select account..." : "Select from account first"}
+              />
             </SelectTrigger>
             <SelectContent>
               {toAccountOptions.map((acc) => (

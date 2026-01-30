@@ -32,9 +32,7 @@ export function CategoryForm({
   disableTypeChange = false,
 }: CategoryFormProps) {
   const [name, setName] = useState(initialData?.name || "");
-  const [type, setType] = useState<CategoryType>(
-    initialData?.type || "expense"
-  );
+  const [type, setType] = useState<CategoryType>(initialData?.type || "expense");
   const [error, setError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -88,9 +86,7 @@ export function CategoryForm({
         placeholder="e.g., Groceries, Salary"
         required
         disabled={isSystemCategory}
-        helperText={
-          isSystemCategory ? "System categories cannot be edited" : undefined
-        }
+        helperText={isSystemCategory ? "System categories cannot be edited" : undefined}
       />
 
       <SimpleSelect

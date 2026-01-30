@@ -70,7 +70,9 @@ export function MultiSelect({
         className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring"
       >
         <span className="truncate">{getDisplayText()}</span>
-        <ChevronDown className={`h-4 w-4 opacity-50 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-4 w-4 opacity-50 transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {/* Dropdown Menu */}

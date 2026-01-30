@@ -137,7 +137,11 @@ export function useCategories(): UseCategoriesReturn {
 
   // Subcategory mutations
   const addSubcategoryMutation = useMutation({
-    mutationFn: async (data: { name: string; category_id: string; monthly_goal?: number | null }) => {
+    mutationFn: async (data: {
+      name: string;
+      category_id: string;
+      monthly_goal?: number | null;
+    }) => {
       return await createSubcategory(data);
     },
     onSuccess: () => {
@@ -197,7 +201,10 @@ export function useCategories(): UseCategoriesReturn {
     return result;
   };
 
-  const editSubcategory = async (id: string, updates: { name?: string; category_id?: string; monthly_goal?: number | null }) => {
+  const editSubcategory = async (
+    id: string,
+    updates: { name?: string; category_id?: string; monthly_goal?: number | null }
+  ) => {
     const result = await updateSubcategoryMutation.mutateAsync({ id, updates });
     return result;
   };

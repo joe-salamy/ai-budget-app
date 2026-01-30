@@ -76,10 +76,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-sm text-foreground">{entry.name}</span>
             </div>
             <span
@@ -145,9 +142,7 @@ export function NetWorthChart({ data, accounts, loading }: NetWorthChartProps) {
     if (assetIndex >= 0) {
       return ASSET_COLORS[assetIndex % ASSET_COLORS.length];
     }
-    const liabilityIndex = liabilityAccounts.findIndex(
-      (a) => a.name === accountName
-    );
+    const liabilityIndex = liabilityAccounts.findIndex((a) => a.name === accountName);
     if (liabilityIndex >= 0) {
       return LIABILITY_COLORS[liabilityIndex % LIABILITY_COLORS.length];
     }
@@ -173,9 +168,7 @@ export function NetWorthChart({ data, accounts, loading }: NetWorthChartProps) {
         <Tooltip content={<CustomTooltip />} />
         <Legend
           wrapperStyle={{ paddingTop: 10 }}
-          formatter={(value) => (
-            <span className="text-foreground text-sm">{value}</span>
-          )}
+          formatter={(value) => <span className="text-foreground text-sm">{value}</span>}
         />
 
         {/* Net Worth line - always shown prominently */}

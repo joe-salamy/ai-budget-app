@@ -34,10 +34,7 @@ export function UserProfileMenu() {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="w-56 bg-card border border-border shadow-xl"
-      >
+      <DropdownMenuContent align="end" className="w-56 bg-card border border-border shadow-xl">
         <DropdownMenuLabel className="text-foreground">{user?.email}</DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-border" />
         <DropdownMenuItem

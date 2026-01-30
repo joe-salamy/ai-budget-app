@@ -284,9 +284,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
           {category.goal !== null ? formatCurrency(category.goal) : "-"}
         </td>
         <td
-          className={`px-4 py-3 text-sm text-right ${getDifferenceColor(
-            category.difference
-          )}`}
+          className={`px-4 py-3 text-sm text-right ${getDifferenceColor(category.difference)}`}
           style={{ width: "19%" }}
         >
           {getDifferenceLabel(category.difference, category.category_type)}
@@ -338,40 +336,43 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
                     .slice()
                     .sort((a, b) => a.subcategory_name.localeCompare(b.subcategory_name))
                     .map((subcategory) => {
-                    const subTotalColor = "text-foreground";
+                      const subTotalColor = "text-foreground";
 
-                    return (
-                      <tr key={subcategory.subcategory_id} className="hover:bg-card/20">
-                        <td className="px-8 py-2" style={{ width: "4%" }}>
-                          {/* Spacer */}
-                        </td>
-                        <td className="px-4 py-2 text-sm text-foreground" style={{ width: "40%" }}>
-                          {subcategory.subcategory_name}
-                        </td>
-                        <td
-                          className={`px-4 py-2 text-sm text-right ${subTotalColor}`}
-                          style={{ width: "19%" }}
-                        >
-                          {category.category_type === "income" ? "+" : ""}
-                          {formatCurrency(Math.abs(subcategory.total))}
-                        </td>
-                        <td
-                          className="px-4 py-2 text-sm text-right text-muted-foreground"
-                          style={{ width: "18%" }}
-                        >
-                          {subcategory.goal !== null ? formatCurrency(subcategory.goal) : "-"}
-                        </td>
-                        <td
-                          className={`px-4 py-2 text-sm text-right ${getDifferenceColor(
-                            subcategory.difference
-                          )}`}
-                          style={{ width: "19%" }}
-                        >
-                          {getDifferenceLabel(subcategory.difference, category.category_type)}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                      return (
+                        <tr key={subcategory.subcategory_id} className="hover:bg-card/20">
+                          <td className="px-8 py-2" style={{ width: "4%" }}>
+                            {/* Spacer */}
+                          </td>
+                          <td
+                            className="px-4 py-2 text-sm text-foreground"
+                            style={{ width: "40%" }}
+                          >
+                            {subcategory.subcategory_name}
+                          </td>
+                          <td
+                            className={`px-4 py-2 text-sm text-right ${subTotalColor}`}
+                            style={{ width: "19%" }}
+                          >
+                            {category.category_type === "income" ? "+" : ""}
+                            {formatCurrency(Math.abs(subcategory.total))}
+                          </td>
+                          <td
+                            className="px-4 py-2 text-sm text-right text-muted-foreground"
+                            style={{ width: "18%" }}
+                          >
+                            {subcategory.goal !== null ? formatCurrency(subcategory.goal) : "-"}
+                          </td>
+                          <td
+                            className={`px-4 py-2 text-sm text-right ${getDifferenceColor(
+                              subcategory.difference
+                            )}`}
+                            style={{ width: "19%" }}
+                          >
+                            {getDifferenceLabel(subcategory.difference, category.category_type)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
