@@ -23,7 +23,7 @@ interface UseAccountsReturn {
   ) => Promise<{ success: boolean; error?: string; data?: Account }>;
   editAccount: (
     id: string,
-    updates: { name?: string; type?: AccountType; initial_balance?: number }
+    updates: { name?: string; type?: AccountType }
   ) => Promise<{ success: boolean; error?: string; data?: Account }>;
   removeAccount: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
@@ -76,7 +76,7 @@ export function useAccounts(): UseAccountsReturn {
       updates,
     }: {
       id: string;
-      updates: { name?: string; type?: AccountType; initial_balance?: number };
+      updates: { name?: string; type?: AccountType };
     }) => {
       return await updateAccount(id, updates);
     },
@@ -107,10 +107,7 @@ export function useAccounts(): UseAccountsReturn {
     return result;
   };
 
-  const editAccount = async (
-    id: string,
-    updates: { name?: string; type?: AccountType; initial_balance?: number }
-  ) => {
+  const editAccount = async (id: string, updates: { name?: string; type?: AccountType }) => {
     const result = await updateMutation.mutateAsync({ id, updates });
     return result;
   };

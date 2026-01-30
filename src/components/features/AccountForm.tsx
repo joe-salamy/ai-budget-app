@@ -32,9 +32,7 @@ export function AccountForm({
 }: AccountFormProps) {
   const [name, setName] = useState(initialData?.name || "");
   const [type, setType] = useState<AccountType>(initialData?.type || "asset");
-  const [initialBalance, setInitialBalance] = useState<string>(
-    initialData?.initial_balance.toString() || "0"
-  );
+  const [initialBalance, setInitialBalance] = useState<string>("0");
   const [error, setError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -43,7 +41,7 @@ export function AccountForm({
     if (initialData) {
       setName(initialData.name);
       setType(initialData.type);
-      setInitialBalance(initialData.initial_balance.toString());
+      // Note: initialBalance is not updated from initialData since it's managed through transactions
     }
   }, [initialData]);
 
@@ -103,16 +101,18 @@ export function AccountForm({
         required
       />
 
-      <Input
-        label="Initial Balance"
-        type="number"
-        step="0.01"
-        value={initialBalance}
-        onChange={(e) => setInitialBalance(e.target.value)}
-        placeholder="0.00"
-        helperText="The starting balance for this account"
-        required
-      />
+      {!initialData && (
+        <Input
+          label="Initial Balance"
+          type="number"
+          step="0.01"
+          value={initialBalance}
+          onChange={(e) => setInitialBalance(e.target.value)}
+          placeholder="0.00"
+          helperText="The starting balance for this account"
+          required
+        />
+      )}
 
       {error && <p className="text-sm text-foreground">{error}</p>}
 

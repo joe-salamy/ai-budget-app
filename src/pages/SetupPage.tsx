@@ -26,7 +26,6 @@ function SetupPage() {
     id: string;
     name: string;
     type: string;
-    initial_balance: number;
   } | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
@@ -36,7 +35,6 @@ function SetupPage() {
   const [editAccountData, setEditAccountData] = useState({
     name: "",
     type: "asset" as "asset" | "liability",
-    initialBalance: 0,
   });
 
   // Sorting state for each table
@@ -93,13 +91,11 @@ function SetupPage() {
     id: string;
     name: string;
     type: string;
-    initial_balance: number;
   }) => {
     setEditingAccount(account);
     setEditAccountData({
       name: account.name,
       type: account.type as "asset" | "liability",
-      initialBalance: account.initial_balance,
     });
   };
 
@@ -108,17 +104,16 @@ function SetupPage() {
     const result = await editAccount(editingAccount.id, {
       name: editAccountData.name.trim(),
       type: editAccountData.type,
-      initial_balance: editAccountData.initialBalance,
     });
     if (result.success) {
       setEditingAccount(null);
-      setEditAccountData({ name: "", type: "asset", initialBalance: 0 });
+      setEditAccountData({ name: "", type: "asset" });
     }
   };
 
   const handleCancelAccountEdit = () => {
     setEditingAccount(null);
-    setEditAccountData({ name: "", type: "asset", initialBalance: 0 });
+    setEditAccountData({ name: "", type: "asset" });
   };
 
   const handleDeleteAccount = async (id: string) => {
@@ -958,21 +953,10 @@ function SetupPage() {
                 <option value="liability">Liability</option>
               </select>
             </div>
-            <Input
-              id="accountBalance"
-              label="Initial Balance"
-              type="number"
-              step="0.01"
-              value={editAccountData.initialBalance}
-              onChange={(e) =>
-                setEditAccountData({
-                  ...editAccountData,
-                  initialBalance: parseFloat(e.target.value) || 0,
-                })
-              }
-              placeholder="0.00"
-              fullWidth
-            />
+            <p className="text-sm text-muted-foreground">
+              Note: Initial balance cannot be edited here. To adjust the initial balance, edit or
+              delete the initial balance transaction in the transaction history.
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={handleCancelAccountEdit}>

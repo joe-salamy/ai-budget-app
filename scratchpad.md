@@ -1,15 +1,16 @@
 ### To do
 
 - Fix DB, have it delete unused columns
-
-- Create AI chatbot functionality
-
+  - > accounts: Simplify initial balance as just transaction (Continue this)
+  - categories: Why are there system categories? When would those be used?
+  - saving_goals: Delete, unneeded table
+  - subcategories: Why are there system subcategories?
 - Remove transfers entirely
-- Add system instructions (for this transaction, add this one [transfer to brokerage, roth])
-- Describe the agent dilemma to Gemini/Claude, see best solution
+  - transactions: Delete transfers entirely, from the entire repo. Delete the "Add Transfer" card from "Input Transactions". In the DB, delete transactions columns is_transfer and transfer_to_account_id
 
 ### Overall plan
 
+- Create AI chatbot functionality
 - Test backend (debug React with dev tools) (keep existing frontend around for testing)
 - Refactor entire frontend using Stitch
   - Mandatory rules on rewrite: wherever possible, use default shadcn instead of creating my own components, and use default tailwind instead of creating custom css
@@ -35,6 +36,9 @@
   4. Iterate for known transactions (filter to unique? Use most recent)
   5. Send unknown to LM
   6. Paste all transactions into Add Transactions, in original order
+- Add system instructions (for this transaction, add this one [transfer to brokerage, roth])
+- If agent consumes this already, bother with regex function + search existing transactions? LLM already consuming the tokens
+  - Describe the agent dilemma to Gemini/Claude, see best solution
 
 ### Settings
 

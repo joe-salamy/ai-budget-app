@@ -13,7 +13,6 @@ export interface Account {
   user_id: string;
   name: string;
   type: AccountType;
-  initial_balance: number;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

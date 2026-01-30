@@ -90,7 +90,7 @@ export async function getAccountSummary(
     // Get all accounts
     const { data: accounts, error: accountsError } = await supabase
       .from("accounts")
-      .select("id, name, type, initial_balance")
+      .select("id, name, type")
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .order("type", { ascending: true })
@@ -120,8 +120,7 @@ export async function getAccountSummary(
           .lt("date", startDate)
           .is("deleted_at", null);
 
-        const priorSum = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
-        const startingBalance = account.initial_balance + priorSum;
+        const startingBalance = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
         // Get transactions in the date range with details
         const { data: rangeTransactions } = await supabase
@@ -388,7 +387,7 @@ export async function calculateNetWorth(atDate: string): Promise<NetWorthRespons
     // Get all accounts
     const { data: accounts, error: accountsError } = await supabase
       .from("accounts")
-      .select("id, type, initial_balance")
+      .select("id, type")
       .eq("user_id", user.id)
       .is("deleted_at", null);
 
@@ -409,7 +408,7 @@ export async function calculateNetWorth(atDate: string): Promise<NetWorthRespons
 
     await Promise.all(
       accounts.map(async (account) => {
-        // Get sum of all transactions up to the date
+        // Get sum of all transactions up to the date (including initial balance transactions)
         const { data: transactions } = await supabase
           .from("transactions")
           .select("amount")
