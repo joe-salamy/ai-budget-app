@@ -198,7 +198,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               value={displayValue}
               onChange={handleNumberChange}
               onBlur={handleNumberBlur}
-              aria-invalid={error ? "true" : "false"}
+              {...(error && { "aria-invalid": "true" })}
               aria-describedby={
                 error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
               }
@@ -224,7 +224,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               onChange={handleDateChange}
               onFocus={handleDateFocus}
               onBlur={handleDateBlur}
-              aria-invalid={error ? "true" : "false"}
+              {...(error && { "aria-invalid": "true" })}
               aria-describedby={
                 error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
               }
@@ -253,7 +253,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             )}
             ref={ref}
             disabled={disabled}
-            aria-invalid={error ? "true" : "false"}
+            {...(error && { "aria-invalid": "true" })}
             aria-describedby={
               error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
             }

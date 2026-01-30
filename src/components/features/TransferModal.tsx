@@ -138,8 +138,11 @@ export function TransferModal({ isOpen, onClose, accounts, onSubmit }: TransferM
 
         {/* Date */}
         <div className="space-y-1">
-          <label className="text-sm font-medium text-foreground">Date</label>
+          <label htmlFor="transfer-date" className="text-sm font-medium text-foreground">
+            Date
+          </label>
           <input
+            id="transfer-date"
             type="date"
             value={date}
             onChange={(e) => {
@@ -181,7 +184,7 @@ export function TransferModal({ isOpen, onClose, accounts, onSubmit }: TransferM
           <label className="text-sm font-medium text-foreground">To Account</label>
           <Select
             value={toAccountId || undefined}
-            onValueChange={(value) => {
+            onValueChange={(value: string) => {
               setToAccountId(value);
               setErrors((prev) => {
                 const { toAccountId: _, ...rest } = prev;

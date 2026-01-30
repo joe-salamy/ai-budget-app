@@ -241,11 +241,9 @@ function TransactionHistoryPage() {
       <div className="rounded-lg border border-border bg-card hover:border-foreground/30 hover:shadow-lg">
         {/* Clear filters button - fixed position at top right */}
         <div
-          className="flex justify-end px-4 pt-3"
-          style={{
-            minHeight: hasFilters ? "40px" : "0",
-            visibility: hasFilters ? "visible" : "hidden",
-          }}
+          className={`flex justify-end px-4 pt-3 ${
+            hasFilters ? "min-h-10 visible" : "min-h-0 invisible"
+          }`}
         >
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             Clear filters

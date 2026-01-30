@@ -68,14 +68,14 @@ export function SimpleSelect({
             ? groups.map((group) => (
                 <SelectGroup key={group.label}>
                   <SelectLabel>{group.label}</SelectLabel>
-                  {group.options.map((option) => (
+                  {group.options.map((option: SelectOption) => (
                     <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
                       {option.label}
                     </SelectItem>
                   ))}
                 </SelectGroup>
               ))
-            : options.map((option) => (
+            : options.map((option: SelectOption) => (
                 <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
                   {option.label}
                 </SelectItem>

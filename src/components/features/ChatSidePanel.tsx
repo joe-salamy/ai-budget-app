@@ -212,6 +212,7 @@ export function ChatSidePanel() {
             />
           </div>
           <button
+            type="button"
             onClick={closePanel}
             className="p-1.5 rounded-md text-muted-foreground hover:text-white hover:bg-muted"
             title="Close panel (Esc)"
@@ -225,6 +226,7 @@ export function ChatSidePanel() {
           {QUICK_ACTIONS.map((action) => (
             <button
               key={action.label}
+              type="button"
               onClick={() => handleQuickAction(action.prompt)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-muted hover:bg-muted text-foreground hover:text-white text-xs font-medium whitespace-nowrap border border-transparent hover:border-border"
               title={action.prompt}
@@ -240,7 +242,12 @@ export function ChatSidePanel() {
           <div className="flex items-center gap-2 px-4 py-2 bg-foreground/30 border-b border-foreground text-foreground text-sm">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span className="flex-1">{error}</span>
-            <button onClick={clearError} className="p-1 hover:text-foreground" title="Dismiss">
+            <button
+              type="button"
+              onClick={clearError}
+              className="p-1 hover:text-foreground"
+              title="Dismiss"
+            >
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -309,6 +316,7 @@ export function ChatSidePanel() {
                     {/* Copy button for assistant messages */}
                     {message.role === "assistant" && (
                       <button
+                        type="button"
                         onClick={() => handleCopyMessage(message.id, message.content)}
                         className="absolute -bottom-6 left-0 opacity-0 group-hover:opacity-100 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                         title="Copy message"

@@ -107,7 +107,7 @@ export function SankeyDiagram({ data, loading }: SankeyDiagramProps) {
   }
 
   return (
-    <div style={{ height: 320 }}>
+    <div className="h-80">
       <ResponsiveSankey
         data={data}
         margin={{ top: 20, right: 120, bottom: 20, left: 120 }}

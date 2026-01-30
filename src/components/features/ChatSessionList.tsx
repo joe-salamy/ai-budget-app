@@ -2,7 +2,7 @@
 // Displays a dropdown/list of chat sessions with management options
 
 import { useState, useRef, useEffect } from "react";
-import type { FormEvent, KeyboardEvent, MouseEvent } from "react";
+import type { FormEvent, KeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { MessageSquare, Plus, Trash2, Pencil, Check, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -35,7 +35,7 @@ export function ChatSessionList({
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: Event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         setEditingId(null);
@@ -54,7 +54,7 @@ export function ChatSessionList({
     }
   }, [editingId]);
 
-  const handleStartEdit = (session: ChatSession, e: MouseEvent) => {
+  const handleStartEdit = (session: ChatSession, e: ReactMouseEvent) => {
     e.stopPropagation();
     setEditingId(session.id);
     setEditTitle(session.title);
@@ -79,7 +79,7 @@ export function ChatSessionList({
     }
   };
 
-  const handleDelete = (sessionId: string, e: MouseEvent) => {
+  const handleDelete = (sessionId: string, e: ReactMouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Delete this chat session?")) {
       onDeleteSession(sessionId);
@@ -100,6 +100,7 @@ export function ChatSessionList({
     <div className="relative" ref={dropdownRef}>
       {/* Current session button / dropdown trigger */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-card hover:bg-muted text-sm text-gray-200 max-w-[200px] border border-transparent hover:border-border"
         title={currentSession?.title || "Select a session"}
@@ -158,6 +159,8 @@ export function ChatSessionList({
                         onKeyDown={handleKeyDown}
                         className="flex-1 px-2 py-1 text-sm bg-background border border-border rounded text-white focus:outline-none focus:border-foreground"
                         maxLength={50}
+                        aria-label="Session title"
+                        placeholder="Session title"
                       />
                       <button
                         type="submit"
@@ -188,6 +191,7 @@ export function ChatSessionList({
                       </div>
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
                         <button
+                          type="button"
                           onClick={(e) => handleStartEdit(session, e)}
                           className="p-1 text-muted-foreground hover:text-foreground"
                           title="Rename"
@@ -195,6 +199,7 @@ export function ChatSessionList({
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
+                          type="button"
                           onClick={(e) => handleDelete(session.id, e)}
                           className="p-1 text-muted-foreground hover:text-foreground"
                           title="Delete"

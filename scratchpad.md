@@ -1,25 +1,25 @@
 ### To do
 
-- Delete unused code
-  - Go through each folder, delete unused code
-  - Go through each folder, correct all build errors (only in compomnents, all 3 folders)
-  - Go through each table in DB, fix
-- Keep frontend around, so can test functionality + the AI chatbot
+- Fix DB, have it delete unused columns
 
 - Create AI chatbot functionality
+
+- Remove transfers entirely
+- Add system instructions (for this transaction, add this one [transfer to brokerage, roth])
+- Describe the agent dilemma to Gemini/Claude, see best solution
+
+### Overall plan
+
+- Test backend (debug React with dev tools) (keep existing frontend around for testing)
 - Refactor entire frontend using Stitch
-
-Remove transfers entirely
-Add system instructions (for this transaction, add this one [transfer to brokerage, roth])
-What's best way to do the model? Describe my dilemma to Gemini / Claude
-
-### Prompt queue
+  - Mandatory rules on rewrite: wherever possible, use default shadcn instead of creating my own components, and use default tailwind instead of creating custom css
 
 ### General
 
 - **Tech stack**: Create summary of tech stack so I can use again, just want to get used to something
 - **Package versioning**: Check every package, ensure correct versioning. If catch error, add comment explicitly stating what version to use.
   - "The issue was that your project uses react-day-picker v9, which changed the classNames API from v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class names:"
+  - Add comments next to imports emphasizing versionings
 - **Privacy**: Best method for encryption / privacy for budget app? Want friends to feel more secure that I can’t just see all their transactions. Encrypted db?
 - **Keyboard shortcuts**: Page nav, all users actions (after UI sweep)
 - **Data loading**: Change the data loading to save data - going from last 365 days to last 90 days to last 30 days shouldn't be a new data queue. Just filter display the already-known data to only display last 30 days. Also, don't like the delay between loads - what causes that? Read the loading files
@@ -27,7 +27,6 @@ What's best way to do the model? Describe my dilemma to Gemini / Claude
 ### AI
 
 - **Categorize after startup**: Desired first user action is copy/paste transaction history into AI - how to get these all right, w/o user data? That's the wow moment.
-- **Search bar**: Most visible thing, rotating placeholder messages (just redesign with Stitch)
 - **Agent design**: Model? Langgraph? Logging? Handle multiple actions, task queue?
 - **Bulk transaction logic**:
   1. Paste transactions
@@ -36,8 +35,6 @@ What's best way to do the model? Describe my dilemma to Gemini / Claude
   4. Iterate for known transactions (filter to unique? Use most recent)
   5. Send unknown to LM
   6. Paste all transactions into Add Transactions, in original order
-
-### Navbar
 
 ### Settings
 
@@ -79,7 +76,7 @@ What's best way to do the model? Describe my dilemma to Gemini / Claude
 
 - Account value goals? By certain date? Can count start and end date, calculate progress
 
-# What I learned
+### What I learned
 
 - Designing UI/UX yourself is useless - just design around functionality, and have Stich/AI design UI
 - Read the logic, AI is retarded

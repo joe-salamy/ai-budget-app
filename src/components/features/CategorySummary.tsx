@@ -115,43 +115,25 @@ export function CategorySummary({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700" style={{ tableLayout: "fixed" }}>
+        <table className="min-w-full divide-y divide-gray-700 table-fixed">
           <thead className="bg-card/30">
             <tr>
-              <th
-                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "4%" }}
-              >
+              <th className="w-[4%] px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {/* Expand icon */}
               </th>
-              <th
-                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "26%" }}
-              >
+              <th className="w-[26%] px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Category
               </th>
-              <th
-                className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "14%" }}
-              >
+              <th className="w-[14%] px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Subcategories
               </th>
-              <th
-                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "19%" }}
-              >
+              <th className="w-[19%] px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Total
               </th>
-              <th
-                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "18%" }}
-              >
+              <th className="w-[18%] px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Goal
               </th>
-              <th
-                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "19%" }}
-              >
+              <th className="w-[19%] px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Difference
               </th>
             </tr>
@@ -256,7 +238,7 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
         className={`hover:bg-card/50 ${hasSubcategories ? "cursor-pointer" : ""}`}
         onClick={hasSubcategories ? onToggle : undefined}
       >
-        <td className="px-4 py-3 text-muted-foreground" style={{ width: "4%" }}>
+        <td className="w-[4%] px-4 py-3 text-muted-foreground">
           {hasSubcategories &&
             (isExpanded ? (
               <ChevronDown className="w-4 h-4" />
@@ -264,28 +246,21 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
               <ChevronRight className="w-4 h-4" />
             ))}
         </td>
-        <td className="px-4 py-3 text-sm text-gray-200 font-medium" style={{ width: "26%" }}>
+        <td className="w-[26%] px-4 py-3 text-sm text-gray-200 font-medium">
           {category.category_name}
         </td>
-        <td
-          className="px-4 py-3 text-sm text-center text-muted-foreground"
-          style={{ width: "14%" }}
-        >
+        <td className="w-[14%] px-4 py-3 text-sm text-center text-muted-foreground">
           {hasSubcategories ? category.subcategories.length : "-"}
         </td>
-        <td
-          className={`px-4 py-3 text-sm text-right font-medium ${totalColor}`}
-          style={{ width: "19%" }}
-        >
+        <td className={`w-[19%] px-4 py-3 text-sm text-right font-medium ${totalColor}`}>
           {category.category_type === "income" ? "+" : ""}
           {formatCurrency(Math.abs(category.total))}
         </td>
-        <td className="px-4 py-3 text-sm text-right text-muted-foreground" style={{ width: "18%" }}>
+        <td className="w-[18%] px-4 py-3 text-sm text-right text-muted-foreground">
           {category.goal !== null ? formatCurrency(category.goal) : "-"}
         </td>
         <td
-          className={`px-4 py-3 text-sm text-right ${getDifferenceColor(category.difference)}`}
-          style={{ width: "19%" }}
+          className={`w-[19%] px-4 py-3 text-sm text-right ${getDifferenceColor(category.difference)}`}
         >
           {getDifferenceLabel(category.difference, category.category_type)}
         </td>
@@ -296,37 +271,22 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
         <tr>
           <td colSpan={6} className="px-0 py-0">
             <div className="bg-background/50 border-y border-border/50">
-              <table className="min-w-full" style={{ tableLayout: "fixed" }}>
+              <table className="min-w-full table-fixed">
                 <thead className="bg-card/20">
                   <tr>
-                    <th
-                      className="px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "4%" }}
-                    >
+                    <th className="w-[4%] px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       {/* Spacer */}
                     </th>
-                    <th
-                      className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "40%" }}
-                    >
+                    <th className="w-[40%] px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Subcategory
                     </th>
-                    <th
-                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "19%" }}
-                    >
+                    <th className="w-[19%] px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Total
                     </th>
-                    <th
-                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "18%" }}
-                    >
+                    <th className="w-[18%] px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Goal
                     </th>
-                    <th
-                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "19%" }}
-                    >
+                    <th className="w-[19%] px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Difference
                     </th>
                   </tr>
@@ -340,33 +300,21 @@ function CategoryRow({ category, isExpanded, onToggle }: CategoryRowProps) {
 
                       return (
                         <tr key={subcategory.subcategory_id} className="hover:bg-card/20">
-                          <td className="px-8 py-2" style={{ width: "4%" }}>
-                            {/* Spacer */}
-                          </td>
-                          <td
-                            className="px-4 py-2 text-sm text-foreground"
-                            style={{ width: "40%" }}
-                          >
+                          <td className="w-[4%] px-8 py-2">{/* Spacer */}</td>
+                          <td className="w-[40%] px-4 py-2 text-sm text-foreground">
                             {subcategory.subcategory_name}
                           </td>
-                          <td
-                            className={`px-4 py-2 text-sm text-right ${subTotalColor}`}
-                            style={{ width: "19%" }}
-                          >
+                          <td className={`w-[19%] px-4 py-2 text-sm text-right ${subTotalColor}`}>
                             {category.category_type === "income" ? "+" : ""}
                             {formatCurrency(Math.abs(subcategory.total))}
                           </td>
-                          <td
-                            className="px-4 py-2 text-sm text-right text-muted-foreground"
-                            style={{ width: "18%" }}
-                          >
+                          <td className="w-[18%] px-4 py-2 text-sm text-right text-muted-foreground">
                             {subcategory.goal !== null ? formatCurrency(subcategory.goal) : "-"}
                           </td>
                           <td
-                            className={`px-4 py-2 text-sm text-right ${getDifferenceColor(
+                            className={`w-[19%] px-4 py-2 text-sm text-right ${getDifferenceColor(
                               subcategory.difference
                             )}`}
-                            style={{ width: "19%" }}
                           >
                             {getDifferenceLabel(subcategory.difference, category.category_type)}
                           </td>

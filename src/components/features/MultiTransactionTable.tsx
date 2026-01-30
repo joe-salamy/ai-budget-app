@@ -673,7 +673,9 @@ export function MultiTransactionTable({
               <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase w-32">
                 Comment
               </th>
-              <th className="px-4 py-3 w-12"></th>
+              <th className="px-4 py-3 w-12">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -695,7 +697,9 @@ export function MultiTransactionTable({
                   <td className="px-4 py-4">
                     <Select
                       value={row.account_id || undefined}
-                      onValueChange={(value) => handleRowChange(row.id, "account_id", value)}
+                      onValueChange={(value: string) =>
+                        handleRowChange(row.id, "account_id", value)
+                      }
                     >
                       <SelectTrigger
                         className={`w-full h-8 px-2 text-sm ${
@@ -769,7 +773,9 @@ export function MultiTransactionTable({
                     <div className="flex items-center gap-1">
                       <Select
                         value={row.subcategory_id || undefined}
-                        onValueChange={(value) => handleRowChange(row.id, "subcategory_id", value)}
+                        onValueChange={(value: string) =>
+                          handleRowChange(row.id, "subcategory_id", value)
+                        }
                       >
                         <SelectTrigger className="flex-1 h-8 px-2 text-sm">
                           <SelectValue placeholder="Select..." />

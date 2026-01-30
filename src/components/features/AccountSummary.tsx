@@ -88,43 +88,25 @@ export function AccountSummary({ accounts, netWorth, loading }: AccountSummaryPr
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700" style={{ tableLayout: "fixed" }}>
+        <table className="min-w-full divide-y divide-gray-700 table-fixed">
           <thead className="bg-card/30">
             <tr>
-              <th
-                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "4%" }}
-              >
+              <th className="w-[4%] px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 {/* Expand icon */}
               </th>
-              <th
-                className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "26%" }}
-              >
+              <th className="w-[26%] px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Account
               </th>
-              <th
-                className="px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "14%" }}
-              >
+              <th className="w-[14%] px-4 py-3 text-center text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Transactions
               </th>
-              <th
-                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "19%" }}
-              >
+              <th className="w-[19%] px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Starting Balance
               </th>
-              <th
-                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "18%" }}
-              >
+              <th className="w-[18%] px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Changes
               </th>
-              <th
-                className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                style={{ width: "19%" }}
-              >
+              <th className="w-[19%] px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Ending Balance
               </th>
             </tr>
@@ -226,7 +208,7 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
         className={`hover:bg-card/50 ${hasTransactions ? "cursor-pointer" : ""}`}
         onClick={hasTransactions ? onToggle : undefined}
       >
-        <td className="px-4 py-3 text-muted-foreground" style={{ width: "4%" }}>
+        <td className="w-[4%] px-4 py-3 text-muted-foreground">
           {hasTransactions &&
             (isExpanded ? (
               <ChevronDown className="w-4 h-4" />
@@ -234,29 +216,20 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
               <ChevronRight className="w-4 h-4" />
             ))}
         </td>
-        <td className="px-4 py-3 text-sm text-gray-200 font-medium" style={{ width: "26%" }}>
+        <td className="w-[26%] px-4 py-3 text-sm text-gray-200 font-medium">
           {account.account_name}
         </td>
-        <td
-          className="px-4 py-3 text-sm text-center text-muted-foreground"
-          style={{ width: "14%" }}
-        >
+        <td className="w-[14%] px-4 py-3 text-sm text-center text-muted-foreground">
           {hasTransactions ? account.transactions.length : "-"}
         </td>
-        <td className="px-4 py-3 text-sm text-right text-foreground" style={{ width: "19%" }}>
+        <td className="w-[19%] px-4 py-3 text-sm text-right text-foreground">
           {formatCurrency(account.starting_balance)}
         </td>
-        <td
-          className={`px-4 py-3 text-sm text-right font-medium ${changeColor}`}
-          style={{ width: "18%" }}
-        >
+        <td className={`w-[18%] px-4 py-3 text-sm text-right font-medium ${changeColor}`}>
           {displayChange >= 0 ? "+" : ""}
           {formatCurrency(displayChange)}
         </td>
-        <td
-          className="px-4 py-3 text-sm text-right text-gray-200 font-medium"
-          style={{ width: "19%" }}
-        >
+        <td className="w-[19%] px-4 py-3 text-sm text-right text-gray-200 font-medium">
           {formatCurrency(account.ending_balance)}
         </td>
       </tr>
@@ -266,43 +239,25 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
         <tr>
           <td colSpan={6} className="px-0 py-0">
             <div className="bg-background/50 border-y border-border/50">
-              <table className="min-w-full" style={{ tableLayout: "fixed" }}>
+              <table className="min-w-full table-fixed">
                 <thead className="bg-card/20">
                   <tr>
-                    <th
-                      className="px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "14%" }}
-                    >
+                    <th className="w-[14%] px-8 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Date
                     </th>
-                    <th
-                      className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "15%" }}
-                    >
+                    <th className="w-[15%] px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Description
                     </th>
-                    <th
-                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "17%" }}
-                    >
+                    <th className="w-[17%] px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Amount
                     </th>
-                    <th
-                      className="px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "17%" }}
-                    >
+                    <th className="w-[17%] px-4 py-2 text-right text-xs font-medium text-muted-foreground uppercase">
                       Balance
                     </th>
-                    <th
-                      className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "18.5%" }}
-                    >
+                    <th className="w-[18.5%] px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Category
                     </th>
-                    <th
-                      className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase"
-                      style={{ width: "18.5%" }}
-                    >
+                    <th className="w-[18.5%] px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase">
                       Subcategory
                     </th>
                   </tr>
@@ -316,41 +271,23 @@ function AccountRow({ account, isExpanded, onToggle }: AccountRowProps) {
 
                     return (
                       <tr key={txn.id} className="hover:bg-card/20">
-                        <td
-                          className="px-8 py-2 text-sm text-muted-foreground"
-                          style={{ width: "14%" }}
-                        >
+                        <td className="w-[14%] px-8 py-2 text-sm text-muted-foreground">
                           {format(new Date(txn.date), "MMM d, yyyy")}
                         </td>
-                        <td
-                          className="px-4 py-2 text-sm text-foreground truncate"
-                          style={{ width: "15%" }}
-                        >
+                        <td className="w-[15%] px-4 py-2 text-sm text-foreground truncate">
                           {txn.name}
                         </td>
-                        <td
-                          className={`px-4 py-2 text-sm text-right ${amountColor}`}
-                          style={{ width: "17%" }}
-                        >
+                        <td className={`w-[17%] px-4 py-2 text-sm text-right ${amountColor}`}>
                           {displayAmount >= 0 ? "+" : ""}
                           {formatCurrency(displayAmount)}
                         </td>
-                        <td
-                          className="px-4 py-2 text-sm text-right text-foreground"
-                          style={{ width: "17%" }}
-                        >
+                        <td className="w-[17%] px-4 py-2 text-sm text-right text-foreground">
                           {formatCurrency(txn.running_balance)}
                         </td>
-                        <td
-                          className="px-4 py-2 text-sm text-muted-foreground"
-                          style={{ width: "18.5%" }}
-                        >
+                        <td className="w-[18.5%] px-4 py-2 text-sm text-muted-foreground">
                           {txn.category_name || "-"}
                         </td>
-                        <td
-                          className="px-4 py-2 text-sm text-muted-foreground"
-                          style={{ width: "18.5%" }}
-                        >
+                        <td className="w-[18.5%] px-4 py-2 text-sm text-muted-foreground">
                           {txn.subcategory_name || "-"}
                         </td>
                       </tr>

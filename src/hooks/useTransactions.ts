@@ -14,7 +14,7 @@ import {
 } from "../services/transactions";
 import { useAuth } from "./useAuth";
 import { queryKeys } from "../lib/queryKeys";
-import { toast } from "../lib/toast";
+import { toast } from "sonner";
 import type { Transaction } from "../types";
 import type {
   CreateTransactionData,
@@ -204,9 +204,9 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   const addTransaction = async (data: CreateTransactionData) => {
     const result = await addTransactionMutation.mutateAsync(data);
     if (result.success) {
-      toast.success("Transaction created", "Your transaction has been added successfully");
+      toast.success("Transaction created", { description: "Your transaction has been added successfully" });
     } else {
-      toast.error("Failed to create transaction", result.error || "An error occurred");
+      toast.error("Failed to create transaction", { description: result.error || "An error occurred" });
     }
     return result;
   };
@@ -230,9 +230,9 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
       comment,
     });
     if (result.success) {
-      toast.success("Transfer created", "Your transfer has been recorded successfully");
+      toast.success("Transfer created", { description: "Your transfer has been recorded successfully" });
     } else {
-      toast.error("Failed to create transfer", result.error || "An error occurred");
+      toast.error("Failed to create transfer", { description: result.error || "An error occurred" });
     }
     return result;
   };
@@ -240,9 +240,9 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   const editTransaction = async (id: string, updates: UpdateTransactionData) => {
     const result = await updateTransactionMutation.mutateAsync({ id, updates });
     if (result.success) {
-      toast.success("Transaction updated", "Your changes have been saved");
+      toast.success("Transaction updated", { description: "Your changes have been saved" });
     } else {
-      toast.error("Failed to update transaction", result.error || "An error occurred");
+      toast.error("Failed to update transaction", { description: result.error || "An error occurred" });
     }
     return result;
   };
@@ -250,9 +250,9 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   const removeTransaction = async (id: string) => {
     const result = await deleteTransactionMutation.mutateAsync(id);
     if (result.success) {
-      toast.success("Transaction deleted", "The transaction has been removed");
+      toast.success("Transaction deleted", { description: "The transaction has been removed" });
     } else {
-      toast.error("Failed to delete transaction", result.error || "An error occurred");
+      toast.error("Failed to delete transaction", { description: result.error || "An error occurred" });
     }
     return result;
   };
@@ -260,9 +260,9 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   const bulkRemove = async (ids: string[]) => {
     const result = await bulkDeleteMutation.mutateAsync(ids);
     if (result.success) {
-      toast.success("Transactions deleted", `${result.count} transactions have been removed`);
+      toast.success("Transactions deleted", { description: `${result.count} transactions have been removed` });
     } else {
-      toast.error("Failed to delete transactions", result.error || "An error occurred");
+      toast.error("Failed to delete transactions", { description: result.error || "An error occurred" });
     }
     return result;
   };
@@ -270,9 +270,9 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   const bulkUpdateSubcategory = async (ids: string[], subcategoryId: string | null) => {
     const result = await bulkUpdateMutation.mutateAsync({ ids, subcategoryId });
     if (result.success) {
-      toast.success("Categories updated", `${result.count} transactions have been updated`);
+      toast.success("Categories updated", { description: `${result.count} transactions have been updated` });
     } else {
-      toast.error("Failed to update categories", result.error || "An error occurred");
+      toast.error("Failed to update categories", { description: result.error || "An error occurred" });
     }
     return result;
   };
