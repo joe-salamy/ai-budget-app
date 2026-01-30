@@ -491,8 +491,7 @@ export async function getRecentActivityByAccount(): Promise<{
           .eq("account_id", account.id)
           .is("deleted_at", null);
 
-        const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
-        const currentBalance = account.initial_balance + transactionSum;
+        const currentBalance = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
         // Get most recent transaction
         const { data: recentTxn } = await supabase
@@ -696,10 +695,10 @@ export async function calculateRunningBalance(
       return { success: false, error: "User not authenticated" };
     }
 
-    // Get the account's initial balance
-    const { data: account, error: accountError } = await supabase
+    // Verify the account exists
+    const { error: accountError } = await supabase
       .from("accounts")
-      .select("initial_balance")
+      .select("id")
       .eq("id", accountId)
       .eq("user_id", user.id)
       .is("deleted_at", null)
@@ -722,9 +721,9 @@ export async function calculateRunningBalance(
       return { success: false, error: txnError.message };
     }
 
-    const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
+    const balance = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
-    return { success: true, balance: account.initial_balance + transactionSum };
+    return { success: true, balance };
   } catch (error) {
     return {
       success: false,
@@ -748,10 +747,10 @@ export async function calculateCurrentBalance(
       return { success: false, error: "User not authenticated" };
     }
 
-    // Get the account's initial balance
-    const { data: account, error: accountError } = await supabase
+    // Verify the account exists
+    const { error: accountError } = await supabase
       .from("accounts")
-      .select("initial_balance")
+      .select("id")
       .eq("id", accountId)
       .eq("user_id", user.id)
       .is("deleted_at", null)
@@ -773,9 +772,9 @@ export async function calculateCurrentBalance(
       return { success: false, error: txnError.message };
     }
 
-    const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
+    const balance = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
-    return { success: true, balance: account.initial_balance + transactionSum };
+    return { success: true, balance };
   } catch (error) {
     return {
       success: false,

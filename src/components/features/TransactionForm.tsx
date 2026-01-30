@@ -6,11 +6,7 @@ import { SimpleSelect } from "../ui/SimpleSelect";
 import type { SelectOption } from "../ui/SimpleSelect";
 import { useAutoSave } from "../../hooks/useAutoSave";
 import { getRecentTransactionByNameAndAccount } from "../../services/transactions";
-import {
-  categorizeSingleTransaction,
-  getAICorrection,
-  saveAICorrection,
-} from "../../services/ai";
+import { categorizeSingleTransaction, getAICorrection, saveAICorrection } from "../../services/ai";
 import type { CategorizationResult } from "../../services/ai";
 import type { Account, Category, Subcategory } from "../../types";
 
@@ -155,7 +151,7 @@ export function TransactionForm({
       subs.forEach((sub) => {
         options.push({
           value: sub.id,
-          label: `${category.name} > ${sub.name}`,
+          label: `${sub.name} > ${category.name}`,
         });
       });
     });
@@ -211,10 +207,7 @@ export function TransactionForm({
 
     try {
       // Step 1: Check for AI correction first (user's preferred categorization)
-      const correctionResponse = await getAICorrection(
-        formData.name,
-        formData.account_id
-      );
+      const correctionResponse = await getAICorrection(formData.name, formData.account_id);
 
       if (correctionResponse.success && correctionResponse.data) {
         // Found a user correction - use it
@@ -251,9 +244,7 @@ export function TransactionForm({
 
       if (lookupResponse.success && lookupResponse.data && lookupResponse.data.subcategory_id) {
         // Found a previous transaction - use its category
-        const subcategory = subcategories.find(
-          (s) => s.id === lookupResponse.data!.subcategory_id
-        );
+        const subcategory = subcategories.find((s) => s.id === lookupResponse.data!.subcategory_id);
         const category = subcategory
           ? categories.find((c) => c.id === subcategory.category_id)
           : null;
@@ -346,7 +337,14 @@ export function TransactionForm({
     ) {
       await handleNameBlur();
     }
-  }, [formData.name, formData.account_id, formData.amount, aiState.source, aiState.isLoading, handleNameBlur]);
+  }, [
+    formData.name,
+    formData.account_id,
+    formData.amount,
+    aiState.source,
+    aiState.isLoading,
+    handleNameBlur,
+  ]);
 
   // Accept AI suggestion
   const handleAcceptAISuggestion = useCallback(() => {
@@ -359,12 +357,20 @@ export function TransactionForm({
       handleChange("subcategory_id", value);
 
       // If this is an override of an AI suggestion, mark for correction saving
-      if (aiState.source === "ai" && aiState.suggestion && value !== aiState.suggestion.subcategory_id) {
+      if (
+        aiState.source === "ai" &&
+        aiState.suggestion &&
+        value !== aiState.suggestion.subcategory_id
+      ) {
         setAIState((prev) => ({
           ...prev,
           userAccepted: false,
         }));
-      } else if (aiState.source === "ai" && aiState.suggestion && value === aiState.suggestion.subcategory_id) {
+      } else if (
+        aiState.source === "ai" &&
+        aiState.suggestion &&
+        value === aiState.suggestion.subcategory_id
+      ) {
         setAIState((prev) => ({
           ...prev,
           userAccepted: true,
@@ -587,16 +593,12 @@ export function TransactionForm({
 
           {/* Lookup match hint */}
           {aiState.source === "lookup" && aiState.suggestion && (
-            <p className="text-sm text-foreground mt-2">
-              Based on previous entry
-            </p>
+            <p className="text-sm text-foreground mt-2">Based on previous entry</p>
           )}
 
           {/* User correction match hint */}
           {aiState.source === "correction" && aiState.suggestion && (
-            <p className="text-sm text-foreground mt-2">
-              Based on your preference
-            </p>
+            <p className="text-sm text-foreground mt-2">Based on your preference</p>
           )}
 
           {/* AI suggestion with accept/override UI */}
@@ -605,14 +607,20 @@ export function TransactionForm({
               {aiState.userAccepted ? (
                 <p className="text-sm text-foreground flex items-center gap-1">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   AI suggestion accepted
                 </p>
               ) : formData.subcategory_id === aiState.suggestion.subcategory_id ? (
                 <div className="flex items-center gap-2">
                   <p className="text-sm text-foreground">
-                    AI suggests: {aiState.suggestion.category_name} &gt; {aiState.suggestion.subcategory_name}
+                    AI suggests: {aiState.suggestion.category_name} &gt;{" "}
+                    {aiState.suggestion.subcategory_name}
                     <span className="text-muted-foreground ml-1">
                       ({Math.round(aiState.suggestion.confidence * 100)}% confident)
                     </span>
@@ -624,14 +632,17 @@ export function TransactionForm({
                     title="Accept suggestion"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </button>
                 </div>
               ) : (
-                <p className="text-sm text-orange-400">
-                  Changed from AI suggestion
-                </p>
+                <p className="text-sm text-orange-400">Changed from AI suggestion</p>
               )}
             </div>
           )}
@@ -639,9 +650,7 @@ export function TransactionForm({
 
         {/* Category (read-only, derived from subcategory) */}
         <div>
-          <label className="block text-sm font-medium text-gray-200 mb-1.5">
-            Category
-          </label>
+          <label className="block text-sm font-medium text-gray-200 mb-1.5">Category</label>
           <div className="px-3 py-2 bg-muted border border-border rounded-md text-foreground">
             {selectedCategory ? selectedCategory.name : "Select a subcategory first"}
           </div>
@@ -659,12 +668,7 @@ export function TransactionForm({
 
       {/* Submit button */}
       <div className="flex justify-end pt-4">
-        <Button
-          type="submit"
-          variant="primary"
-          isLoading={isLoading}
-          disabled={isLoading}
-        >
+        <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
           {submitLabel}
         </Button>
       </div>

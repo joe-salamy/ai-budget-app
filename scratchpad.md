@@ -1,25 +1,19 @@
+### To do
+
+- Read all code
+- Create AI chatbot functionality
+- Refactor entire frontend using Stitch
+
 ### Prompt queue
-
----
-
-Fix how Running Balance is calculated
-
-Remove Category name from Subcategory dropdown
-
-Show initial balance in transaction history
-
----
-
-Change the data loading to save data - going from last 365 days to last 90 days to last 30 days shouldn't be a new data queue. Just filter display the already-known data to only display last 30 days. Also, don't like the delay between loads - what causes that? Read the loading files
 
 ### General
 
-- **Stitch**: Refactor entire frontend using Stitch. Only design around functionality.
 - **Tech stack**: Create summary of tech stack so I can use again, just want to get used to something
 - **Package versioning**: Check every package, ensure correct versioning. If catch error, add comment explicitly stating what version to use.
   - "The issue was that your project uses react-day-picker v9, which changed the classNames API from v8. I updated src/components/ui/Calendar.tsx:31-42 with the correct v9 class names:"
 - **Privacy**: Best method for encryption / privacy for budget app? Want friends to feel more secure that I can’t just see all their transactions. Encrypted db?
 - **Keyboard shortcuts**: Page nav, all users actions (after UI sweep)
+- **Data loading**: Change the data loading to save data - going from last 365 days to last 90 days to last 30 days shouldn't be a new data queue. Just filter display the already-known data to only display last 30 days. Also, don't like the delay between loads - what causes that? Read the loading files
 
 ### AI
 

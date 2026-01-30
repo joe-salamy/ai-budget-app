@@ -78,13 +78,35 @@ export async function createAccount(accountData: CreateAccountData): Promise<Acc
         user_id: user.id,
         name: accountData.name,
         type: accountData.type,
-        initial_balance: accountData.initial_balance,
+        initial_balance: 0, // Set to 0, use transaction instead
       })
       .select()
       .single();
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    // Create an initial balance transaction if initial_balance is not zero
+    if (accountData.initial_balance !== 0) {
+      const { error: txnError } = await supabase.from("transactions").insert({
+        user_id: user.id,
+        account_id: data.id,
+        date: new Date().toISOString().split("T")[0], // Today's date
+        name: "Initial Balance",
+        amount: accountData.initial_balance,
+        subcategory_id: null,
+        comment: null,
+        is_initial_balance: true,
+        is_transfer: false,
+        transfer_to_account_id: null,
+        ai_suggested: false,
+        user_corrected: false,
+      });
+
+      if (txnError) {
+        console.error("Failed to create initial balance transaction:", txnError);
+      }
     }
 
     return { success: true, data };
@@ -177,8 +199,8 @@ export async function getAccountsWithBalances(): Promise<AccountsWithBalanceResp
           .eq("account_id", account.id)
           .is("deleted_at", null);
 
-        const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
-        const currentBalance = account.initial_balance + transactionSum;
+        // Sum all transactions (including initial balance)
+        const currentBalance = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
         return {
           ...account,
@@ -293,6 +315,54 @@ export async function updateAccount(
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    // If initial_balance was updated, manage the initial balance transaction
+    if (updates.initial_balance !== undefined) {
+      // Find existing initial balance transaction for this account
+      const { data: existingTxn } = await supabase
+        .from("transactions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("account_id", id)
+        .eq("is_initial_balance", true)
+        .is("deleted_at", null)
+        .maybeSingle();
+
+      if (updates.initial_balance === 0) {
+        // If new balance is 0, delete the initial balance transaction if it exists
+        if (existingTxn) {
+          await supabase
+            .from("transactions")
+            .update({ deleted_at: new Date().toISOString() })
+            .eq("id", existingTxn.id);
+        }
+      } else {
+        // If balance is non-zero, update or create the transaction
+        if (existingTxn) {
+          // Update existing transaction
+          await supabase
+            .from("transactions")
+            .update({ amount: updates.initial_balance })
+            .eq("id", existingTxn.id);
+        } else {
+          // Create new initial balance transaction
+          await supabase.from("transactions").insert({
+            user_id: user.id,
+            account_id: id,
+            date: new Date().toISOString().split("T")[0],
+            name: "Initial Balance",
+            amount: updates.initial_balance,
+            subcategory_id: null,
+            comment: null,
+            is_initial_balance: true,
+            is_transfer: false,
+            transfer_to_account_id: null,
+            ai_suggested: false,
+            user_corrected: false,
+          });
+        }
+      }
     }
 
     return { success: true, data };

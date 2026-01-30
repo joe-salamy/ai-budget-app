@@ -46,7 +46,7 @@ export function BulkEditModal({
       subs.forEach((sub) => {
         options.push({
           value: sub.id,
-          label: `${category.name} > ${sub.name}`,
+          label: `${sub.name} > ${category.name}`,
         });
       });
     });
@@ -113,9 +113,7 @@ export function BulkEditModal({
           placeholder="Select subcategory"
         />
 
-        {error && (
-          <p className="text-sm text-foreground">{error}</p>
-        )}
+        {error && <p className="text-sm text-foreground">{error}</p>}
       </div>
     </Modal>
   );

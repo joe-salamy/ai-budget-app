@@ -153,11 +153,10 @@ export async function prepareNetWorthData(
       accounts.forEach((account) => {
         // Calculate account balance up to this date
         const txns = accountTransactions[account.id] || [];
-        const balanceFromTransactions = txns
+        const accountBalance = txns
           .filter((txn) => txn.date <= dateStr)
           .reduce((sum, txn) => sum + txn.amount, 0);
 
-        const accountBalance = account.initial_balance + balanceFromTransactions;
         point[account.name] = accountBalance;
 
         // Add to net worth calculation

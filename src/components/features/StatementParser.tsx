@@ -75,7 +75,7 @@ export function StatementParser({
         groupSubs.forEach((sub) => {
           options.push({
             value: sub.id,
-            label: `${category.name} > ${sub.name}`,
+            label: `${sub.name} > ${category.name}`,
           });
         });
       });
@@ -271,7 +271,9 @@ export function StatementParser({
         );
       default:
         return (
-          <span className="px-1.5 py-0.5 text-xs rounded bg-muted/20 text-muted-foreground">Manual</span>
+          <span className="px-1.5 py-0.5 text-xs rounded bg-muted/20 text-muted-foreground">
+            Manual
+          </span>
         );
     }
   };
@@ -300,7 +302,9 @@ export function StatementParser({
 
           {/* Statement Textarea */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Paste Statement</label>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              Paste Statement
+            </label>
             <textarea
               value={statementText}
               onChange={(e) => setStatementText(e.target.value)}
@@ -531,7 +535,9 @@ Example formats supported:
             </Button>
 
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">{nonDuplicateCount} transactions to add</span>
+              <span className="text-sm text-muted-foreground">
+                {nonDuplicateCount} transactions to add
+              </span>
               <Button
                 type="button"
                 variant="primary"

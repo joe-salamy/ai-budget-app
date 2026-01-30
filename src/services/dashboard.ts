@@ -409,7 +409,7 @@ export async function calculateNetWorth(atDate: string): Promise<NetWorthRespons
 
     await Promise.all(
       accounts.map(async (account) => {
-        // Get sum of transactions up to the date
+        // Get sum of all transactions up to the date
         const { data: transactions } = await supabase
           .from("transactions")
           .select("amount")
@@ -418,8 +418,7 @@ export async function calculateNetWorth(atDate: string): Promise<NetWorthRespons
           .lte("date", atDate)
           .is("deleted_at", null);
 
-        const transactionSum = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
-        const balance = account.initial_balance + transactionSum;
+        const balance = (transactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
         if (account.type === "asset") {
           totalAssets += balance;

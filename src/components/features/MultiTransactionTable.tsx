@@ -114,7 +114,7 @@ export function MultiTransactionTable({
       subs.forEach((sub) => {
         options.push({
           value: sub.id,
-          label: `${category.name} > ${sub.name}`,
+          label: `${sub.name} > ${category.name}`,
         });
       });
     });
@@ -314,8 +314,8 @@ export function MultiTransactionTable({
       e.preventDefault();
 
       // Parse the pasted data into a 2D array
-      const lines = pastedData.split("\n").filter(line => line.trim() !== "");
-      const pastedGrid = lines.map(line => line.split("\t"));
+      const lines = pastedData.split("\n").filter((line) => line.trim() !== "");
+      const pastedGrid = lines.map((line) => line.split("\t"));
 
       // Find current row index
       const currentRowIndex = rows.findIndex((r) => r.id === rowId);
@@ -902,11 +902,7 @@ export function MultiTransactionTable({
       {/* Action buttons row */}
       <div className="flex items-center justify-between pt-2">
         <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setShowClearConfirm(true)}
-          >
+          <Button type="button" variant="secondary" onClick={() => setShowClearConfirm(true)}>
             Clear All
           </Button>
           {onTransferClick && (
@@ -929,11 +925,7 @@ export function MultiTransactionTable({
               This will remove all rows from the table. This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setShowClearConfirm(false)}
-              >
+              <Button type="button" variant="secondary" onClick={() => setShowClearConfirm(false)}>
                 Cancel
               </Button>
               <Button type="button" variant="primary" onClick={handleClearAll}>

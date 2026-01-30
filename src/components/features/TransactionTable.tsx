@@ -124,7 +124,7 @@ export function TransactionTable({
             const priorSum = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
 
             balanceMap.set(account.id, {
-              initial_balance: account.initial_balance,
+              initial_balance: 0, // Always 0 since we use transactions
               prior_transactions_sum: priorSum,
             });
           })
@@ -159,7 +159,10 @@ export function TransactionTable({
 
     // Initialize starting balances for each account
     accountBalances.forEach((balance, accountId) => {
-      accountRunningBalances.set(accountId, balance.initial_balance + balance.prior_transactions_sum);
+      accountRunningBalances.set(
+        accountId,
+        balance.initial_balance + balance.prior_transactions_sum
+      );
     });
 
     // Add running balance to each transaction
@@ -235,16 +238,25 @@ export function TransactionTable({
         return;
       }
 
+      // Don't allow selecting initial balance transactions
+      const transaction = sortedTransactionsWithBalance[index];
+      if (transaction?.is_initial_balance) {
+        return;
+      }
+
       const newSelected = new Set(selectedIds);
       const isShiftClick = event.shiftKey && lastSelectedIndex !== null;
 
       if (isShiftClick) {
-        // Range selection
+        // Range selection (skip initial balance transactions)
         const start = Math.min(lastSelectedIndex, index);
         const end = Math.max(lastSelectedIndex, index);
 
         for (let i = start; i <= end; i++) {
-          newSelected.add(sortedTransactionsWithBalance[i].id);
+          const txn = sortedTransactionsWithBalance[i];
+          if (txn && !txn.is_initial_balance) {
+            newSelected.add(txn.id);
+          }
         }
       } else {
         // Single selection toggle
@@ -357,10 +369,10 @@ export function TransactionTable({
               return (
                 <tr
                   key={txn.id}
-                  onClick={(e) => handleRowClick(txn.id, index, e)}
-                  className={`hover:bg-muted cursor-pointer ${
+                  onClick={(e) => !txn.is_initial_balance && handleRowClick(txn.id, index, e)}
+                  className={`${txn.is_initial_balance ? "" : "hover:bg-muted cursor-pointer"} ${
                     isSelected ? "bg-foreground/10" : ""
-                  }`}
+                  } ${txn.is_initial_balance ? "bg-blue-900/20" : ""}`}
                 >
                   {/* Date */}
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-foreground">
@@ -373,6 +385,11 @@ export function TransactionTable({
                     {txn.is_transfer && (
                       <span className="ml-2 px-2 py-0.5 text-xs rounded bg-foreground/20 text-foreground">
                         Transfer
+                      </span>
+                    )}
+                    {txn.is_initial_balance && (
+                      <span className="ml-2 px-2 py-0.5 text-xs rounded bg-blue-500/30 text-blue-200">
+                        Initial
                       </span>
                     )}
                   </td>
@@ -413,22 +430,31 @@ export function TransactionTable({
                   {/* Actions */}
                   <td className="px-4 py-3 whitespace-nowrap text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEditTransaction(txn)}
-                        className="text-foreground hover:text-foreground hover:bg-muted"
-                      >
-                        <Pencil size={16} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onDeleteTransaction(txn.id)}
-                        className="text-foreground hover:text-foreground hover:bg-muted"
-                      >
-                        <Trash2 size={16} />
-                      </Button>
+                      {!txn.is_initial_balance && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditTransaction(txn)}
+                            className="text-foreground hover:text-foreground hover:bg-muted"
+                          >
+                            <Pencil size={16} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDeleteTransaction(txn.id)}
+                            className="text-foreground hover:text-foreground hover:bg-muted"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </>
+                      )}
+                      {txn.is_initial_balance && (
+                        <span className="text-xs text-muted-foreground italic">
+                          Edit in Settings
+                        </span>
+                      )}
                     </div>
                   </td>
                 </tr>
