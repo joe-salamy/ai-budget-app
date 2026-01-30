@@ -2,7 +2,7 @@
 // Displays a dropdown/list of chat sessions with management options
 
 import { useState, useRef, useEffect } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { FormEvent, KeyboardEvent, MouseEvent } from "react";
 import { formatDistanceToNow } from "date-fns";
 import { MessageSquare, Plus, Trash2, Pencil, Check, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -54,7 +54,7 @@ export function ChatSessionList({
     }
   }, [editingId]);
 
-  const handleStartEdit = (session: ChatSession, e: React.MouseEvent) => {
+  const handleStartEdit = (session: ChatSession, e: MouseEvent) => {
     e.stopPropagation();
     setEditingId(session.id);
     setEditTitle(session.title);
@@ -79,7 +79,7 @@ export function ChatSessionList({
     }
   };
 
-  const handleDelete = (sessionId: string, e: React.MouseEvent) => {
+  const handleDelete = (sessionId: string, e: MouseEvent) => {
     e.stopPropagation();
     if (window.confirm("Delete this chat session?")) {
       onDeleteSession(sessionId);

@@ -64,6 +64,7 @@ Check in Supabase Dashboard:
 ### 4. Configure Local Environment
 
 - [ ] Copy `.env.local.example` to `.env.local`:
+
   ```bash
   cp .env.local.example .env.local
   ```
@@ -73,6 +74,7 @@ Check in Supabase Dashboard:
   - [ ] Copy **anon public** API key (NOT service_role)
 
 - [ ] Edit `.env.local` and add credentials:
+
   ```env
   VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
   VITE_SUPABASE_ANON_KEY=your_anon_key_here
@@ -84,6 +86,7 @@ Check in Supabase Dashboard:
 ### 5. Test Connection
 
 - [ ] Start dev server:
+
   ```bash
   npm run dev
   ```
@@ -93,22 +96,17 @@ Check in Supabase Dashboard:
 - [ ] Open browser DevTools console (F12)
 
 - [ ] Test Supabase connection (paste in console):
+
   ```javascript
   // Import supabase client
-  const { createClient } = await import('@supabase/supabase-js');
-  const supabase = createClient(
-    'YOUR_PROJECT_URL',
-    'YOUR_ANON_KEY'
-  );
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient("YOUR_PROJECT_URL", "YOUR_ANON_KEY");
 
   // Test query
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('is_system', true);
+  const { data, error } = await supabase.from("categories").select("*").eq("is_system", true);
 
-  console.log('System categories:', data);
-  console.log('Error:', error);
+  console.log("System categories:", data);
+  console.log("Error:", error);
   ```
 
 - [ ] Console shows 2 system categories (no errors)

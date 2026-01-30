@@ -1,12 +1,17 @@
 ### To do
 
 - Delete unused code
-  - Go through each folder, correct all build errors + delete unused code
+  - Go through each folder, delete unused code
+  - Go through each folder, correct all build errors (only in compomnents, all 3 folders)
   - Go through each table in DB, fix
 - Keep frontend around, so can test functionality + the AI chatbot
 
 - Create AI chatbot functionality
 - Refactor entire frontend using Stitch
+
+Remove transfers entirely
+Add system instructions (for this transaction, add this one [transfer to brokerage, roth])
+What's best way to do the model? Describe my dilemma to Gemini / Claude
 
 ### Prompt queue
 

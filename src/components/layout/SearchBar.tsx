@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import type { KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -41,7 +42,7 @@ export function SearchBar() {
   }, []);
 
   // Keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen || results.length === 0) return;
 
     switch (e.key) {

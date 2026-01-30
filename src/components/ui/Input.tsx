@@ -1,5 +1,5 @@
 import { forwardRef, useState } from "react";
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ChangeEvent, FocusEvent } from "react";
 
 import { cn, formatNumberWithCommas, parseNumberWithCommas, formatDateInput } from "@/lib/utils";
 import { format, parse, isValid } from "date-fns";
@@ -40,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     const [dateDisplayValue, setDateDisplayValue] = useState("");
 
     // Handle number input changes - remove commas for storage
-    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNumberChange = (e: ChangeEvent<HTMLInputElement>) => {
       if (isNumberInput && onChange) {
         const rawValue = e.target.value;
         const cleanValue = parseNumberWithCommas(rawValue);
@@ -51,7 +51,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ...e.target,
             value: cleanValue,
           },
-        } as React.ChangeEvent<HTMLInputElement>;
+        } as ChangeEvent<HTMLInputElement>;
         onChange(newEvent);
       } else if (onChange) {
         onChange(e);
@@ -59,7 +59,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     // Format number with commas on blur
-    const handleNumberBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleNumberBlur = (e: FocusEvent<HTMLInputElement>) => {
       if (isNumberInput) {
         const rawValue = e.target.value;
         if (rawValue) {
@@ -73,7 +73,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     // Handle date input focus
-    const handleDateFocus = (_e: React.FocusEvent<HTMLInputElement>) => {
+    const handleDateFocus = (_e: FocusEvent<HTMLInputElement>) => {
       if (isDateInput) {
         setIsDateFocused(true);
         // Initialize display value from current value
@@ -95,7 +95,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     // Handle date input changes - auto-format with slashes
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
       if (isDateInput) {
         const rawValue = e.target.value;
         const formatted = formatDateInput(rawValue);
@@ -106,7 +106,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     // Handle date blur - convert to yyyy-MM-dd if valid
-    const handleDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleDateBlur = (e: FocusEvent<HTMLInputElement>) => {
       if (isDateInput) {
         setIsDateFocused(false);
         const inputValue = dateDisplayValue;
@@ -127,7 +127,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   ...e.target,
                   value: dateValue,
                 },
-              } as React.ChangeEvent<HTMLInputElement>;
+              } as ChangeEvent<HTMLInputElement>;
               onChange(newEvent);
             }
           } catch {
@@ -141,7 +141,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               ...e.target,
               value: "",
             },
-          } as React.ChangeEvent<HTMLInputElement>;
+          } as ChangeEvent<HTMLInputElement>;
           onChange(newEvent);
         }
       }

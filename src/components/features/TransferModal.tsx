@@ -1,5 +1,6 @@
 // TransferModal component - Modal dialog for adding account transfers
 import { useState, useMemo } from "react";
+import type { FormEvent } from "react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
@@ -84,7 +85,7 @@ export function TransferModal({ isOpen, onClose, accounts, onSubmit }: TransferM
   };
 
   // Handle submit
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!validate()) return;

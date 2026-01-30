@@ -175,15 +175,12 @@ npm run dev
 3. **Test Supabase connection**:
 
 ```javascript
-import { supabase } from './src/lib/supabaseClient';
+import { supabase } from "./src/lib/supabaseClient";
 
 // Test connection
-const { data, error } = await supabase
-  .from('categories')
-  .select('*')
-  .eq('is_system', true);
+const { data, error } = await supabase.from("categories").select("*").eq("is_system", true);
 
-console.log('System categories:', data);
+console.log("System categories:", data);
 // Should show 2 Unassigned categories
 ```
 
@@ -255,7 +252,7 @@ These UUIDs are hardcoded in the seed data and available in [`src/config/constan
 Use these constants when referencing system categories in your code:
 
 ```typescript
-import { SYSTEM_CATEGORIES, SYSTEM_SUBCATEGORIES } from '@/config/constants';
+import { SYSTEM_CATEGORIES, SYSTEM_SUBCATEGORIES } from "@/config/constants";
 
 // Example: Default to unassigned expense subcategory
 const defaultSubcategoryId = SYSTEM_SUBCATEGORIES.EXPENSE_UNASSIGNED;
