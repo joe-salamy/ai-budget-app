@@ -87,11 +87,7 @@ function SetupPage() {
     navigate("/dashboard");
   };
 
-  const handleEditAccount = (account: {
-    id: string;
-    name: string;
-    type: string;
-  }) => {
+  const handleEditAccount = (account: { id: string; name: string; type: string }) => {
     setEditingAccount(account);
     setEditAccountData({
       name: account.name,

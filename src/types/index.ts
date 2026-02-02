@@ -53,8 +53,6 @@ export interface Transaction {
   subcategory_id: string | null;
   comment: string | null;
   is_initial_balance: boolean;
-  is_transfer: boolean;
-  transfer_to_account_id: string | null;
   ai_suggested: boolean;
   user_corrected: boolean;
   created_at: string;

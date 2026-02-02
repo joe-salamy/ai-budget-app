@@ -96,8 +96,6 @@ export async function createAccount(accountData: CreateAccountData): Promise<Acc
         subcategory_id: null,
         comment: null,
         is_initial_balance: true,
-        is_transfer: false,
-        transfer_to_account_id: null,
         ai_suggested: false,
         user_corrected: false,
       });
@@ -160,7 +158,7 @@ export interface AccountsWithBalanceResponse {
 }
 
 /**
- * Get all accounts with their current balances (initial_balance + transaction sum)
+ * Get all accounts with their current balances (sum of all transactions including initial balance transaction)
  */
 export async function getAccountsWithBalances(): Promise<AccountsWithBalanceResponse> {
   try {

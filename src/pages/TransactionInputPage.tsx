@@ -1,31 +1,27 @@
-// TransactionInputPage - Page for adding multiple transactions with unified table and transfer modal
+// TransactionInputPage - Page for adding multiple transactions with unified table
 import { useState, useCallback } from "react";
 import { MultiTransactionTable } from "../components/features/MultiTransactionTable";
-import { TransferModal } from "../components/features/TransferModal";
 import { RecentActivityPanel } from "../components/features/RecentActivityPanel";
 import { useAccounts } from "../hooks/useAccounts";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions, useRecentActivity } from "../hooks/useTransactions";
 import { saveAICorrection } from "../services/ai";
 import type { TransactionRowData } from "../components/features/MultiTransactionTable";
-import type { TransferData } from "../components/features/TransferModal";
 
 function TransactionInputPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Data hooks
   const { accounts, loading: accountsLoading } = useAccounts();
   const { categories, subcategories, loading: categoriesLoading } = useCategories();
-  const { addTransaction, addTransfer } = useTransactions();
+  const { addTransaction } = useTransactions();
   const {
     recentActivity,
     loading: activityLoading,
     error: activityError,
     refresh: refreshActivity,
   } = useRecentActivity();
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Handle batch submission of transactions
   const handleBatchSubmit = useCallback(
@@ -49,7 +45,6 @@ function TransactionInputPage() {
               amount: amount,
               subcategory_id: txn.subcategory_id || null,
               comment: txn.comment || null,
-              is_transfer: false,
               ai_suggested: txn.ai_suggested || false,
               user_corrected: txn.user_corrected || false,
             });
@@ -91,28 +86,6 @@ function TransactionInputPage() {
       }
     },
     [addTransaction, refreshActivity]
-  );
-
-  // Handle transfer submission from modal
-  const handleTransferSubmit = useCallback(
-    async (transfer: TransferData): Promise<{ success: boolean; error?: string }> => {
-      const result = await addTransfer(
-        transfer.fromAccountId,
-        transfer.toAccountId,
-        transfer.date,
-        transfer.name,
-        transfer.amount,
-        null, // subcategory_id
-        transfer.comment || null
-      );
-
-      if (result.success) {
-        refreshActivity();
-      }
-
-      return result;
-    },
-    [addTransfer, refreshActivity]
   );
 
   const isDataLoading = accountsLoading || categoriesLoading;
@@ -172,7 +145,6 @@ function TransactionInputPage() {
                     subcategories={subcategories}
                     onSubmit={handleBatchSubmit}
                     isLoading={isSubmitting}
-                    onTransferClick={() => setIsTransferModalOpen(true)}
                   />
                 )}
               </>
@@ -180,14 +152,6 @@ function TransactionInputPage() {
           </div>
         </div>
       </div>
-
-      {/* Transfer Modal */}
-      <TransferModal
-        isOpen={isTransferModalOpen}
-        onClose={() => setIsTransferModalOpen(false)}
-        accounts={accounts}
-        onSubmit={handleTransferSubmit}
-      />
     </div>
   );
 }

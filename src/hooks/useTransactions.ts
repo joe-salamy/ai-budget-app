@@ -6,7 +6,6 @@ import {
   getTransactionsWithDetails,
   getRecentActivityByAccount,
   createTransaction,
-  createTransfer,
   updateTransaction,
   deleteTransaction,
   bulkDeleteTransactions,
@@ -43,15 +42,6 @@ interface UseTransactionsReturn {
   addTransaction: (
     data: CreateTransactionData
   ) => Promise<{ success: boolean; error?: string; data?: Transaction }>;
-  addTransfer: (
-    fromAccountId: string,
-    toAccountId: string,
-    date: string,
-    name: string,
-    amount: number,
-    subcategoryId?: string | null,
-    comment?: string | null
-  ) => Promise<{ success: boolean; error?: string }>;
   editTransaction: (
     id: string,
     updates: UpdateTransactionData
@@ -108,42 +98,6 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
   const addTransactionMutation = useMutation({
     mutationFn: async (data: CreateTransactionData) => {
       return await createTransaction(data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
-    },
-  });
-
-  // Add transfer mutation
-  const addTransferMutation = useMutation({
-    mutationFn: async ({
-      fromAccountId,
-      toAccountId,
-      date,
-      name,
-      amount,
-      subcategoryId,
-      comment,
-    }: {
-      fromAccountId: string;
-      toAccountId: string;
-      date: string;
-      name: string;
-      amount: number;
-      subcategoryId?: string | null;
-      comment?: string | null;
-    }) => {
-      return await createTransfer(
-        fromAccountId,
-        toAccountId,
-        date,
-        name,
-        amount,
-        subcategoryId,
-        comment
-      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
@@ -211,32 +165,6 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
     return result;
   };
 
-  const addTransfer = async (
-    fromAccountId: string,
-    toAccountId: string,
-    date: string,
-    name: string,
-    amount: number,
-    subcategoryId?: string | null,
-    comment?: string | null
-  ) => {
-    const result = await addTransferMutation.mutateAsync({
-      fromAccountId,
-      toAccountId,
-      date,
-      name,
-      amount,
-      subcategoryId,
-      comment,
-    });
-    if (result.success) {
-      toast.success("Transfer created", { description: "Your transfer has been recorded successfully" });
-    } else {
-      toast.error("Failed to create transfer", { description: result.error || "An error occurred" });
-    }
-    return result;
-  };
-
   const editTransaction = async (id: string, updates: UpdateTransactionData) => {
     const result = await updateTransactionMutation.mutateAsync({ id, updates });
     if (result.success) {
@@ -289,7 +217,6 @@ export function useTransactions(initialFilters?: TransactionFilters): UseTransac
     setFilters,
     refresh,
     addTransaction,
-    addTransfer,
     editTransaction,
     removeTransaction,
     bulkRemove,

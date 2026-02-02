@@ -11,8 +11,6 @@ export interface CreateTransactionData {
   amount: number;
   subcategory_id?: string | null;
   comment?: string | null;
-  is_transfer?: boolean;
-  transfer_to_account_id?: string | null;
   ai_suggested?: boolean;
   user_corrected?: boolean;
 }
@@ -24,8 +22,6 @@ export interface UpdateTransactionData {
   amount?: number;
   subcategory_id?: string | null;
   comment?: string | null;
-  is_transfer?: boolean;
-  transfer_to_account_id?: string | null;
   ai_suggested?: boolean;
   user_corrected?: boolean;
 }
@@ -60,7 +56,6 @@ export interface TransactionWithDetails extends Transaction {
   category_id?: string;
   category_name?: string;
   category_type?: string;
-  transfer_to_account_name?: string;
   running_balance?: number;
 }
 
@@ -98,8 +93,6 @@ export async function createTransaction(
         subcategory_id: transactionData.subcategory_id || null,
         comment: transactionData.comment || null,
         is_initial_balance: false,
-        is_transfer: transactionData.is_transfer || false,
-        transfer_to_account_id: transactionData.transfer_to_account_id || null,
         ai_suggested: transactionData.ai_suggested || false,
         user_corrected: transactionData.user_corrected || false,
       })
@@ -111,90 +104,6 @@ export async function createTransaction(
     }
 
     return { success: true, data };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    };
-  }
-}
-
-/**
- * Create a transfer transaction (creates two transactions: one debit, one credit)
- */
-export async function createTransfer(
-  fromAccountId: string,
-  toAccountId: string,
-  date: string,
-  name: string,
-  amount: number,
-  subcategoryId?: string | null,
-  comment?: string | null
-): Promise<{
-  success: boolean;
-  data?: { outgoing: Transaction; incoming: Transaction };
-  error?: string;
-}> {
-  try {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: "User not authenticated" };
-    }
-
-    // Create outgoing transaction (negative amount from source account)
-    const { data: outgoing, error: outgoingError } = await supabase
-      .from("transactions")
-      .insert({
-        user_id: user.id,
-        account_id: fromAccountId,
-        date,
-        name,
-        amount: -Math.abs(amount), // Negative for outgoing
-        subcategory_id: subcategoryId || null,
-        comment,
-        is_initial_balance: false,
-        is_transfer: true,
-        transfer_to_account_id: toAccountId,
-        ai_suggested: false,
-        user_corrected: false,
-      })
-      .select()
-      .single();
-
-    if (outgoingError) {
-      return { success: false, error: outgoingError.message };
-    }
-
-    // Create incoming transaction (positive amount to destination account)
-    const { data: incoming, error: incomingError } = await supabase
-      .from("transactions")
-      .insert({
-        user_id: user.id,
-        account_id: toAccountId,
-        date,
-        name,
-        amount: Math.abs(amount), // Positive for incoming
-        subcategory_id: subcategoryId || null,
-        comment,
-        is_initial_balance: false,
-        is_transfer: true,
-        transfer_to_account_id: fromAccountId,
-        ai_suggested: false,
-        user_corrected: false,
-      })
-      .select()
-      .single();
-
-    if (incomingError) {
-      // Rollback the outgoing transaction if incoming fails
-      await supabase.from("transactions").delete().eq("id", outgoing.id);
-      return { success: false, error: incomingError.message };
-    }
-
-    return { success: true, data: { outgoing, incoming } };
   } catch (error) {
     return {
       success: false,
@@ -286,8 +195,7 @@ export async function getTransactionsWithDetails(
         `
         *,
         account:accounts!account_id(name, type),
-        subcategory:subcategories!subcategory_id(name, category_id, category:categories!category_id(id, name, type)),
-        transfer_account:accounts!transfer_to_account_id(name)
+        subcategory:subcategories!subcategory_id(name, category_id, category:categories!category_id(id, name, type))
       `
       )
       .eq("user_id", user.id)
@@ -332,7 +240,6 @@ export async function getTransactionsWithDetails(
         category_id: string;
         category: { id: string; name: string; type: string } | null;
       } | null;
-      const transferAccount = txn.transfer_account as { name: string } | null;
 
       return {
         ...txn,
@@ -342,11 +249,9 @@ export async function getTransactionsWithDetails(
         category_id: subcategory?.category?.id,
         category_name: subcategory?.category?.name,
         category_type: subcategory?.category?.type,
-        transfer_to_account_name: transferAccount?.name,
         // Remove the nested objects
         account: undefined,
         subcategory: undefined,
-        transfer_account: undefined,
       } as TransactionWithDetails;
     });
 
@@ -467,7 +372,7 @@ export async function getRecentActivityByAccount(): Promise<{
     // Get all accounts
     const { data: accounts, error: accountsError } = await supabase
       .from("accounts")
-      .select("id, name, type, initial_balance")
+      .select("id, name, type")
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .order("created_at", { ascending: true });
@@ -680,7 +585,7 @@ export async function bulkDeleteTransactions(
 
 /**
  * Calculate the running balance for an account at a specific date
- * Formula: initial_balance + SUM(all transactions up to and including the date)
+ * Formula: SUM(all transactions up to and including the date, including initial balance transaction)
  */
 export async function calculateRunningBalance(
   accountId: string,
@@ -803,19 +708,6 @@ export async function getTransactionsWithRunningBalance(
       return { success: false, error: "User not authenticated" };
     }
 
-    // Get account initial balance
-    const { data: account, error: accountError } = await supabase
-      .from("accounts")
-      .select("initial_balance")
-      .eq("id", accountId)
-      .eq("user_id", user.id)
-      .is("deleted_at", null)
-      .single();
-
-    if (accountError) {
-      return { success: false, error: accountError.message };
-    }
-
     // Build query for transactions
     let query = supabase
       .from("transactions")
@@ -840,10 +732,10 @@ export async function getTransactionsWithRunningBalance(
     }
 
     // If we have a start date filter, we need to calculate the balance up to the start date
-    let startingBalance = account.initial_balance;
+    let startingBalance = 0;
 
     if (filters?.startDate) {
-      // Get sum of all transactions before the start date
+      // Get sum of all transactions before the start date (including initial balance transaction)
       const { data: priorTransactions } = await supabase
         .from("transactions")
         .select("amount")
@@ -853,7 +745,7 @@ export async function getTransactionsWithRunningBalance(
         .is("deleted_at", null);
 
       const priorSum = (priorTransactions || []).reduce((sum, txn) => sum + txn.amount, 0);
-      startingBalance += priorSum;
+      startingBalance = priorSum;
     }
 
     // Calculate running balance for each transaction

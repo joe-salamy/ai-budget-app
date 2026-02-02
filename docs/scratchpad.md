@@ -1,12 +1,11 @@
 ### To do
 
 - Fix DB, have it delete unused columns
-  - > accounts: Simplify initial balance as just transaction (Continue this)
   - categories: Why are there system categories? When would those be used?
   - saving_goals: Delete, unneeded table
   - subcategories: Why are there system subcategories?
 - Remove transfers entirely
-  - transactions: Delete transfers entirely, from the entire repo. Delete the "Add Transfer" card from "Input Transactions". In the DB, delete transactions columns is_transfer and transfer_to_account_id
+  - transactions: Delete transfers entirely, from the entire repo. Delete the "Add Transfer" card from "Input Transactions". In the DB, delete columns is_transfer and transfer_to_account_id from the transactions table
 
 ### Overall plan
 
@@ -14,6 +13,7 @@
 - Test backend (debug React with dev tools) (keep existing frontend around for testing)
 - Refactor entire frontend using Stitch
   - Mandatory rules on rewrite: wherever possible, use default shadcn instead of creating my own components, and use default tailwind instead of creating custom css
+  - Before doing this, delete entire frontend
 
 ### General
 
@@ -84,4 +84,5 @@
 
 - Designing UI/UX yourself is useless - just design around functionality, and have Stich/AI design UI
 - Read the logic, AI is retarded
-- Ton of UI/UX fixes are just the z-value. AI is fucking retarded.
+- Ton of UI/UX fixes are just the z-value - AI is fucking retarded
+- Opted for simplicity: remove transaction type (income/expense, users just input sign properly), transfers (AI adding it all anyway, might as well simplify), initial balance (just another transaction)

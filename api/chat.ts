@@ -442,7 +442,7 @@ async function fetchUserContext(supabase: AnySupabaseClient, userId: string): Pr
     }
   });
 
-  // Calculate total balance (sum of account initial balances + all transaction amounts)
+  // Calculate total balance (sum of account transaction amounts)
   const { data: allTransactionsData } = await supabase
     .from("transactions")
     .select("amount")
@@ -616,7 +616,6 @@ async function executeFunctionCall(
           amount,
           subcategory_id: subcategoryId,
           is_initial_balance: false,
-          is_transfer: false,
           ai_suggested: false,
           user_corrected: false,
         });

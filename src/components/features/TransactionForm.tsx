@@ -13,9 +13,6 @@ import type { Account, Category, Subcategory } from "../../types";
 // ============== TYPES ==============
 
 // Removed income/expense distinction - transactions use signed amounts
-// Only keep transfer type for special transfer handling
-export type TransactionType = "transfer";
-
 export interface TransactionFormData {
   date: string;
   account_id: string;
@@ -23,8 +20,6 @@ export interface TransactionFormData {
   amount: string; // Signed value: positive for income, negative for expense
   subcategory_id: string;
   comment: string;
-  // Transfer-specific
-  transfer_to_account_id?: string;
   // AI-related
   ai_suggested?: boolean;
   user_corrected?: boolean;
@@ -41,7 +36,6 @@ interface AICategorizationState {
 }
 
 interface TransactionFormProps {
-  type?: TransactionType; // Optional: only needed for transfer transactions
   accounts: Account[];
   categories: Category[];
   subcategories: Subcategory[];
@@ -55,7 +49,6 @@ interface TransactionFormProps {
 // ============== COMPONENT ==============
 
 export function TransactionForm({
-  type,
   accounts,
   categories,
   subcategories,
@@ -76,7 +69,6 @@ export function TransactionForm({
     amount: initialData?.amount || "",
     subcategory_id: initialData?.subcategory_id || "",
     comment: initialData?.comment || "",
-    transfer_to_account_id: initialData?.transfer_to_account_id || "",
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof TransactionFormData, string>>>({});
@@ -121,16 +113,6 @@ export function TransactionForm({
       label: `${acc.name} (${acc.type === "asset" ? "Asset" : "Liability"})`,
     }));
   }, [accounts]);
-
-  // Build transfer destination account options (exclude source account)
-  const transferAccountOptions: SelectOption[] = useMemo(() => {
-    return accounts
-      .filter((acc) => acc.id !== formData.account_id)
-      .map((acc) => ({
-        value: acc.id,
-        label: `${acc.name} (${acc.type === "asset" ? "Asset" : "Liability"})`,
-      }));
-  }, [accounts, formData.account_id]);
 
   // Build subcategory options (grouped by category)
   const subcategoryOptions: SelectOption[] = useMemo(() => {
@@ -319,7 +301,6 @@ export function TransactionForm({
     formData.amount,
     aiState.source,
     aiState.suggestion,
-    type,
     categories,
     subcategories,
     getAccountName,
@@ -400,17 +381,9 @@ export function TransactionForm({
       newErrors.amount = "Amount cannot be zero";
     }
 
-    if (type === "transfer" && !formData.transfer_to_account_id) {
-      newErrors.transfer_to_account_id = "Destination account is required";
-    }
-
-    if (type === "transfer" && formData.account_id === formData.transfer_to_account_id) {
-      newErrors.transfer_to_account_id = "Cannot transfer to the same account";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData, type]);
+  }, [formData]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -454,7 +427,6 @@ export function TransactionForm({
         amount: "",
         subcategory_id: "",
         comment: "",
-        transfer_to_account_id: "",
       });
       setAIState({
         source: "none",
@@ -483,7 +455,6 @@ export function TransactionForm({
       formData.amount,
       formData.subcategory_id,
       formData.comment,
-      formData.transfer_to_account_id,
     ],
     enabled: !!onAutoSave,
   });
@@ -504,9 +475,9 @@ export function TransactionForm({
           fullWidth
         />
 
-        {/* Account (source for transfers) */}
+        {/* Account */}
         <SimpleSelect
-          label={type === "transfer" ? "From Account" : "Account"}
+          label="Account"
           options={accountOptions}
           value={formData.account_id}
           onChange={(value) => handleChange("account_id", value)}
@@ -514,19 +485,6 @@ export function TransactionForm({
           error={errors.account_id}
         />
       </div>
-
-      {/* Transfer destination account */}
-      {type === "transfer" && (
-        <SimpleSelect
-          label="To Account"
-          options={transferAccountOptions}
-          value={formData.transfer_to_account_id || ""}
-          onChange={(value) => handleChange("transfer_to_account_id", value)}
-          placeholder="Select destination account"
-          error={errors.transfer_to_account_id}
-          disabled={!formData.account_id}
-        />
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Name / Description */}
@@ -560,7 +518,7 @@ export function TransactionForm({
         {/* Subcategory */}
         <div>
           <SimpleSelect
-            label={`Subcategory${type === "transfer" ? " (Optional)" : ""}`}
+            label="Subcategory"
             options={subcategoryOptions}
             value={formData.subcategory_id}
             onChange={handleSubcategoryChange}

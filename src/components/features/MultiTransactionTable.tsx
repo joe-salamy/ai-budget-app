@@ -34,7 +34,6 @@ interface MultiTransactionTableProps {
   subcategories: Subcategory[];
   onSubmit: (transactions: TransactionRowData[]) => Promise<{ success: boolean; error?: string }>;
   isLoading?: boolean;
-  onTransferClick?: () => void;
 }
 
 // Generate unique ID for rows
@@ -66,7 +65,6 @@ export function MultiTransactionTable({
   subcategories,
   onSubmit,
   isLoading = false,
-  onTransferClick,
 }: MultiTransactionTableProps) {
   // Initialize with 3 empty rows
   const [rows, setRows] = useState<TransactionRowData[]>(() => [
@@ -907,16 +905,9 @@ export function MultiTransactionTable({
 
       {/* Action buttons row */}
       <div className="flex items-center justify-between pt-2">
-        <div className="flex gap-2">
-          <Button type="button" variant="secondary" onClick={() => setShowClearConfirm(true)}>
-            Clear All
-          </Button>
-          {onTransferClick && (
-            <Button type="button" variant="secondary" onClick={onTransferClick}>
-              Add Transfer
-            </Button>
-          )}
-        </div>
+        <Button type="button" variant="secondary" onClick={() => setShowClearConfirm(true)}>
+          Clear All
+        </Button>
         <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
           Add All Transactions
         </Button>

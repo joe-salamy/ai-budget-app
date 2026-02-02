@@ -73,7 +73,7 @@ export async function prepareNetWorthData(
     // Get all accounts
     const { data: accounts, error: accountsError } = await supabase
       .from("accounts")
-      .select("id, name, type, initial_balance")
+      .select("id, name, type")
       .eq("user_id", user.id)
       .is("deleted_at", null)
       .order("type", { ascending: true })
