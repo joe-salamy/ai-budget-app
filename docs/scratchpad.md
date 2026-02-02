@@ -1,11 +1,6 @@
 ### To do
 
-- Fix DB, have it delete unused columns
-  - categories: Why are there system categories? When would those be used?
-  - saving_goals: Delete, unneeded table
-  - subcategories: Why are there system subcategories?
-- Remove transfers entirely
-  - transactions: Delete transfers entirely, from the entire repo. Delete the "Add Transfer" card from "Input Transactions". In the DB, delete columns is_transfer and transfer_to_account_id from the transactions table
+- Fix supabase warnings
 
 ### Overall plan
 
@@ -13,7 +8,6 @@
 - Test backend (debug React with dev tools) (keep existing frontend around for testing)
 - Refactor entire frontend using Stitch
   - Mandatory rules on rewrite: wherever possible, use default shadcn instead of creating my own components, and use default tailwind instead of creating custom css
-  - Before doing this, delete entire frontend
 
 ### General
 

@@ -75,20 +75,6 @@ export interface SpendingGoal {
   deleted_at: string | null;
 }
 
-export interface SavingGoal {
-  id: string;
-  user_id: string;
-  name: string;
-  target_amount: number | null;
-  target_date: string | null;
-  current_amount: number;
-  account_id: string | null;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  completed_at: string | null;
-}
-
 export interface AICorrection {
   id: string;
   user_id: string;

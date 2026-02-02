@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../lib/queryKeys";
 import { getAccounts } from "../services/accounts";
 import { getCategories, getSubcategories } from "../services/categories";
-import { getSpendingGoalsWithDetails, getSavingGoalsWithDetails } from "../services/goals";
+import { getSpendingGoalsWithDetails } from "../services/goals";
 import { getTransactionsWithDetails, getRecentActivityByAccount } from "../services/transactions";
 import { useAuth } from "./useAuth";
 
@@ -71,19 +71,6 @@ export function usePrefetchOtherPages(dashboardLoading: boolean) {
         const response = await getSpendingGoalsWithDetails();
         if (!response.success) {
           throw new Error(response.error || "Failed to fetch spending goals");
-        }
-        return response.data || [];
-      },
-      staleTime: 5 * 60 * 1000,
-    });
-
-    // Prefetch saving goals (used by Goals page)
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.goals.saving.list(),
-      queryFn: async () => {
-        const response = await getSavingGoalsWithDetails();
-        if (!response.success) {
-          throw new Error(response.error || "Failed to fetch saving goals");
         }
         return response.data || [];
       },

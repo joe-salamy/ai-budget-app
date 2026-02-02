@@ -262,44 +262,6 @@ export type Database = {
           updated_at?: string;
         };
       };
-      saving_goals: {
-        Row: {
-          id: string;
-          user_id: string;
-          name: string;
-          target_amount: number | null;
-          target_date: string | null;
-          current_amount: number;
-          account_id: string | null;
-          created_at: string;
-          updated_at: string;
-          completed_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          name: string;
-          target_amount?: number | null;
-          target_date?: string | null;
-          current_amount?: number;
-          account_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-          completed_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          name?: string;
-          target_amount?: number | null;
-          target_date?: string | null;
-          current_amount?: number;
-          account_id?: string | null;
-          created_at?: string;
-          updated_at?: string;
-          completed_at?: string | null;
-        };
-      };
       ai_corrections: {
         Row: {
           id: string;

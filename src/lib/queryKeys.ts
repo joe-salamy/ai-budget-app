@@ -25,10 +25,6 @@ export const queryKeys = {
       all: ["spending-goals"] as const,
       list: () => [...queryKeys.goals.spending.all, "list"] as const,
     },
-    saving: {
-      all: ["saving-goals"] as const,
-      list: () => [...queryKeys.goals.saving.all, "list"] as const,
-    },
   },
   dashboard: {
     all: ["dashboard"] as const,

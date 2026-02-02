@@ -207,57 +207,12 @@ const AVAILABLE_FUNCTIONS = [
     },
   },
   {
-    name: "create_saving_goal",
-    description: "Create a new saving goal to track progress towards a financial target",
-    parameters: {
-      type: "object",
-      properties: {
-        name: {
-          type: "string",
-          description: "Name of the saving goal (e.g., 'Emergency Fund', 'Vacation')",
-        },
-        target_amount: {
-          type: "number",
-          description: "Target amount to save (optional if target_date provided)",
-        },
-        target_date: {
-          type: "string",
-          description:
-            "Target date to reach the goal in YYYY-MM-DD format (optional if target_amount provided)",
-        },
-        current_amount: {
-          type: "number",
-          description: "Amount already saved towards this goal (default: 0)",
-        },
-      },
-      required: ["name"],
-    },
-  },
-  {
-    name: "get_goals_summary",
-    description: "Get a summary of all spending and saving goals with their progress",
+    name: "get_spending_goals_summary",
+    description: "Get a summary of all spending goals with their budgets and periods",
     parameters: {
       type: "object",
       properties: {},
       required: [],
-    },
-  },
-  {
-    name: "add_to_saving_goal",
-    description: "Add an amount to a saving goal's progress",
-    parameters: {
-      type: "object",
-      properties: {
-        goal_name: {
-          type: "string",
-          description: "Name of the saving goal",
-        },
-        amount: {
-          type: "number",
-          description: "Amount to add to the goal",
-        },
-      },
-      required: ["goal_name", "amount"],
     },
   },
 ];
@@ -808,50 +763,7 @@ async function executeFunctionCall(
         };
       }
 
-      case "create_saving_goal": {
-        const {
-          name: goalName,
-          target_amount,
-          target_date,
-          current_amount,
-        } = args as {
-          name: string;
-          target_amount?: number;
-          target_date?: string;
-          current_amount?: number;
-        };
-
-        if (!target_amount && !target_date) {
-          return {
-            success: false,
-            message: "Either target amount or target date must be specified",
-          };
-        }
-
-        const { error } = await supabase.from("saving_goals").insert({
-          user_id: userId,
-          name: goalName,
-          target_amount: target_amount || null,
-          target_date: target_date || null,
-          current_amount: current_amount || 0,
-        });
-
-        if (error) {
-          return { success: false, message: `Failed to create saving goal: ${error.message}` };
-        }
-
-        let description = `Created saving goal "${goalName}"`;
-        if (target_amount) {
-          description += ` with target of $${target_amount.toFixed(2)}`;
-        }
-        if (target_date) {
-          description += ` by ${target_date}`;
-        }
-
-        return { success: true, message: description };
-      }
-
-      case "get_goals_summary": {
+      case "get_spending_goals_summary": {
         // Fetch spending goals
         const { data: spendingGoals } = await supabase
           .from("spending_goals")
@@ -866,13 +778,6 @@ async function executeFunctionCall(
           )
           .eq("user_id", userId);
 
-        // Fetch saving goals
-        const { data: savingGoals } = await supabase
-          .from("saving_goals")
-          .select("*")
-          .eq("user_id", userId)
-          .is("completed_at", null);
-
         const spendingSummary = (spendingGoals || []).map((g) => {
           const sub = g.subcategories as unknown as { name: string; categories: { name: string } };
           return {
@@ -883,74 +788,13 @@ async function executeFunctionCall(
           };
         });
 
-        const savingSummary = (savingGoals || []).map((g) => ({
-          name: g.name,
-          targetAmount: g.target_amount,
-          targetDate: g.target_date,
-          currentAmount: g.current_amount,
-          percentComplete: g.target_amount
-            ? Math.round((g.current_amount / g.target_amount) * 100)
-            : null,
-        }));
-
         return {
           success: true,
-          message: `Found ${spendingSummary.length} spending goals and ${savingSummary.length} saving goals`,
+          message: `Found ${spendingSummary.length} spending goals`,
           data: {
             spendingGoals: spendingSummary,
-            savingGoals: savingSummary,
           },
         };
-      }
-
-      case "add_to_saving_goal": {
-        const { goal_name, amount: addAmount } = args as {
-          goal_name: string;
-          amount: number;
-        };
-
-        // Find the goal
-        const { data: goal, error: findError } = await supabase
-          .from("saving_goals")
-          .select("id, name, current_amount, target_amount")
-          .eq("user_id", userId)
-          .ilike("name", goal_name)
-          .is("completed_at", null)
-          .single();
-
-        if (findError || !goal) {
-          return { success: false, message: `Saving goal "${goal_name}" not found` };
-        }
-
-        const newAmount = (goal.current_amount || 0) + addAmount;
-        const updates: { current_amount: number; completed_at?: string } = {
-          current_amount: newAmount,
-        };
-
-        // Auto-complete if target reached
-        if (goal.target_amount && newAmount >= goal.target_amount) {
-          updates.completed_at = new Date().toISOString();
-        }
-
-        const { error: updateError } = await supabase
-          .from("saving_goals")
-          .update(updates)
-          .eq("id", goal.id);
-
-        if (updateError) {
-          return { success: false, message: `Failed to update goal: ${updateError.message}` };
-        }
-
-        let message = `Added $${addAmount.toFixed(2)} to "${goal.name}". New total: $${newAmount.toFixed(2)}`;
-        if (goal.target_amount) {
-          const percent = Math.round((newAmount / goal.target_amount) * 100);
-          message += ` (${percent}% of $${goal.target_amount.toFixed(2)} target)`;
-          if (newAmount >= goal.target_amount) {
-            message += " - Goal completed!";
-          }
-        }
-
-        return { success: true, message };
       }
 
       default:
