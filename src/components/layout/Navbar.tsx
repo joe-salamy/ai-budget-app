@@ -77,6 +77,7 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             {/* AI Assistant Button */}
             <button
+              type="button"
               onClick={togglePanel}
               className={cn(
                 "flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium border whitespace-nowrap",
@@ -87,7 +88,7 @@ export function Navbar() {
               )}
               aria-label="Toggle AI Assistant (Ctrl+K)"
               title="Toggle AI Assistant (Ctrl+K)"
-              aria-pressed={chatPanelOpen}
+              {...(chatPanelOpen ? { "aria-pressed": true } : { "aria-pressed": false })}
             >
               <Bot className="h-4 w-4" />
               <span className="hidden sm:inline">AI Assistant</span>
@@ -98,10 +99,11 @@ export function Navbar() {
 
             {/* Mobile Menu Button */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden rounded-lg p-2 text-foreground/80 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label="Open menu"
-              aria-expanded={mobileMenuOpen}
+              {...(mobileMenuOpen ? { "aria-expanded": true } : { "aria-expanded": false })}
             >
               <Menu className="h-6 w-6" />
             </button>

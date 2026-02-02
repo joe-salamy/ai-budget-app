@@ -1,7 +1,5 @@
 ### To do
 
-- Fix supabase warnings
-
 ### Overall plan
 
 - Create AI chatbot functionality
@@ -40,8 +38,6 @@
 
 ### Dashboard
 
-- **Sankey**: Fix colors, text overlaps, don't like savings bar (delete)
-  - Ensure shows only from start date to end date
 - **Diagrams**: Add button to expand to full screen? Detailed view?
 
 ### Setup
@@ -58,7 +54,6 @@
 
 - **Data export**: Download as csv
 - **Running balance**: Doesn't calculate properly, annoying
-- **Initial balance**: Treat just like any other transaction, this is retarded+
 
 ### Checklist
 

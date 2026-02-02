@@ -166,10 +166,7 @@ export function NetWorthChart({ data, accounts, loading }: NetWorthChartProps) {
           axisLine={{ stroke: "#4b5563" }}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Legend
-          wrapperStyle={{ paddingTop: 10 }}
-          formatter={(value) => <span className="text-foreground text-sm">{value}</span>}
-        />
+        <Legend formatter={(value) => <span className="text-foreground text-sm">{value}</span>} />
 
         {/* Net Worth line - always shown prominently */}
         <Line
