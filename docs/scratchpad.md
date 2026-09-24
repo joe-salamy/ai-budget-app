@@ -1,5 +1,8 @@
 ### To do
 
+For budget app: all statement parsing as LLM call, maybe nano for first round, then send to existing transactions, then back to LLM?
+There's flags that break the regex, like transaction eligible for pay over time
+
 ### Overall plan
 
 - Create AI chatbot functionality
@@ -21,6 +24,7 @@
 
 - **Categorize after startup**: Desired first user action is copy/paste transaction history into AI - how to get these all right, w/o user data? That's the wow moment.
 - **Agent design**: Model? Langgraph? Logging? Handle multiple actions, task queue?
+  - --> [LangChain deepagents](https://x.com/LangChain_JS/status/2018346035240923577)
 - **Bulk transaction logic**:
   1. Paste transactions
   2. AI identifies block, sends to function
@@ -75,3 +79,14 @@
 - Read the logic, AI is retarded
 - Ton of UI/UX fixes are just the z-value - AI is fucking retarded
 - Opted for simplicity: remove transaction type (income/expense, users just input sign properly), transfers (AI adding it all anyway, might as well simplify), initial balance (just another transaction)
+
+### Another checklist
+
+→ Rate limits
+→ Row Level Security
+→ CAPTCHA on auth + forms
+→ Server-side validation
+→ API keys secured
+→ Env vars set properly
+→ CORS restrictions
+→ Dependency audit
